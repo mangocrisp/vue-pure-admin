@@ -50,6 +50,7 @@ export default defineFakeRoute([
       if (body.phone) list = list.filter(item => item.phone === body.phone);
       if (body.deptId) list = list.filter(item => item.dept.id === body.deptId);
       return {
+        mock: true,
         success: true,
         data: {
           list,
@@ -66,6 +67,7 @@ export default defineFakeRoute([
     method: "get",
     response: () => {
       return {
+        mock: true,
         success: true,
         data: [
           { id: 1, name: "超级管理员" },
@@ -82,17 +84,20 @@ export default defineFakeRoute([
       if (body.userId) {
         if (body.userId == 1) {
           return {
+            mock: true,
             success: true,
             data: [1]
           };
         } else if (body.userId == 2) {
           return {
+            mock: true,
             success: true,
             data: [2]
           };
         }
       } else {
         return {
+          mock: true,
           success: false,
           data: []
         };
@@ -130,6 +135,7 @@ export default defineFakeRoute([
       );
       if (body.code) list = list.filter(item => item.code === body.code);
       return {
+        mock: true,
         success: true,
         data: {
           list,
@@ -146,6 +152,7 @@ export default defineFakeRoute([
     method: "post",
     response: () => {
       return {
+        mock: true,
         success: true,
         data: [
           // 外部页面
@@ -350,6 +357,7 @@ export default defineFakeRoute([
     response: ({ body }) => {
       if (body.id == 1) {
         return {
+          mock: true,
           success: true,
           data: [
             100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 200, 201,
@@ -359,6 +367,7 @@ export default defineFakeRoute([
         };
       } else if (body.id == 2) {
         return {
+          mock: true,
           success: true,
           data: [
             100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 404, 500,
@@ -374,6 +383,7 @@ export default defineFakeRoute([
     method: "post",
     response: () => {
       return {
+        mock: true,
         success: true,
         data: [
           // 外部页面
@@ -1255,6 +1265,7 @@ export default defineFakeRoute([
     method: "post",
     response: () => {
       return {
+        mock: true,
         success: true,
         data: [
           {
@@ -1418,6 +1429,7 @@ export default defineFakeRoute([
       ];
       list = list.filter(item => item.username.includes(body?.username));
       return {
+        mock: true,
         success: true,
         data: {
           list,
@@ -1462,6 +1474,7 @@ export default defineFakeRoute([
         String(item.status).includes(String(body?.status))
       );
       return {
+        mock: true,
         success: true,
         data: {
           list,
@@ -1508,6 +1521,7 @@ export default defineFakeRoute([
         String(item.status).includes(String(body?.status))
       );
       return {
+        mock: true,
         success: true,
         data: {
           list,
@@ -1566,6 +1580,7 @@ export default defineFakeRoute([
       ];
       list = list.filter(item => item.module.includes(body?.module));
       return {
+        mock: true,
         success: true,
         data: {
           list,

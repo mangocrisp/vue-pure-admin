@@ -33,6 +33,7 @@ export default defineFakeRoute([
     method: "get",
     response: () => {
       return {
+        mock: true,
         success: true,
         data: mapList()
       };

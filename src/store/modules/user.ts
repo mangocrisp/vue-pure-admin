@@ -7,14 +7,15 @@ import {
   routerArrays,
   storageLocal
 } from "../utils";
-import {
+import User, {
   type UserResult,
   type RefreshTokenResult,
-  getLogin,
   refreshTokenApi
 } from "@/api/user";
 import { useMultiTagsStoreHook } from "./multiTags";
 import { type DataInfo, setToken, removeToken, userKey } from "@/utils/auth";
+import { useEncrypt } from "@/hooks";
+import Auth from "@/api/auth";
 
 export const useUserStore = defineStore("pure-user", {
   state: (): userType => ({
@@ -76,12 +77,41 @@ export const useUserStore = defineStore("pure-user", {
       this.loginDay = Number(value);
     },
     /** 登入 */
-    async loginByUsername(data) {
-      return new Promise<UserResult>((resolve, reject) => {
-        getLogin(data)
-          .then(data => {
-            if (data?.success) setToken(data.data);
-            resolve(data);
+    async loginByUsername(params) {
+      return new Promise<UserResult>(async (resolve, reject) => {
+        Auth.login({
+          ...params,
+          password: await useEncrypt().encrypt(params.password),
+          grant_type: "taybct",
+          scope: "all"
+        })
+          .then(async res => {
+            console.log(res);
+            const { data: loginResult } = res;
+            setToken({
+              accessToken: loginResult.access_token,
+              refreshToken: loginResult.refresh_token,
+              expires: new Date(
+                loginResult.expires_in * 1000 + new Date().getTime()
+              )
+            });
+            const { data: myInfo } = await User.myInfo();
+            console.log(myInfo);
+            resolve({
+              success: true,
+              data: {
+                avatar: myInfo.avatar,
+                username: myInfo.username,
+                nickname: myInfo.nickname,
+                roles: myInfo.roles,
+                permissions: undefined,
+                accessToken: loginResult.access_token,
+                refreshToken: loginResult.refresh_token,
+                expires: new Date(
+                  loginResult.expires_in * 1000 + new Date().getTime()
+                )
+              }
+            });
           })
           .catch(error => {
             reject(error);

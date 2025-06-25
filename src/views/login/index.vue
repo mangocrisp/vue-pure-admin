@@ -58,8 +58,8 @@ const { title, getDropdownItemStyle, getDropdownItemClass } = useNav();
 const { locale, translationCh, translationEn } = useTranslationLang();
 
 const ruleForm = reactive({
-  username: "admin",
-  password: "admin123",
+  username: "root",
+  password: "123456",
   verifyCode: ""
 });
 
@@ -208,7 +208,8 @@ watch(loginDay, value => {
             </Motion>
 
             <Motion :delay="150">
-              <el-form-item prop="password">
+              <!--<el-form-item prop="password">-->
+              <el-form-item>
                 <el-input
                   v-model="ruleForm.password"
                   clearable

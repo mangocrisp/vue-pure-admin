@@ -8,6 +8,7 @@ export default defineFakeRoute([
     response: ({ body }) => {
       if (body.username === "admin") {
         return {
+          mock: true,
           success: true,
           data: {
             avatar: "https://avatars.githubusercontent.com/u/44761321",
@@ -24,6 +25,7 @@ export default defineFakeRoute([
         };
       } else {
         return {
+          mock: true,
           success: true,
           data: {
             avatar: "https://avatars.githubusercontent.com/u/52823142",

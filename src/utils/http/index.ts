@@ -1,7 +1,7 @@
 import Axios, {
   type AxiosInstance,
-  type AxiosRequestConfig,
-  type CustomParamsSerializer
+  type AxiosRequestConfig
+  // ,type CustomParamsSerializer
 } from "axios";
 import type {
   PureHttpError,
@@ -9,25 +9,43 @@ import type {
   PureHttpResponse,
   PureHttpRequestConfig
 } from "./types.d";
-import { stringify } from "qs";
+// import { stringify } from "qs";
 import NProgress from "../progress";
 import { getToken, formatToken } from "@/utils/auth";
 import { useUserStoreHook } from "@/store/modules/user";
+import cancelRepeatRequest from "./cancelRepeatRequest";
+import { ElMessage, ElNotification } from "element-plus";
 
 // 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
 const defaultConfig: AxiosRequestConfig = {
   // 请求超时时间
-  timeout: 10000,
-  headers: {
-    Accept: "application/json, text/plain, */*",
-    "Content-Type": "application/json",
-    "X-Requested-With": "XMLHttpRequest"
-  },
+  timeout: 60000
+  // headers: {
+  //   Accept: "application/json, text/plain, */*",
+  //   "Content-Type": "application/json",
+  //   "X-Requested-With": "XMLHttpRequest"
+  // },
   // 数组格式参数序列化（https://github.com/axios/axios/issues/5142）
-  paramsSerializer: {
-    serialize: stringify as unknown as CustomParamsSerializer
-  }
+  // paramsSerializer: {
+  //   serialize: stringify as unknown as CustomParamsSerializer
+  // }
 };
+
+/** 服务响应正常code */
+export const resultCode = "200";
+
+/** 文件响应类型(一般情况下响应为数据流, 不存在响应码, 所以不进行拦截) */
+export const fileResHeaders: string[] = ["application/octet-stream"];
+
+export type ResponseBody = Res<any>;
+
+/**
+ * 用于响应拦截文件类型
+ * @param fileType 文件类型
+ * @param interceptType 拦截类型
+ */
+export const interceptFileType = (fileType: string, interceptType: string[]) =>
+  interceptType.some(header => fileType?.indexOf(header) > -1);
 
 class PureHttp {
   constructor() {
@@ -72,6 +90,16 @@ class PureHttp {
           PureHttp.initConfig.beforeRequestCallback(config);
           return config;
         }
+        // 存储请求，防止重复请求
+        cancelRepeatRequest.set(config);
+        // 查询参数为空串改为undefine, 达到不传递到后端的要求
+        if (config.params) {
+          Object.entries(config.params).reduce((acc, [key, value]) => {
+            if (value === "") acc[key] = undefined;
+            return acc;
+          }, config.params);
+        }
+
         /** 请求白名单，放置一些不需要`token`的接口（通过设置请求白名单，防止`token`过期后再请求造成的死循环问题） */
         const whiteList = ["/refresh-token", "/login"];
         return whiteList.some(url => config.url.endsWith(url))
@@ -110,6 +138,9 @@ class PureHttp {
             });
       },
       error => {
+        if (error?.config) {
+          cancelRepeatRequest.del(error.config);
+        }
         return Promise.reject(error);
       }
     );
@@ -119,8 +150,11 @@ class PureHttp {
   private httpInterceptorsResponse(): void {
     const instance = PureHttp.axiosInstance;
     instance.interceptors.response.use(
-      (response: PureHttpResponse) => {
+      (response: PureHttpResponse, option = { fileResHeaders }) => {
         const $config = response.config;
+        const { data, headers } = response || {};
+        const { code = "", message = "", success = undefined } = data || {};
+        cancelRepeatRequest.del($config);
         // 关闭进度条动画
         NProgress.done();
         // 优先判断post/get等方法是否传入回调，否则执行初始化设置等回调
@@ -132,10 +166,72 @@ class PureHttp {
           PureHttp.initConfig.beforeResponseCallback(response);
           return response.data;
         }
-        return response.data;
+        // 这个是 mock 才会返回的结果，这里直接按原来框架的结果返回
+        if (success !== undefined) {
+          return response.data;
+        }
+        /** 特殊响应类型拦截 */
+        if (interceptFileType(headers?.["content-type"], option.fileResHeaders))
+          return response;
+        if (code === resultCode) {
+          return response;
+        } else {
+          ElNotification({
+            title: code ? `业务状态码: ${String(code)}` : "未知业务状态码",
+            message: message || "接口异常",
+            type: "error"
+          });
+          return Promise.reject(response);
+        }
       },
-      (error: PureHttpError) => {
+      (error: PureHttpError<ResponseBody>) => {
         const $error = error;
+        if ($error?.config) {
+          cancelRepeatRequest.del($error.config);
+        }
+        if (error.code === "ERR_CANCELED") {
+          // ElNotification({
+          //   title: '重复查询',
+          //   message: '请等待查询响应后, 再重试!',
+          //   type: 'error'
+          // })
+          return Promise.reject(error);
+        }
+        if (error.code === "ECONNABORTED") {
+          ElNotification({
+            title: "请求超时",
+            message: "请稍后重试!",
+            type: "error"
+          });
+        } else if (error.response?.status === 400) {
+          ElNotification({
+            title: "参数错误",
+            message: error.response?.data?.message ?? "请求出错",
+            type: "error"
+          });
+        } else if (error.response?.status === 401) {
+          if (error.config?.url === "/auth/oauth/login")
+            return Promise.reject(error);
+          // TODO 重复登录操作
+          // return userStore
+          //   .reLogin()
+          //   .then(() => Service.request(error.config))
+          //   .catch(() => router.replace("/login"));
+        } else if (error.response?.status === 500) {
+          ElNotification({
+            title: "服务出错",
+            message: error.response?.data?.message ?? "请稍后重试!",
+            type: "error"
+          });
+        } else if (error.response?.status === 503) {
+          ElNotification({
+            title: "服务离线",
+            message: error.response?.data?.message ?? "请稍后重试!",
+            type: "error"
+          });
+        } else {
+          ElMessage.error(error.response?.data?.message ?? "请求出错");
+        }
         $error.isCancelRequest = Axios.isCancel($error);
         // 关闭进度条动画
         NProgress.done();
@@ -143,6 +239,13 @@ class PureHttp {
         return Promise.reject($error);
       }
     );
+  }
+  /**
+   * 获取到当前`Axios`实例对象
+   * @returns 当前`Axios`实例对象
+   */
+  public service() {
+    return PureHttp.axiosInstance;
   }
 
   /** 通用请求工具函数 */

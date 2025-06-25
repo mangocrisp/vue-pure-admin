@@ -8,6 +8,7 @@ export default defineFakeRoute([
     method: "get",
     response: () => {
       return {
+        mock: true,
         success: true,
         data: {
           avatar: "https://avatars.githubusercontent.com/u/44761321",
@@ -46,6 +47,7 @@ export default defineFakeRoute([
         }
       ];
       return {
+        mock: true,
         success: true,
         data: {
           list,

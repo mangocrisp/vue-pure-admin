@@ -8,6 +8,7 @@ export default defineFakeRoute([
     response: ({ body }) => {
       if (body.refreshToken) {
         return {
+          mock: true,
           success: true,
           data: {
             accessToken: "eyJhbGciOiJIUzUxMiJ9.newAdmin",
@@ -18,6 +19,7 @@ export default defineFakeRoute([
         };
       } else {
         return {
+          mock: true,
           success: false,
           data: {}
         };

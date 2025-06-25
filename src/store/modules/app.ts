@@ -7,6 +7,7 @@ import {
   deviceDetection,
   responsiveStorageNameSpace
 } from "../utils";
+import { EncryptType } from "../types";
 
 export const useAppStore = defineStore("pure-app", {
   state: (): appType => ({
@@ -30,7 +31,8 @@ export const useAppStore = defineStore("pure-app", {
       height: document.documentElement.clientHeight
     },
     // 作用于 src/views/components/draggable/index.vue 页面，当离开页面并不会销毁 new Swap()，sortablejs 官网也没有提供任何销毁的 api
-    sortSwap: false
+    sortSwap: false,
+    encryptType: EncryptType.SM2
   }),
   getters: {
     getSidebarStatus(state) {

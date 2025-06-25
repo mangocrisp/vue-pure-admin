@@ -1,5 +1,11 @@
 import type { RouteRecordName } from "vue-router";
 
+/** 加密方式 */
+export enum EncryptType {
+  RSA,
+  SM2
+}
+
 export type cacheType = {
   mode: string;
   name?: RouteRecordName;
@@ -21,6 +27,8 @@ export type appType = {
   device: string;
   viewportSize: { width: number; height: number };
   sortSwap: boolean;
+  /** 加密类型 */
+  encryptType: EncryptType;
 };
 
 export type multiType = {
