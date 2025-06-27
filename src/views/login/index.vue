@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
 import Motion from "./utils/motion";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { message } from "@/utils/message";
 import { loginRules } from "./utils/rule";
 import TypeIt from "@/components/ReTypeit";
@@ -20,7 +20,7 @@ import { useUserStoreHook } from "@/store/modules/user";
 import { initRouter, getTopMenu } from "@/router/utils";
 import { bg, avatar, illustration } from "./utils/static";
 import { ReImageVerify } from "@/components/ReImageVerify";
-import { ref, toRaw, reactive, watch, computed } from "vue";
+import { ref, toRaw, reactive, watch, computed, onMounted } from "vue";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import { useTranslationLang } from "@/layout/hooks/useTranslationLang";
 import { useDataThemeChange } from "@/layout/hooks/useDataThemeChange";
@@ -33,6 +33,9 @@ import Check from "~icons/ep/check";
 import User from "~icons/ri/user-3-fill";
 import Info from "~icons/ri/information-line";
 import Keyhole from "~icons/ri/shield-keyhole-line";
+import { useToggle } from "@/hooks/web/useToggle";
+import Auth from "@/api/auth";
+import board from "@/router/modules/board";
 
 defineOptions({
   name: "Login"
@@ -57,11 +60,48 @@ dataThemeChange(overallStyle.value);
 const { title, getDropdownItemStyle, getDropdownItemClass } = useNav();
 const { locale, translationCh, translationEn } = useTranslationLang();
 
+const route = useRoute();
+
 const ruleForm = reactive({
   username: "root",
   password: "123456",
-  verifyCode: ""
+  verifyCode: "",
+  captcha_code: "",
+  captcha_uuid: ""
 });
+
+const image = ref("");
+
+const [hasCaptcha, setHasCaptcha] = useToggle(true);
+
+onMounted(() => {
+  getEnableCaptcha();
+});
+
+const getEnableCaptcha = async () => {
+  try {
+    const { data } = await Auth.enableCaptcha();
+    setHasCaptcha(data);
+    data && (await getCaptcha());
+  } catch (error) {
+    console.error("error =>", error);
+  }
+};
+
+const getCaptcha = async () => {
+  try {
+    const { data } = await Auth.captcha();
+    image.value = `data:image;base64,${data.captcha_img}`;
+    ruleForm.captcha_uuid = data.captcha_uuid;
+    ruleForm.captcha_code = "";
+  } catch (error) {
+    console.error("error =>", error);
+  }
+};
+
+const refreshCode = () => {
+  getCaptcha();
+};
 
 const onLogin = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
@@ -71,22 +111,47 @@ const onLogin = async (formEl: FormInstance | undefined) => {
       useUserStoreHook()
         .loginByUsername({
           username: ruleForm.username,
-          password: ruleForm.password
+          password: ruleForm.password,
+          captcha_code: ruleForm.captcha_code,
+          captcha_uuid: ruleForm.captcha_uuid
         })
         .then(res => {
           if (res.success) {
             // 获取后端路由
-            return initRouter().then(() => {
-              disabled.value = true;
-              router
-                .push(getTopMenu(true).path)
-                .then(() => {
+            return initRouter().then(async () => {
+              try {
+                disabled.value = true;
+                const redirect =
+                  (route?.query?.redirect as string) ?? getTopMenu(true).path;
+                if (redirect.startsWith("http")) {
+                  window.location.href = redirect;
+                } else if (redirect.startsWith("base64:")) {
+                  window.location.href = window.atob(redirect.substring(7));
+                } else if (redirect.startsWith("URIComponent:")) {
+                  window.location.href = decodeURIComponent(
+                    redirect.substring(13)
+                  );
+                } else {
+                  await router.push({ path: redirect });
                   message(t("login.pureLoginSuccess"), { type: "success" });
-                })
-                .finally(() => (disabled.value = false));
+                }
+              } finally {
+                disabled.value = false;
+              }
             });
           } else {
             message(t("login.pureLoginFail"), { type: "error" });
+            // 需要输入验证码时
+            if (hasCaptcha.value) {
+              refreshCode();
+            }
+          }
+        })
+        .catch(error => {
+          message(t("login.pureLoginFail"), { type: "error" });
+          // 需要输入验证码时
+          if (hasCaptcha.value) {
+            refreshCode();
           }
         })
         .finally(() => (loading.value = false));
@@ -221,7 +286,7 @@ watch(loginDay, value => {
             </Motion>
 
             <Motion :delay="200">
-              <el-form-item prop="verifyCode">
+              <!-- <el-form-item prop="verifyCode">
                 <el-input
                   v-model="ruleForm.verifyCode"
                   clearable
@@ -230,6 +295,24 @@ watch(loginDay, value => {
                 >
                   <template v-slot:append>
                     <ReImageVerify v-model:code="imgCode" />
+                  </template>
+                </el-input>
+              </el-form-item> -->
+              <el-form-item v-if="hasCaptcha" prop="captcha_code">
+                <el-input
+                  v-model="ruleForm.captcha_code"
+                  autocomplete="false"
+                  clearable
+                  :prefix-icon="useRenderIcon(Keyhole)"
+                  placeholder="请输入验证码"
+                >
+                  <template v-slot:append>
+                    <img
+                      style="border: 1px solid rgb(0 0 0 / 10%)"
+                      :src="image"
+                      class="login-code-img"
+                      @click="refreshCode"
+                    />
                   </template>
                 </el-input>
               </el-form-item>

@@ -1,3 +1,4 @@
+import router from "@/router";
 import Axios, {
   type AxiosInstance,
   type AxiosRequestConfig
@@ -56,8 +57,14 @@ class PureHttp {
   /** `token`过期后，暂存待执行的请求 */
   private static requests = [];
 
+  /** 请求报错 401 后，暂存待执行的请求 */
+  private static unauthorizedRequests = [];
+
   /** 防止重复刷新`token` */
   private static isRefreshing = false;
+
+  /** 防止重复重新登录 */
+  private static isReLogin = false;
 
   /** 初始化配置对象 */
   private static initConfig: PureHttpRequestConfig = {};
@@ -71,6 +78,16 @@ class PureHttp {
       PureHttp.requests.push((token: string) => {
         config.headers["Authorization"] = formatToken(token);
         resolve(config);
+      });
+    });
+  }
+
+  /** 重新请求报 401 的接口 */
+  private static retryUnauthorizedRequest(config: PureHttpRequestConfig) {
+    return new Promise(resolve => {
+      PureHttp.unauthorizedRequests.push((token: string) => {
+        config.headers["Authorization"] = formatToken(token);
+        resolve(PureHttp.axiosInstance(config));
       });
     });
   }
@@ -101,20 +118,22 @@ class PureHttp {
         }
 
         /** 请求白名单，放置一些不需要`token`的接口（通过设置请求白名单，防止`token`过期后再请求造成的死循环问题） */
-        const whiteList = ["/refresh-token", "/login"];
+        const whiteList = ["/refresh-token", "/login", "/auth/oauth/login"];
         return whiteList.some(url => config.url.endsWith(url))
           ? config
           : new Promise(resolve => {
-              const data = getToken();
-              if (data) {
+              const tokenCache = getToken();
+              if (tokenCache) {
                 const now = new Date().getTime();
-                const expired = parseInt(data.expires) - now <= 0;
+                const expired = parseInt(tokenCache.expires) - now <= 0;
                 if (expired) {
                   if (!PureHttp.isRefreshing) {
                     PureHttp.isRefreshing = true;
                     // token过期刷新
                     useUserStoreHook()
-                      .handRefreshToken({ refreshToken: data.refreshToken })
+                      .handRefreshToken({
+                        refreshToken: tokenCache.refreshToken
+                      })
                       .then(res => {
                         const token = res.data.accessToken;
                         config.headers["Authorization"] = formatToken(token);
@@ -128,7 +147,7 @@ class PureHttp {
                   resolve(PureHttp.retryOriginalRequest(config));
                 } else {
                   config.headers["Authorization"] = formatToken(
-                    data.accessToken
+                    tokenCache.accessToken
                   );
                   resolve(config);
                 }
@@ -184,7 +203,7 @@ class PureHttp {
           return Promise.reject(response);
         }
       },
-      (error: PureHttpError<ResponseBody>) => {
+      async (error: PureHttpError<ResponseBody>) => {
         const $error = error;
         if ($error?.config) {
           cancelRepeatRequest.del($error.config);
@@ -210,13 +229,31 @@ class PureHttp {
             type: "error"
           });
         } else if (error.response?.status === 401) {
-          if (error.config?.url === "/auth/oauth/login")
+          if (error.config?.url === "/auth/oauth/login") {
             return Promise.reject(error);
-          // TODO 重复登录操作
-          // return userStore
-          //   .reLogin()
-          //   .then(() => Service.request(error.config))
-          //   .catch(() => router.replace("/login"));
+          }
+          const tokenCache = getToken();
+          if (!PureHttp.isReLogin) {
+            PureHttp.isReLogin = true;
+            try {
+              const { data } = await useUserStoreHook().reLogin(
+                tokenCache.refreshToken
+              );
+              const token = data.accessToken;
+              error.config.headers["Authorization"] = formatToken(token);
+              PureHttp.unauthorizedRequests.forEach(cb => cb(token));
+              return PureHttp.axiosInstance(error.config);
+            } catch {
+              router.replace("/login");
+            } finally {
+              PureHttp.isReLogin = false;
+              PureHttp.unauthorizedRequests = [];
+            }
+          } else {
+            return PureHttp.retryUnauthorizedRequest(error.config).catch(() => {
+              router.replace("/login");
+            });
+          }
         } else if (error.response?.status === 500) {
           ElNotification({
             title: "服务出错",

@@ -101,6 +101,11 @@ export function useNav() {
     useUserStoreHook().logOut();
   }
 
+  /** 清理关于登录的所有信息 */
+  function clearLoginStatus() {
+    useUserStoreHook().clearLoginStatus();
+  }
+
   function backTopMenu() {
     router.push(getTopMenu()?.path);
   }
@@ -152,6 +157,7 @@ export function useNav() {
     device,
     layout,
     logout,
+    clearLoginStatus,
     routers,
     $storage,
     isFullscreen,

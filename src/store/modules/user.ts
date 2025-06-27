@@ -7,15 +7,13 @@ import {
   routerArrays,
   storageLocal
 } from "../utils";
-import User, {
-  type UserResult,
-  type RefreshTokenResult,
-  refreshTokenApi
-} from "@/api/user";
+import User, { type UserResult } from "@/api/user";
 import { useMultiTagsStoreHook } from "./multiTags";
 import { type DataInfo, setToken, removeToken, userKey } from "@/utils/auth";
 import { useEncrypt } from "@/hooks";
 import Auth from "@/api/auth";
+
+let reLoginHandler!: Promise<any> | null;
 
 export const useUserStore = defineStore("pure-user", {
   state: (): userType => ({
@@ -86,7 +84,6 @@ export const useUserStore = defineStore("pure-user", {
           scope: "all"
         })
           .then(async res => {
-            console.log(res);
             const { data: loginResult } = res;
             setToken({
               accessToken: loginResult.access_token,
@@ -96,7 +93,6 @@ export const useUserStore = defineStore("pure-user", {
               )
             });
             const { data: myInfo } = await User.myInfo();
-            console.log(myInfo);
             resolve({
               success: true,
               data: {
@@ -118,8 +114,19 @@ export const useUserStore = defineStore("pure-user", {
           });
       });
     },
-    /** 前端登出（不调用接口） */
-    logOut() {
+    /** 前端登出（调用接口） */
+    async logOut() {
+      try {
+        await Auth.logout();
+        this.clearLoginStatus();
+        return Promise.resolve();
+      } catch (error) {
+        console.error("LogOut error =>", error);
+        return Promise.reject(error);
+      }
+    },
+    /** 清理关于登录的所有信息 */
+    clearLoginStatus() {
       this.username = "";
       this.roles = [];
       this.permissions = [];
@@ -128,20 +135,44 @@ export const useUserStore = defineStore("pure-user", {
       resetRouter();
       router.push("/login");
     },
-    /** 刷新`token` */
-    async handRefreshToken(data) {
-      return new Promise<RefreshTokenResult>((resolve, reject) => {
-        refreshTokenApi(data)
-          .then(data => {
-            if (data) {
-              setToken(data.data);
-              resolve(data);
-            }
+    /** 重新登录 */
+    async reLogin(refreshToken: string) {
+      if (reLoginHandler) return reLoginHandler;
+
+      reLoginHandler = new Promise((resolve, reject) => {
+        Auth.reLogin(refreshToken)
+          .then(({ res }) => {
+            const { data: loginResult } = res;
+            setToken({
+              accessToken: loginResult.access_token,
+              refreshToken: loginResult.refresh_token,
+              expires: new Date(
+                loginResult.expires_in * 1000 + new Date().getTime()
+              )
+            });
+            resolve({
+              success: true,
+              data: {
+                accessToken: loginResult.access_token,
+                refreshToken: loginResult.refresh_token,
+                expires: new Date(
+                  loginResult.expires_in * 1000 + new Date().getTime()
+                )
+              }
+            });
           })
           .catch(error => {
+            console.error("error: ", error);
             reject(error);
-          });
+          })
+          .finally(() => (reLoginHandler = null));
       });
+
+      return reLoginHandler;
+    },
+    /** 刷新`token` */
+    async handRefreshToken(tokenData) {
+      return this.reLogin(tokenData.refreshToken);
     }
   }
 });
