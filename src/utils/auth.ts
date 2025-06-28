@@ -22,6 +22,10 @@ export interface DataInfo<T> {
 }
 
 export const userKey = "user-info";
+
+/** 顶级角色 code */
+export const ROOTRoleCode = ["ROOT"];
+
 export const TokenKey = "authorized-token";
 /**
  * 通过`multiple-tabs`是否在`cookie`中，判断用户是否已经登录系统，

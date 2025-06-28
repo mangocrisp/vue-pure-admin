@@ -93,6 +93,18 @@ export const useUserStore = defineStore("pure-user", {
               )
             });
             const { data: myInfo } = await User.myInfo();
+            setToken({
+              accessToken: loginResult.access_token,
+              refreshToken: loginResult.refresh_token,
+              expires: new Date(
+                loginResult.expires_in * 1000 + new Date().getTime()
+              ),
+              avatar: myInfo.avatar,
+              username: myInfo.username,
+              nickname: myInfo.nickname,
+              roles: myInfo.roles,
+              permissions: undefined
+            });
             resolve({
               success: true,
               data: {

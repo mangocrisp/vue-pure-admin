@@ -35,7 +35,8 @@ import {
   type DataInfo,
   userKey,
   removeToken,
-  multipleTabsKey
+  multipleTabsKey,
+  ROOTRoleCode
 } from "@/utils/auth";
 
 /** 自动导入全部静态路由，无需再手动引入！匹配 src/router/modules 目录（任何嵌套级别）中具有 .ts 扩展名的所有文件，除了 remaining.ts 文件
@@ -137,7 +138,14 @@ router.beforeEach((to: ToRouteType, _from, next) => {
   }
   if (Cookies.get(multipleTabsKey) && userInfo) {
     // 无权限跳转403页面
-    if (to.meta?.roles && !isOneOfArray(to.meta?.roles, userInfo?.roles)) {
+    if (
+      // 如果菜单有角色要求
+      to.meta?.roles &&
+      // 如果也不是超级管理员
+      !isOneOfArray(ROOTRoleCode, userInfo?.roles) &&
+      // 如果当前登录用户的角色不满足菜单要求
+      !isOneOfArray(to.meta?.roles, userInfo?.roles)
+    ) {
       next({ path: "/error/403" });
     }
     // 开启隐藏首页后在浏览器地址栏手动输入首页welcome路由则跳转到404页面

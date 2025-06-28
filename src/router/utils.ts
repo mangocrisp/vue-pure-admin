@@ -18,7 +18,7 @@ import {
 } from "@pureadmin/utils";
 import { getConfig } from "@/config";
 import { buildHierarchyTree } from "@/utils/tree";
-import { userKey, type DataInfo } from "@/utils/auth";
+import { userKey, ROOTRoleCode, type DataInfo } from "@/utils/auth";
 import { type menuType, routerArrays } from "@/layout/types";
 import { useMultiTagsStoreHook } from "@/store/modules/multiTags";
 import { usePermissionStoreHook } from "@/store/modules/permission";
@@ -85,9 +85,12 @@ function isOneOfArray(a: Array<string>, b: Array<string>) {
 function filterNoPermissionTree(data: RouteComponent[]) {
   const currentRoles =
     storageLocal().getItem<DataInfo<number>>(userKey)?.roles ?? [];
-  const newTree = cloneDeep(data).filter((v: any) =>
-    isOneOfArray(v.meta?.roles, currentRoles)
-  );
+  // 如果当前的用户的角色码中包含ROOTRoleCode，则代表当前用户为超级管理员，超级管理员拥有所有菜单权限，不需要过滤
+  const newTree = isOneOfArray(ROOTRoleCode, currentRoles)
+    ? cloneDeep(data)
+    : cloneDeep(data).filter((v: any) =>
+        isOneOfArray(v.meta?.roles, currentRoles)
+      );
   newTree.forEach(
     (v: any) => v.children && (v.children = filterNoPermissionTree(v.children))
   );
