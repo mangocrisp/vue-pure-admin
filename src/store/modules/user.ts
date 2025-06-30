@@ -153,23 +153,18 @@ export const useUserStore = defineStore("pure-user", {
 
       reLoginHandler = new Promise((resolve, reject) => {
         Auth.reLogin(refreshToken)
-          .then(({ res }) => {
-            const { data: loginResult } = res;
+          .then(({ data }) => {
             setToken({
-              accessToken: loginResult.access_token,
-              refreshToken: loginResult.refresh_token,
-              expires: new Date(
-                loginResult.expires_in * 1000 + new Date().getTime()
-              )
+              accessToken: data.access_token,
+              refreshToken: data.refresh_token,
+              expires: new Date(data.expires_in * 1000 + new Date().getTime())
             });
             resolve({
               success: true,
               data: {
-                accessToken: loginResult.access_token,
-                refreshToken: loginResult.refresh_token,
-                expires: new Date(
-                  loginResult.expires_in * 1000 + new Date().getTime()
-                )
+                accessToken: data.access_token,
+                refreshToken: data.refresh_token,
+                expires: new Date(data.expires_in * 1000 + new Date().getTime())
               }
             });
           })

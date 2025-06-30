@@ -85,6 +85,7 @@ const getEnableCaptcha = async () => {
     data && (await getCaptcha());
   } catch (error) {
     console.error("error =>", error);
+    setHasCaptcha(false);
   }
 };
 

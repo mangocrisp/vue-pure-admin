@@ -118,7 +118,20 @@ class PureHttp {
         }
 
         /** 请求白名单，放置一些不需要`token`的接口（通过设置请求白名单，防止`token`过期后再请求造成的死循环问题） */
-        const whiteList = ["/refresh-token", "/login", "/auth/oauth/login"];
+        const whiteList = [
+          // 框架原有的刷新 token 接口
+          "/refresh-token",
+          // 登录接口
+          "/login",
+          // OAuth2 登录接口
+          "/auth/oauth/login",
+          // 查看是否需要验证码
+          "/enableCaptcha",
+          // 获取 sm2 公钥
+          "/sm2/publicKey",
+          // 获取 rsa 公钥
+          "/rsa/publicKey"
+        ];
         return whiteList.some(url => config.url.endsWith(url))
           ? config
           : new Promise(resolve => {
@@ -204,6 +217,7 @@ class PureHttp {
         }
       },
       async (error: PureHttpError<ResponseBody>) => {
+        debugger;
         const $error = error;
         if ($error?.config) {
           cancelRepeatRequest.del($error.config);
@@ -236,14 +250,16 @@ class PureHttp {
           if (!PureHttp.isReLogin) {
             PureHttp.isReLogin = true;
             try {
-              const { data } = await useUserStoreHook().reLogin(
+              const res = await useUserStoreHook().reLogin(
                 tokenCache.refreshToken
               );
+              const { data } = res;
               const token = data.accessToken;
               error.config.headers["Authorization"] = formatToken(token);
               PureHttp.unauthorizedRequests.forEach(cb => cb(token));
               return PureHttp.axiosInstance(error.config);
-            } catch {
+            } catch (e) {
+              console.error(e);
               router.replace("/login");
             } finally {
               PureHttp.isReLogin = false;

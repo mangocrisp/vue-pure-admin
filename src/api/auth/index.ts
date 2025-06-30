@@ -54,7 +54,7 @@ export default class Auth {
     return request.post({
       url: "/auth/oauth/login",
       data: {
-        grant_type: "refresh_token",
+        grant_type: "taybct_refresh",
         refresh_token: refreshToken
       },
       headers: {
