@@ -22,12 +22,13 @@ import { userKey, ROOTRoleCode, type DataInfo } from "@/utils/auth";
 import { type menuType, routerArrays } from "@/layout/types";
 import { useMultiTagsStoreHook } from "@/store/modules/multiTags";
 import { usePermissionStoreHook } from "@/store/modules/permission";
+import Menu from "@/api/menu";
 const IFrame = () => import("@/layout/frame.vue");
 // https://cn.vitejs.dev/guide/features.html#glob-import
 const modulesRoutes = import.meta.glob("/src/views/**/*.{vue,tsx}");
 
 // 动态路由
-import { getAsyncRoutes } from "@/api/routes";
+// import { getAsyncRoutes } from "@/api/routes";
 
 function handRank(routeInfo: any) {
   const { name, path, parentId, meta } = routeInfo;
@@ -207,21 +208,116 @@ function initRouter() {
       });
     } else {
       return new Promise(resolve => {
-        getAsyncRoutes().then(({ data }) => {
-          handleAsyncRoutes(cloneDeep(data));
-          storageLocal().setItem(key, data);
+        // getAsyncRoutes()
+        Menu.loadRouter().then(({ data }) => {
+          const menuData = convert(data);
+          handleAsyncRoutes(menuData);
+          storageLocal().setItem(key, menuData);
           resolve(router);
         });
       });
     }
   } else {
+    // return new Promise(resolve => {
+    //   getAsyncRoutes().then(({ data }) => {
+    //     const menuData = cloneDeep(data);
+    //     console.log("menuData", menuData);
+    //     handleAsyncRoutes(menuData);
+    //     resolve(router);
+    //   });
+    // });
     return new Promise(resolve => {
-      getAsyncRoutes().then(({ data }) => {
-        handleAsyncRoutes(cloneDeep(data));
+      // getAsyncRoutes()
+      Menu.loadRouter().then(({ data }) => {
+        const menuData = convert(data);
+        // menuData[1].children = menuData[1].children.concat([
+        //   {
+        //     path: "/iframe/baidu",
+        //     name: "FrameBaiDu",
+        //     meta: {
+        //       title: "百度",
+        //       icon: "ant-design:baidu-outlined",
+        //       frameSrc: "https://www.baidu.com",
+        //       keepAlive: true
+        //     }
+        //   },
+        //   {
+        //     path: "/pureUtilsLink",
+        //     name: "https://pure-admin-utils.netlify.app/",
+        //     meta: {
+        //       title: "menus.pureUtilsLink",
+        //       roles: ["admin", "common"]
+        //     }
+        //   }
+        // ]);
+
+        menuData[1].children = [
+          // {
+          //   path: "/iframe/baidu",
+          //   name: "FrameBaiDu",
+          //   meta: {
+          //     showParent: false,
+          //     title: "百度",
+          //     icon: "ant-design:baidu-outlined",
+          //     frameSrc: "https://www.baidu.com",
+          //     keepAlive: true
+          //   }
+          // }
+          // ,
+          {
+            path: "/pureUtilsLink",
+            name: "https://pure-admin-utils.netlify.app/",
+            meta: {
+              showParent: false,
+              title: "menus.pureUtilsLink",
+              roles: ["admin", "common"]
+            }
+          }
+        ];
+        handleAsyncRoutes(menuData);
         resolve(router);
       });
     });
   }
+}
+
+/** 转换成前端能用的菜单结构 */
+function convert(data: SystemMenuType.Router[]): any[] {
+  return data
+    ? data.map(item => {
+        const node = {
+          path: item.path.startsWith("/") ? item.path : "/" + item.path,
+          name: item.name,
+          component: item.component,
+          redirect: item.redirect,
+          meta: {
+            title: item.title, // 菜单名称（兼容国际化、非国际化，如何用国际化的写法就必须在根目录的`locales`文件夹下对应添加）
+            icon: item.icon, // 菜单图标
+            extraIcon: item.meta?.extraIcon, // 菜单名称右侧的额外图标
+            showLink: item.hidden === 0, // 是否在菜单中显示
+            showParent: item.alwaysShow === 0, // 当所有子菜单只有一个时，是否显示父级菜单
+            roles: item.meta?.roles, // 页面级别权限设置
+            auths: item.rolePermissions.map(rp => rp.btnPerm), // 按钮级别权限设置
+            keepAlive: item.isCache === 1, // 路由组件缓存（开启 `true`、关闭 `false`）
+            frameLoading: item.meta?.frameLoading, // 页面加载动画
+            hiddenTag: item.meta?.hiddenTag, // 当前菜单名称或自定义信息禁止添加到标签页（默认`false`）
+            fixedTag: item.meta?.fixedTag, // 当前菜单名称是否固定显示在标签页且不可关闭（默认`false`）
+            dynamicLevel: item.meta?.dynamicLevel, // 动态路由可打开的最大数量 `可选`
+            activePath: item.meta?.activePath, // 将某个菜单激活
+            rank: item.sort // 排序
+          }
+        };
+        const frameSrc = (item.redirect || item.component) ?? "";
+        if (frameSrc.startsWith("http://") || frameSrc.startsWith("https://")) {
+          node.meta["frameSrc"] = frameSrc; // 内嵌的`iframe`链接
+        }
+        const children = item.children ? convert(item.children) : [];
+        if (children.length > 0) {
+          node["children"] = children; // 子集
+        }
+        return node;
+      })
+    : [];
 }
 
 /**

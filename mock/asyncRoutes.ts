@@ -22,7 +22,8 @@ const systemManagementRouter = {
       meta: {
         icon: "ri:admin-line",
         title: "menus.pureUser",
-        roles: ["admin"]
+        roles: ["admin"],
+        keepAlive: true
       }
     },
     {

@@ -217,7 +217,6 @@ class PureHttp {
         }
       },
       async (error: PureHttpError<ResponseBody>) => {
-        debugger;
         const $error = error;
         if ($error?.config) {
           cancelRepeatRequest.del($error.config);

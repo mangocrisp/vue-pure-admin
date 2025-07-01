@@ -79,6 +79,7 @@ declare namespace SystemMenuType {
     rolePermissions: SystemPermissionType.Permission[];
     redirect?: string;
     props?: string;
+    meta?: any;
   }
 
   export interface RouterReturn {

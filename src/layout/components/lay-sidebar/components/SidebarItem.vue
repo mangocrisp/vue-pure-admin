@@ -99,6 +99,7 @@ function hasOneShowingChild(children: menuType[] = [], parent: menuType) {
   }
 
   if (showingChildren.length === 1) {
+    parent.name = showingChildren[0].name;
     return true;
   }
 
