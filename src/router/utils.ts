@@ -16,6 +16,13 @@ import {
   storageLocal,
   isIncludeAllChildren
 } from "@pureadmin/utils";
+import {
+  //systemManagementRouter,
+  systemMonitorRouter,
+  permissionRouter,
+  frameRouter,
+  tabsRouter
+} from "@/api/mock";
 import { getConfig } from "@/config";
 import { buildHierarchyTree } from "@/utils/tree";
 import { userKey, ROOTRoleCode, type DataInfo } from "@/utils/auth";
@@ -230,51 +237,14 @@ function initRouter() {
       // getAsyncRoutes()
       Menu.loadRouter().then(({ data }) => {
         const menuData = convert(data);
-        // menuData[1].children = menuData[1].children.concat([
-        //   {
-        //     path: "/iframe/baidu",
-        //     name: "FrameBaiDu",
-        //     meta: {
-        //       title: "百度",
-        //       icon: "ant-design:baidu-outlined",
-        //       frameSrc: "https://www.baidu.com",
-        //       keepAlive: true
-        //     }
-        //   },
-        //   {
-        //     path: "/pureUtilsLink",
-        //     name: "https://pure-admin-utils.netlify.app/",
-        //     meta: {
-        //       title: "menus.pureUtilsLink",
-        //       roles: ["admin", "common"]
-        //     }
-        //   }
-        // ]);
-
-        menuData[1].children = [
-          // {
-          //   path: "/iframe/baidu",
-          //   name: "FrameBaiDu",
-          //   meta: {
-          //     showParent: false,
-          //     title: "百度",
-          //     icon: "ant-design:baidu-outlined",
-          //     frameSrc: "https://www.baidu.com",
-          //     keepAlive: true
-          //   }
-          // }
-          // ,
-          {
-            path: "/pureUtilsLink",
-            name: "https://pure-admin-utils.netlify.app/",
-            meta: {
-              showParent: false,
-              title: "menus.pureUtilsLink",
-              roles: ["admin", "common"]
-            }
-          }
-        ];
-        handleAsyncRoutes(menuData);
+        handleAsyncRoutes(
+          menuData.concat([
+            systemMonitorRouter,
+            permissionRouter,
+            frameRouter,
+            tabsRouter
+          ])
+        );
         resolve(router);
       });
     });
@@ -289,7 +259,7 @@ function convert(data: SystemMenuType.Router[]): any[] {
           path: item.path.startsWith("/") ? item.path : "/" + item.path,
           name: item.name,
           component: item.component,
-          redirect: item.redirect,
+          redirect: item.redirect, // 路由重定向
           meta: {
             title: item.title, // 菜单名称（兼容国际化、非国际化，如何用国际化的写法就必须在根目录的`locales`文件夹下对应添加）
             icon: item.icon, // 菜单图标
