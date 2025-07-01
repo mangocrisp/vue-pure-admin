@@ -206,7 +206,7 @@ router.beforeEach((to: ToRouteType, _from, next) => {
         next();
       } else {
         removeToken();
-        next({ path: `/login?redirect=${to.path}` });
+        router.push(`/login?redirect=${to.fullPath}`);
       }
     } else {
       next();
