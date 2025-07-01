@@ -145,7 +145,10 @@ export const useUserStore = defineStore("pure-user", {
       removeToken();
       useMultiTagsStoreHook().handleTags("equal", [...routerArrays]);
       resetRouter();
-      router.push("/login");
+      // 清除缓存
+      //storageLocal().clear();
+      // redirect
+      router.push("/login?redirect=" + router.currentRoute.value.fullPath);
     },
     /** 重新登录 */
     async reLogin(refreshToken: string) {

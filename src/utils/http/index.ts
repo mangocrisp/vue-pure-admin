@@ -1,4 +1,3 @@
-import router from "@/router";
 import Axios, {
   type AxiosInstance,
   type AxiosRequestConfig
@@ -153,6 +152,10 @@ class PureHttp {
                         PureHttp.requests.forEach(cb => cb(token));
                         PureHttp.requests = [];
                       })
+                      .catch(e => {
+                        console.error(e);
+                        useUserStoreHook().clearLoginStatus();
+                      })
                       .finally(() => {
                         PureHttp.isRefreshing = false;
                       });
@@ -221,29 +224,29 @@ class PureHttp {
         if ($error?.config) {
           cancelRepeatRequest.del($error.config);
         }
-        if (error.code === "ERR_CANCELED") {
-          // ElNotification({
-          //   title: '重复查询',
-          //   message: '请等待查询响应后, 再重试!',
-          //   type: 'error'
-          // })
-          return Promise.reject(error);
+        if ($error.code === "ERR_CANCELED") {
+          ElNotification({
+            title: "重复查询",
+            message: "请等待查询响应后, 再重试!",
+            type: "error"
+          });
+          return Promise.reject($error);
         }
-        if (error.code === "ECONNABORTED") {
+        if ($error.code === "ECONNABORTED") {
           ElNotification({
             title: "请求超时",
             message: "请稍后重试!",
             type: "error"
           });
-        } else if (error.response?.status === 400) {
+        } else if ($error.response?.status === 400) {
           ElNotification({
             title: "参数错误",
-            message: error.response?.data?.message ?? "请求出错",
+            message: $error.response?.data?.message ?? "请求出错",
             type: "error"
           });
-        } else if (error.response?.status === 401) {
-          if (error.config?.url === "/auth/oauth/login") {
-            return Promise.reject(error);
+        } else if ($error.response?.status === 401) {
+          if ($error.config?.url === "/auth/oauth/login") {
+            return Promise.reject($error);
           }
           const tokenCache = getToken();
           if (!PureHttp.isReLogin) {
@@ -254,35 +257,39 @@ class PureHttp {
               );
               const { data } = res;
               const token = data.accessToken;
-              error.config.headers["Authorization"] = formatToken(token);
+              $error.config.headers["Authorization"] = formatToken(token);
               PureHttp.unauthorizedRequests.forEach(cb => cb(token));
-              return PureHttp.axiosInstance(error.config);
+              return PureHttp.axiosInstance($error.config);
             } catch (e) {
               console.error(e);
-              router.replace("/login");
+              useUserStoreHook().clearLoginStatus();
+              // 所有的响应异常 区分来源为取消请求/非取消请求
+              return Promise.reject($error);
             } finally {
               PureHttp.isReLogin = false;
               PureHttp.unauthorizedRequests = [];
             }
           } else {
-            return PureHttp.retryUnauthorizedRequest(error.config).catch(() => {
-              router.replace("/login");
+            return PureHttp.retryUnauthorizedRequest($error.config).catch(e => {
+              console.error(e);
+              useUserStoreHook().clearLoginStatus();
+              return Promise.reject($error);
             });
           }
-        } else if (error.response?.status === 500) {
+        } else if ($error.response?.status === 500) {
           ElNotification({
             title: "服务出错",
-            message: error.response?.data?.message ?? "请稍后重试!",
+            message: $error.response?.data?.message ?? "请稍后重试!",
             type: "error"
           });
-        } else if (error.response?.status === 503) {
+        } else if ($error.response?.status === 503) {
           ElNotification({
             title: "服务离线",
-            message: error.response?.data?.message ?? "请稍后重试!",
+            message: $error.response?.data?.message ?? "请稍后重试!",
             type: "error"
           });
         } else {
-          ElMessage.error(error.response?.data?.message ?? "请求出错");
+          ElMessage.error($error.response?.data?.message ?? "请求出错");
         }
         $error.isCancelRequest = Axios.isCancel($error);
         // 关闭进度条动画
@@ -292,6 +299,7 @@ class PureHttp {
       }
     );
   }
+
   /**
    * 获取到当前`Axios`实例对象
    * @returns 当前`Axios`实例对象
