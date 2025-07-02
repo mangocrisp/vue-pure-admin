@@ -198,7 +198,9 @@ router.beforeEach((to: ToRouteType, _from, next) => {
         next();
       } else {
         removeToken();
-        next({ path: "/login" });
+        //next({ path: "/login" });
+        // 如果是因为 token 失效跳转回登录页，则带上参数 redirect 到登录页，方便后续重新登录之后直接回到原来的页面
+        router.push(`/login?redirect=${to.fullPath}`);
       }
     } else {
       next();

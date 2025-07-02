@@ -78,12 +78,33 @@ const onLogin = async (formEl: FormInstance | undefined) => {
             // 获取后端路由
             return initRouter().then(() => {
               disabled.value = true;
-              router
-                .push(getTopMenu(true).path)
-                .then(() => {
-                  message(t("login.pureLoginSuccess"), { type: "success" });
-                })
-                .finally(() => (disabled.value = false));
+              // 登录成功之后，自动跳转到这个 redirect 地址
+              const redirect =
+                (router?.currentRoute.value?.query?.redirect as string) ??
+                getTopMenu(true).path;
+              /*
+               * 外链接跳转可以作为兼容 OAuth2 的登录页面来使用，这个需要后端配合使用，让后端把登录页面设置成当前的这个页面，登录之后，后端把登录成功的 Cookie 设置到前端，然后可以利用这个 Cookie 获取到授权码
+               */
+              if (redirect.startsWith("http")) {
+                // 如果跳转地址是外链，则直接跳转
+                window.location.href = redirect;
+              } else if (redirect.startsWith("base64:")) {
+                // base64 加密的外链接，则直接跳转
+                window.location.href = window.atob(redirect.substring(7));
+              } else if (redirect.startsWith("URIComponent:")) {
+                // URIComponent 加密的外链接，则直接跳转
+                window.location.href = decodeURIComponent(
+                  redirect.substring(13)
+                );
+              } else {
+                // 普通跳转
+                router
+                  .push({ path: redirect })
+                  .then(() => {
+                    message(t("login.pureLoginSuccess"), { type: "success" });
+                  })
+                  .finally(() => (disabled.value = false));
+              }
             });
           } else {
             message(t("login.pureLoginFail"), { type: "error" });
