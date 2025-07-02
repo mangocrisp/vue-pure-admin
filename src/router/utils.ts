@@ -265,7 +265,7 @@ function convert(data: SystemMenuType.Router[]): any[] {
             icon: item.icon, // 菜单图标
             extraIcon: item.meta?.extraIcon, // 菜单名称右侧的额外图标
             showLink: item.hidden === 0, // 是否在菜单中显示
-            showParent: item.alwaysShow === 0, // 当所有子菜单只有一个时，是否显示父级菜单
+            showParent: item.alwaysShow === 1, // 当所有子菜单只有一个时，是否显示父级菜单
             roles: item.meta?.roles, // 页面级别权限设置
             auths: item.rolePermissions.map(rp => rp.btnPerm), // 按钮级别权限设置
             keepAlive: item.isCache === 1, // 路由组件缓存（开启 `true`、关闭 `false`）
