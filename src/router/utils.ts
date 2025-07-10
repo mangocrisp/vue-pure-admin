@@ -29,7 +29,7 @@ import { userKey, ROOTRoleCode, type DataInfo } from "@/utils/auth";
 import { type menuType, routerArrays } from "@/layout/types";
 import { useMultiTagsStoreHook } from "@/store/modules/multiTags";
 import { usePermissionStoreHook } from "@/store/modules/permission";
-import Menu from "@/api/menu";
+import MenuApi from "@/api/system/menu";
 const IFrame = () => import("@/layout/frame.vue");
 // https://cn.vitejs.dev/guide/features.html#glob-import
 const modulesRoutes = import.meta.glob("/src/views/**/*.{vue,tsx}");
@@ -216,7 +216,7 @@ function initRouter() {
     } else {
       return new Promise(resolve => {
         // getAsyncRoutes()
-        Menu.loadRouter().then(({ data }) => {
+        MenuApi.loadRouter().then(({ data }) => {
           const menuData = convert(data);
           handleAsyncRoutes(menuData);
           storageLocal().setItem(key, menuData);
@@ -235,7 +235,7 @@ function initRouter() {
     // });
     return new Promise(resolve => {
       // getAsyncRoutes()
-      Menu.loadRouter().then(({ data }) => {
+      MenuApi.loadRouter().then(({ data }) => {
         const menuData = convert(data);
         handleAsyncRoutes(
           menuData.concat([

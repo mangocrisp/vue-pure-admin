@@ -79,6 +79,8 @@ function parseInt(s: string | number, radix?: number): number;
 
 function parseFloat(string: string | number): number;
 
+//------------------ base-api ----------------
+
 interface UnknownObject {
   [x: string]: unknown;
 }
@@ -147,3 +149,5 @@ type MultiplePartial<T extends { id: any }, K extends keyof T = "id"> = Omit<
   K
 > &
   Partial<Pick<T, K>>;
+
+//------------------ base-api ----------------

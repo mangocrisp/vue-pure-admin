@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { formRules } from "./utils/rule";
-import { FormProps } from "./utils/types";
+import type { RoleEditFormDTO } from "./utils/types";
 
-const props = withDefaults(defineProps<FormProps>(), {
+const props = withDefaults(defineProps<RoleEditFormDTO>(), {
   formInline: () => ({
+    id: undefined,
     name: "",
     code: "",
-    remark: ""
+    sort: 1
   })
 });
 
@@ -44,12 +45,8 @@ defineExpose({ getRef });
       />
     </el-form-item>
 
-    <el-form-item label="备注">
-      <el-input
-        v-model="newFormInline.remark"
-        placeholder="请输入备注信息"
-        type="textarea"
-      />
+    <el-form-item label="排序">
+      <el-input v-model="newFormInline.sort" placeholder="排序" type="number" />
     </el-form-item>
   </el-form>
 </template>

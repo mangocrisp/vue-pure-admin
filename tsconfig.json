@@ -4,6 +4,8 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "strict": false,
+    "useDefineForClassFields": false,
+    "strictPropertyInitialization": false,
     "strictFunctionTypes": false,
     "noImplicitThis": true,
     "jsx": "preserve",
@@ -12,12 +14,13 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "isolatedModules": true,
-    "allowSyntheticDefaultImports": true,
+    "allowSyntheticDefaultImports": true, // 解决 CommonJS 模块与 ES6 模块语法之间的兼容性问题
     "forceConsistentCasingInFileNames": true,
     "sourceMap": true,
     "baseUrl": ".",
     "allowJs": false,
     "resolveJsonModule": true,
+    "noImplicitAny": false,
     "lib": [
       "ESNext",
       "DOM"
@@ -45,8 +48,9 @@
     "src/**/*.tsx",
     "src/**/*.vue",
     "types/*.d.ts",
-    "vite.config.ts"
-  ],
+    "vite.config.ts",    
+    "types/**/*.d.ts"
+],
   "exclude": [
     "dist",
     "**/*.js",

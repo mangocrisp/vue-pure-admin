@@ -4,9 +4,11 @@ const request = useAxios();
 
 const URL = "/system/v1/menu";
 
-export default class Menu {
+export default class SystemMenuApi {
   /** 菜单管理列表 */
-  static list: SystemMenuType.MenuListReturn = params => {
+  static list = (
+    params: Partial<SystemMenuType.Menu> & { permCheckId?: string }
+  ): HttpReturn<SystemMenuType.Menu[]> => {
     return request.get({
       url: `${URL}/list`,
       params: {
@@ -40,7 +42,7 @@ export default class Menu {
   };
 
   /** 获取路由 */
-  static loadRouter: SystemMenuType.RouterReturn = () => {
+  static loadRouter = (): HttpReturn<SystemMenuType.Router[]> => {
     return request.get({
       url: `${URL}/router`
     });

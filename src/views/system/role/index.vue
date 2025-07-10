@@ -69,6 +69,7 @@ const {
   handleMenu,
   handleSave,
   handleDelete,
+  handleDeleteBatch,
   filterMethod,
   transformI18n,
   onQueryChanged,
@@ -147,7 +148,7 @@ onMounted(() => {
       <PureTableBar
         :class="[isShow && !deviceDetection() ? 'w-[60vw]!' : 'w-full']"
         style="transition: width 220ms cubic-bezier(0.4, 0, 0.2, 1)"
-        title="角色管理（仅演示，操作后不生效）"
+        title="角色管理"
         :columns="columns"
         @refresh="onSearch"
       >
@@ -157,8 +158,20 @@ onMounted(() => {
             :icon="useRenderIcon(AddFill)"
             @click="openDialog()"
           >
-            新增角色
+            新增
           </el-button>
+
+          <el-popconfirm
+            title="是否批量删除勾选角色?"
+            placement="right"
+            @confirm="handleDeleteBatch"
+          >
+            <template #reference>
+              <el-button type="danger" :icon="useRenderIcon(Delete)">
+                删除
+              </el-button>
+            </template>
+          </el-popconfirm>
         </template>
         <template v-slot="{ size, dynamicColumns }">
           <pure-table
@@ -169,6 +182,7 @@ onMounted(() => {
             :loading="loading"
             :size="size"
             adaptive
+            select-on-indeterminate
             :row-style="rowStyle"
             :adaptiveConfig="{ offsetBottom: 108 }"
             :data="dataList"
@@ -178,6 +192,7 @@ onMounted(() => {
               background: 'var(--el-fill-color-light)',
               color: 'var(--el-text-color-primary)'
             }"
+            :row-key="row => row.id"
             @selection-change="handleSelectionChange"
             @page-size-change="handleSizeChange"
             @page-current-change="handleCurrentChange"
@@ -201,7 +216,7 @@ onMounted(() => {
                   <el-button
                     class="reset-margin"
                     link
-                    type="primary"
+                    type="danger"
                     :size="size"
                     :icon="useRenderIcon(Delete)"
                   >
@@ -212,50 +227,13 @@ onMounted(() => {
               <el-button
                 class="reset-margin"
                 link
-                type="primary"
+                type="success"
                 :size="size"
                 :icon="useRenderIcon(Menu)"
                 @click="handleMenu(row)"
               >
                 权限
               </el-button>
-              <!-- <el-dropdown>
-              <el-button
-                class="ml-3 mt-[2px]"
-                link
-                type="primary"
-                :size="size"
-                :icon="useRenderIcon(More)"
-              />
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item>
-                    <el-button
-                      :class="buttonClass"
-                      link
-                      type="primary"
-                      :size="size"
-                      :icon="useRenderIcon(Menu)"
-                      @click="handleMenu"
-                    >
-                      菜单权限
-                    </el-button>
-                  </el-dropdown-item>
-                  <el-dropdown-item>
-                    <el-button
-                      :class="buttonClass"
-                      link
-                      type="primary"
-                      :size="size"
-                      :icon="useRenderIcon(Database)"
-                      @click="handleDatabase"
-                    >
-                      数据权限
-                    </el-button>
-                  </el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown> -->
             </template>
           </pure-table>
         </template>
@@ -272,7 +250,7 @@ onMounted(() => {
                 v-tippy="{
                   content: '关闭'
                 }"
-                class="dark:text-white"
+                class="dark:text-red"
                 width="18px"
                 height="18px"
                 :icon="Close"
@@ -307,14 +285,17 @@ onMounted(() => {
         <div class="flex flex-wrap">
           <el-checkbox v-model="isExpandAll" label="展开/折叠" />
           <el-checkbox v-model="isSelectAll" label="全选/全不选" />
-          <el-checkbox v-model="isLinkage" label="父子联动" />
+          <!-- <el-checkbox v-model="isLinkage" label="父子联动" /> -->
         </div>
         <el-tree-v2
           ref="treeRef"
           show-checkbox
+          highlight-current
           :data="treeData"
           :props="treeProps"
           :height="treeHeight"
+          :indent="10"
+          :item-size="30"
           :check-strictly="!isLinkage"
           :filter-method="filterMethod"
         >
