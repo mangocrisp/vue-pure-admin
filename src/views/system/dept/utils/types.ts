@@ -1,16 +1,9 @@
-interface FormItemProps {
-  higherDeptOptions: Record<string, unknown>[];
-  parentId: number;
-  name: string;
-  principal: string;
-  phone: string | number;
-  email: string;
-  sort: number;
-  status: number;
-  remark: string;
-}
+import type { Resolve } from "element-plus";
+
 interface FormProps {
-  formInline: FormItemProps;
+  formInline: {
+    lazyLoad: (node, resolve: Resolve) => void;
+  } & (SystemDeptType.DeptAddDTO | SystemDeptType.DeptUpdateDTO);
 }
 
-export type { FormItemProps, FormProps };
+export type { FormProps };

@@ -6,8 +6,8 @@ import type { RoleEditFormDTO } from "./utils/types";
 const props = withDefaults(defineProps<RoleEditFormDTO>(), {
   formInline: () => ({
     id: undefined,
-    name: "",
-    code: "",
+    name: undefined,
+    code: undefined,
     sort: 1
   })
 });

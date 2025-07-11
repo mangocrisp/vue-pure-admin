@@ -63,9 +63,8 @@ export function useRole(treeRef: Ref) {
   });
   /** 列名 */
   const columns: TableColumnList = [
-    { type: "selection", fixed: "right", reserveSelection: true },
     {
-      label: "角色编号",
+      label: "角色id",
       prop: "id"
     },
     {
@@ -101,6 +100,7 @@ export function useRole(treeRef: Ref) {
       formatter: ({ createTime }) =>
         dayjs(createTime).format("YYYY-MM-DD HH:mm:ss")
     },
+    { type: "selection", fixed: "right", reserveSelection: true },
     {
       label: "操作",
       fixed: "right",
@@ -247,10 +247,7 @@ export function useRole(treeRef: Ref) {
    * @param title 表单标题
    * @param row 编辑的数据
    */
-  function openDialog(
-    title = "新增",
-    row?: SystemRoleType.RoleAddDTO | SystemRoleType.RoleUpdateDTO
-  ) {
+  function openDialog(title = "新增", row?: SystemRoleType.Role) {
     addDialog({
       title: `${title}角色`,
       props: {

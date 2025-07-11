@@ -8,19 +8,22 @@ import Delete from "~icons/ep/delete";
 import EditPen from "~icons/ep/edit-pen";
 import Refresh from "~icons/ep/refresh";
 import AddFill from "~icons/ri/add-circle-line";
+import AntDesignReloadOutlined from "~icons/ant-design/reload-outlined";
 
 defineOptions({
   name: "SystemDept"
 });
 
 const formRef = ref();
-const tableRef = ref();
 const {
+  tableRef,
   form,
   loading,
   columns,
   dataList,
   onSearch,
+  onLoad,
+  clearLazyCache,
   resetForm,
   openDialog,
   handleDelete,
@@ -49,16 +52,13 @@ function onFullscreen() {
           class="w-[180px]!"
         />
       </el-form-item>
-      <el-form-item label="状态：" prop="status">
-        <el-select
-          v-model="form.status"
-          placeholder="请选择状态"
+      <el-form-item label="部门编码：" prop="code">
+        <el-input
+          v-model="form.code"
+          placeholder="请输入部门编码"
           clearable
           class="w-[180px]!"
-        >
-          <el-option label="启用" :value="1" />
-          <el-option label="停用" :value="0" />
-        </el-select>
+        />
       </el-form-item>
       <el-form-item>
         <el-button
@@ -76,7 +76,7 @@ function onFullscreen() {
     </el-form>
 
     <PureTableBar
-      title="部门管理（仅演示，操作后不生效）"
+      title="部门管理"
       :columns="columns"
       :tableRef="tableRef?.getTableRef()"
       @refresh="onSearch"
@@ -90,6 +90,13 @@ function onFullscreen() {
         >
           新增部门
         </el-button>
+        <!-- <el-button
+          type="warning"
+          :icon="useRenderIcon(AntDesignReloadOutlined)"
+          @click="clearLazyCache()"
+        >
+          清除缓存
+        </el-button> -->
       </template>
       <template v-slot="{ size, dynamicColumns }">
         <pure-table
@@ -100,10 +107,19 @@ function onFullscreen() {
           row-key="id"
           showOverflowTooltip
           table-layout="auto"
-          default-expand-all
+          :default-expand-all="false"
           :loading="loading"
+          stripe
           :size="size"
           :data="dataList"
+          lazy
+          :load="onLoad"
+          border
+          :tree-props="{
+            children: 'children',
+            hasChildren: 'hasChildren',
+            checkStrictly: false
+          }"
           :columns="dynamicColumns"
           :header-cell-style="{
             background: 'var(--el-fill-color-light)',
@@ -128,7 +144,9 @@ function onFullscreen() {
               type="primary"
               :size="size"
               :icon="useRenderIcon(AddFill)"
-              @click="openDialog('新增', { parentId: row.id } as any)"
+              @click="
+                openDialog('新增', { id: row.id, pidAll: row.pidAll } as any)
+              "
             >
               新增
             </el-button>
