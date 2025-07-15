@@ -1,4 +1,4 @@
-## 字段含义
+## 字段含义（原 Pure 的菜单的字段）
 
 | 字段              | 说明                                                         |
 | :---------------- | :----------------------------------------------------------- |
@@ -24,3 +24,22 @@
 | `showLink`        | 菜单（是否显示该菜单）                                       |
 | `showParent`      | 父级菜单（是否显示父级菜单 [点击查看更多](https://pure-admin.cn/pages/routerMenu/#%E7%AC%AC%E4%B8%80%E7%A7%8D-%E8%AF%A5%E6%A8%A1%E5%BC%8F%E9%92%88%E5%AF%B9%E7%88%B6%E7%BA%A7%E8%8F%9C%E5%8D%95%E4%B8%8B%E5%8F%AA%E6%9C%89%E4%B8%80%E4%B8%AA%E5%AD%90%E8%8F%9C%E5%8D%95%E7%9A%84%E6%83%85%E5%86%B5-%E5%9C%A8%E5%AD%90%E8%8F%9C%E5%8D%95%E7%9A%84-meta-%E5%B1%9E%E6%80%A7%E4%B8%AD%E5%8A%A0%E4%B8%8A-showparent-true-%E5%8D%B3%E5%8F%AF)） |
 
+## Spring Taybct 集成的字段含义
+
+| 字段              | 说明                                                         |
+| :---------------- | :----------------------------------------------------------- |
+| `name`            | 菜单名称 |
+| `parentId`        | 上级菜单ID |
+| `alwaysShow`      | 当所有子菜单只有一个时，是否显示父级菜单 |
+| `props`           | 因为集成原因， Spring Taybct 的菜单和 Pure 的字段是有差异，但是 Spring Taybct 提供了 props 属性可以自定义菜单字段配置，props 可以直接配置原 Pure 的菜单的字段 |
+| `sort`            | 排序 |
+| `routeName`       | 路由名称（集成后，外链跳转新页面的时候地址填在这里，http://xxx） |
+| `routePath`       | 路由路径 |
+| `component`       | 组件路径（如果是内嵌 Iframe 页面的时候地址填在这里） |
+| `redirect`        | 路由重定向 |
+| `isCache`         | 缓存页面（是否缓存该路由页面，开启后会保存该页面的整体状态，刷新后会清空状态） |
+| `menuType`        | 菜单类型（Spring Taybct 只有目录和菜单两种类型，所以这里还会把 Spring Taybct 里面的权限也一起添加到菜单里面管理） |
+| `hidden`          | 是否隐藏该菜单 |
+| `status`          | 菜单启用状态 |
+| `icon`            | 图标 |
+| `isBlank`         | 外链是否新窗口打开 |

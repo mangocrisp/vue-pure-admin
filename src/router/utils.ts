@@ -256,10 +256,11 @@ function convert(data: SystemMenuType.Router[]): any[] {
   return data
     ? data.map(item => {
         const node = {
-          path: item.path.startsWith("/") ? item.path : "/" + item.path,
+          path: item.path?.startsWith("/") ? item.path : "/" + item.path,
           name: item.name,
           component: item.component,
           redirect: item.redirect, // 路由重定向
+          isBlank: item.isBlank, // 是否打开新页面
           meta: {
             title: item.title, // 菜单名称（兼容国际化、非国际化，如何用国际化的写法就必须在根目录的`locales`文件夹下对应添加）
             icon: item.icon, // 菜单图标
@@ -277,9 +278,13 @@ function convert(data: SystemMenuType.Router[]): any[] {
             rank: item.sort // 排序
           }
         };
-        const frameSrc = (item.redirect || item.component) ?? "";
+        const frameSrc = item.component ?? "";
         if (frameSrc.startsWith("http://") || frameSrc.startsWith("https://")) {
           node.meta["frameSrc"] = frameSrc; // 内嵌的`iframe`链接
+        }
+        // 自定义路由参数
+        if (item.props) {
+          node.meta = { ...node.meta, ...JSON.parse(item.props) };
         }
         const children = item.children ? convert(item.children) : [];
         if (children.length > 0) {

@@ -40,13 +40,14 @@ const tabsList = [
   }
 ];
 
-const pageList = computed(() =>
-  copyIconList[currentActiveType.value]
-    .filter(i => i.includes(filterValue.value))
-    .slice(
-      (currentPage.value - 1) * pageSize.value,
-      currentPage.value * pageSize.value
-    )
+const pageList = computed(
+  () =>
+    copyIconList[currentActiveType.value]
+      ?.filter(i => i.includes(filterValue.value))
+      .slice(
+        (currentPage.value - 1) * pageSize.value,
+        currentPage.value * pageSize.value
+      ) ?? []
 );
 
 const iconItemStyle = computed((): ParameterCSSProperties => {
@@ -65,14 +66,18 @@ function setVal() {
     0,
     inputValue.value.indexOf(":") + 1
   );
-  icon.value = inputValue.value.substring(inputValue.value.indexOf(":") + 1);
+  if (!copyIconList[currentActiveType.value]) {
+    currentActiveType.value = "ep:";
+  } else {
+    icon.value = inputValue.value.substring(inputValue.value.indexOf(":") + 1);
+  }
 }
 
 function onBeforeEnter() {
   if (isAllEmpty(icon.value)) return;
   setVal();
   // 寻找当前图标在第几页
-  const curIconIndex = copyIconList[currentActiveType.value].findIndex(
+  const curIconIndex = copyIconList[currentActiveType.value]?.findIndex(
     i => i === icon.value
   );
   currentPage.value = Math.ceil((curIconIndex + 1) / pageSize.value);
@@ -104,9 +109,10 @@ function onClear() {
 watch(
   () => pageList.value,
   () =>
-    (totalPage.value = copyIconList[currentActiveType.value].filter(i =>
-      i.includes(filterValue.value)
-    ).length),
+    (totalPage.value =
+      copyIconList[currentActiveType.value]?.filter(i =>
+        i.includes(filterValue.value)
+      ) ?? []).length,
   { immediate: true }
 );
 watch(
@@ -122,7 +128,7 @@ watch(
 
 <template>
   <div class="selector">
-    <el-input v-model="inputValue" disabled>
+    <el-input v-model="inputValue">
       <template #append>
         <el-popover
           :width="350"

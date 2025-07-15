@@ -35,4 +35,22 @@ declare namespace SystemPermissionType {
       params: OmitDefaultParams<Permission>[] | [{ menuId: string }]
     ): HttpReturn<string>;
   }
+
+  /** 新增对象 */
+  export interface PermissionAddDTO {
+    id?: string;
+    name: string;
+    menuId: string;
+    urlPerm: string;
+    btnPerm: string;
+  }
+
+  /** 修改对象 */
+  export interface PermissionUpdateDTO {
+    id: string;
+    name: string;
+    menuId: string;
+    urlPerm: string;
+    btnPerm: string;
+  }
 }

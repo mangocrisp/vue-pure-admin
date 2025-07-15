@@ -19,16 +19,42 @@ const menuTypeOptions: Array<OptionsType> = [
   }
 ];
 
+const outLinkOptionOptions: Array<OptionsType> = [
+  {
+    label: "是",
+    tip: "外链菜单将打开一个新窗口",
+    value: true
+  },
+  {
+    label: "否",
+    tip: "外链菜单将打开当前页面",
+    value: false
+  }
+];
+
+const menuStatusOptions: Array<OptionsType> = [
+  {
+    label: "启用",
+    tip: "启用后，该菜单将显示在菜单栏",
+    value: true
+  },
+  {
+    label: "禁用",
+    tip: "禁用后，该菜单将不会显示在菜单栏",
+    value: false
+  }
+];
+
 const showLinkOptions: Array<OptionsType> = [
   {
     label: "显示",
     tip: "会在菜单中显示",
-    value: true
+    value: false
   },
   {
     label: "隐藏",
     tip: "不会在菜单中显示",
-    value: false
+    value: true
   }
 ];
 
@@ -104,5 +130,7 @@ export {
   keepAliveOptions,
   hiddenTagOptions,
   showParentOptions,
-  frameLoadingOptions
+  frameLoadingOptions,
+  menuStatusOptions,
+  outLinkOptionOptions
 };

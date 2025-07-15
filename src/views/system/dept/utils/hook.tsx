@@ -20,21 +20,21 @@ export function useDept() {
 
   const columns: TableColumnList = [
     {
+      label: "部门名称",
+      prop: "name",
+      minWidth: 200,
+      align: "left"
+    },
+    {
       label: "部门id",
       prop: "id",
       minWidth: 70,
-      align: "left"
+      hide: true
     },
     {
       label: "部门编码",
       prop: "code",
-      minWidth: 70
-    },
-    {
-      label: "部门名称",
-      prop: "name",
-      width: 180,
-      align: "left"
+      minWidth: 100
     },
     {
       label: "部门全称",

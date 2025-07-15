@@ -1,5 +1,6 @@
 import type { PureHttpRequestConfig } from "./types.d";
 
+/** 只能过滤简单的请求，如果请求参数为复杂对象，则要考虑过滤成本(key 会太长，序列化需要时间) */
 function getReqKey(config: PureHttpRequestConfig) {
   // 请求方式、请求地址、请求参数生成的字符串来作为是否重复请求的依据
   const { method, url, params, data } = config;
@@ -20,9 +21,13 @@ class CancelRepeatRequest {
 
   set(config: PureHttpRequestConfig) {
     if (config.isCancelRepeat) return;
+    const reqKey = getReqKey(config);
+    if (reqKey.length > 2000) {
+      // 如果 key 太长了，就直接返回了，太长了，过滤不了
+      return;
+    }
     const controller = new AbortController();
     config.signal = controller.signal;
-    const reqKey = getReqKey(config);
     // 当等待接口中 已存在 现接口, 则取消当前接口请求
     if (this.pendingRequestMap.has(reqKey)) {
       console.error("存在重复请求的接口, 请排查问题:", reqKey);
@@ -30,6 +35,9 @@ class CancelRepeatRequest {
     } else {
       this.pendingRequestMap.set(reqKey, controller);
     }
+    setTimeout(() => {
+      this.pendingRequestMap.delete(reqKey);
+    });
   }
 
   del(config: PureHttpRequestConfig) {

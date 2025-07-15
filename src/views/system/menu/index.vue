@@ -42,10 +42,10 @@ function onFullscreen() {
       :model="form"
       class="search-form bg-bg_color w-full pl-8 pt-[12px] overflow-auto"
     >
-      <el-form-item label="菜单名称：" prop="title">
+      <el-form-item label="菜单/权限名称：" prop="title">
         <el-input
-          v-model="form.title"
-          placeholder="请输入菜单名称"
+          v-model="form.name"
+          placeholder="请输入菜单/权限名称"
           clearable
           class="w-[180px]!"
         />
@@ -66,7 +66,7 @@ function onFullscreen() {
     </el-form>
 
     <PureTableBar
-      title="菜单管理（仅演示，操作后不生效）"
+      title="菜单管理（仅管理部分菜单，原框架演示菜单皆是静态路由）"
       :columns="columns"
       :isExpandAll="false"
       :tableRef="tableRef?.getTableRef()"

@@ -12,7 +12,8 @@ const getLinkProps = (item: menuType) => {
   if (isExternalLink.value) {
     return {
       href: item.name,
-      target: "_blank",
+      // target: "_blank",
+      target: (item.isBlank ?? 1 === 1) ? "_blank" : "_self",
       rel: "noopener"
     };
   }
