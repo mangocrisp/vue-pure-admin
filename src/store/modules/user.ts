@@ -7,13 +7,19 @@ import {
   routerArrays,
   storageLocal
 } from "../utils";
-import type UserResult from "@/api/user";
 import { useMultiTagsStoreHook } from "./multiTags";
-import { type DataInfo, setToken, removeToken, userKey } from "@/utils/auth";
+import {
+  type DataInfo,
+  setToken,
+  removeToken,
+  userKey,
+  updateTokenInfo
+} from "@/utils/auth";
 import { useEncrypt } from "@/hooks";
 import Auth from "@/api/auth";
 import SystemUserApi from "@/api/system/user";
 import staticAvatar from "@/assets/user.jpg";
+import type { UserResult } from "@/api/user";
 import AdminFileApi from "@/api/admin/file";
 import { blobToDataURI } from "@/utils";
 
@@ -89,53 +95,62 @@ export const useUserStore = defineStore("pure-user", {
         })
           .then(async res => {
             const { data: loginResult } = res;
+            const expires = new Date(
+              loginResult.access_token_exp * 1000 + new Date().getTime()
+            );
             setToken({
               accessToken: loginResult.access_token,
               refreshToken: loginResult.refresh_token,
-              expires: new Date(
-                loginResult.expires_in * 1000 + new Date().getTime()
-              )
+              expires
             });
             const { data: myInfo } = await SystemUserApi.myInfo();
-            if (myInfo.avatar) {
-              setTimeout(async () => {
-                const dataURI = await AdminFileApi.fileDownload(
-                  myInfo.avatar
-                ).then(async (res: Blob) => await blobToDataURI(res));
-                this.SET_AVATAR(dataURI);
-              });
-            }
-            setToken({
-              accessToken: loginResult.access_token,
-              refreshToken: loginResult.refresh_token,
-              expires: new Date(
-                loginResult.expires_in * 1000 + new Date().getTime()
-              ),
-              avatar: staticAvatar,
+            const token = {
+              avatar: myInfo.avatar ?? staticAvatar,
               username: myInfo.username,
               nickname: myInfo.nickname,
               roles: myInfo.roles,
-              permissions: undefined
-            });
+              permissions: undefined,
+              accessToken: loginResult.access_token,
+              refreshToken: loginResult.refresh_token,
+              expires
+            };
+            updateTokenInfo(token);
+            this.SET_AVATAR(token.avatar);
+            this.setAvatarBase64();
             resolve({
               success: true,
-              data: {
-                avatar: staticAvatar,
-                username: myInfo.username,
-                nickname: myInfo.nickname,
-                roles: myInfo.roles,
-                permissions: undefined,
-                accessToken: loginResult.access_token,
-                refreshToken: loginResult.refresh_token,
-                expires: new Date(
-                  loginResult.expires_in * 1000 + new Date().getTime()
-                )
-              }
+              data: token
             });
           })
           .catch(error => {
             reject(error);
           });
+      });
+    },
+    /**获取用户头像 */
+    setAvatarBase64() {
+      if (!this.avatar) {
+        return;
+      }
+      if (
+        this.avatar === staticAvatar ||
+        this.avatar.startsWith("data:") ||
+        this.avatar.startsWith("blob:") ||
+        this.avatar.startsWith("http")
+      ) {
+        return;
+      }
+      const avatar = this.avatar;
+      this.SET_AVATAR(staticAvatar);
+      setTimeout(async () => {
+        ``;
+        AdminFileApi.fileDownload(avatar)
+          .then((res: Blob) => {
+            blobToDataURI(res)
+              .then(dataURI => this.SET_AVATAR(dataURI))
+              .catch(() => this.SET_AVATAR(staticAvatar));
+          })
+          .catch(() => this.SET_AVATAR(staticAvatar));
       });
     },
     /** 前端登出（调用接口） */

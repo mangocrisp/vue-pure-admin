@@ -8,7 +8,7 @@ import { useFullscreen } from "@vueuse/core";
 import type { routeMetaType } from "../types";
 import { transformI18n } from "@/plugins/i18n";
 import { router, remainingPaths } from "@/router";
-import { computed, type CSSProperties } from "vue";
+import { computed, onMounted, type CSSProperties } from "vue";
 import { useAppStoreHook } from "@/store/modules/app";
 import { useUserStoreHook } from "@/store/modules/user";
 import { useGlobal, isAllEmpty } from "@pureadmin/utils";
@@ -151,6 +151,10 @@ export function useNav() {
   function getLogo() {
     return new URL("/logo.svg", import.meta.url).href;
   }
+
+  onMounted(() => {
+    useUserStoreHook().setAvatarBase64();
+  });
 
   return {
     title,

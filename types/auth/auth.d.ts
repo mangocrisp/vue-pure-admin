@@ -1,6 +1,6 @@
 /** 鉴权管理 */
 declare namespace AuthType {
-  interface LoginParams {
+  export interface LoginParams {
     password: string;
     username: string;
     captcha_code: string;
@@ -9,16 +9,15 @@ declare namespace AuthType {
     scope: "all";
   }
 
-  interface LoginReturn {
+  export interface LoginReturn {
     access_token: string;
-    authenticationMethod: string;
-    expires_in: number;
+    access_token_exp: number;
+    atm: string;
     jti: string;
     refresh_token: string;
-    scope: "all";
+    refresh_token_exp: number;
+    scope: string[];
     token_type: "bearer";
-    userId: number;
-    username: string;
   }
 
   export interface Login {
