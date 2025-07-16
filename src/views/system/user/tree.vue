@@ -9,6 +9,7 @@ import OfficeBuilding from "~icons/ep/office-building";
 import LocationCompany from "~icons/ep/add-location";
 import ExpandIcon from "./svg/expand.svg?component";
 import UnExpandIcon from "./svg/unexpand.svg?component";
+import { Resolve } from "element-plus";
 
 interface Tree {
   id: number;
@@ -17,9 +18,16 @@ interface Tree {
   children?: Tree[];
 }
 
-defineProps({
-  treeLoading: Boolean,
-  treeData: Array
+interface PropsType {
+  treeData?: Tree[];
+  treeLoading?: boolean;
+  lazyLoad?: (node, resolve: Resolve) => void;
+}
+
+const props = withDefaults(defineProps<PropsType>(), {
+  treeData: () => [],
+  treeLoading: () => false,
+  lazyLoad: () => () => {}
 });
 
 const emit = defineEmits(["tree-select"]);
@@ -77,6 +85,15 @@ function toggleRowExpansionAll(status) {
   for (let i = 0; i < nodes.length; i++) {
     nodes[i].expanded = status;
   }
+}
+
+/**
+ * 懒加载数据
+ * @param node 节点数据
+ * @param resolve 加载数据
+ */
+function loadNode(node, resolve) {
+  props.lazyLoad(node, resolve);
 }
 
 /** 重置部门树状态（选中状态、搜索框值、树初始化） */
@@ -183,9 +200,9 @@ defineExpose({ onTreeReset });
           >
             <IconifyIconOffline
               :icon="
-                data.type === 1
+                data.type === '1'
                   ? OfficeBuilding
-                  : data.type === 2
+                  : data.type === '2'
                     ? LocationCompany
                     : Dept
               "

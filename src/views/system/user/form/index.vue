@@ -9,25 +9,35 @@ const props = withDefaults(defineProps<FormProps>(), {
   formInline: () => ({
     title: "新增",
     higherDeptOptions: [],
-    parentId: 0,
-    nickname: "",
-    username: "",
-    password: "",
-    phone: "",
-    email: "",
-    sex: "",
-    status: 1,
-    remark: ""
+    deptId: [],
+    id: undefined,
+    email: undefined,
+    gender: "1",
+    nickname: undefined,
+    password: undefined,
+    phone: undefined,
+    realName: undefined,
+    userType: "00",
+    username: undefined,
+    status: 1
   })
 });
 
+const cascaderProps = {
+  value: "id",
+  label: "name",
+  emitPath: false,
+  checkStrictly: true,
+  multiple: true
+};
+
 const sexOptions = [
   {
-    value: 0,
+    value: "1",
     label: "男"
   },
   {
-    value: 1,
+    value: "2",
     label: "女"
   }
 ];
@@ -79,6 +89,8 @@ defineExpose({ getRef });
           <el-input
             v-model="newFormInline.password"
             clearable
+            type="password"
+            show-password
             placeholder="请输入用户密码"
           />
         </el-form-item>
@@ -105,7 +117,7 @@ defineExpose({ getRef });
       <re-col :value="12" :xs="24" :sm="24">
         <el-form-item label="用户性别">
           <el-select
-            v-model="newFormInline.sex"
+            v-model="newFormInline.gender"
             placeholder="请选择用户性别"
             class="w-full"
             clearable
@@ -119,28 +131,13 @@ defineExpose({ getRef });
           </el-select>
         </el-form-item>
       </re-col>
-
       <re-col :value="12" :xs="24" :sm="24">
-        <el-form-item label="归属部门">
-          <el-cascader
-            v-model="newFormInline.parentId"
-            class="w-full"
-            :options="newFormInline.higherDeptOptions"
-            :props="{
-              value: 'id',
-              label: 'name',
-              emitPath: false,
-              checkStrictly: true
-            }"
+        <el-form-item label="真实姓名" prop="realName">
+          <el-input
+            v-model="newFormInline.realName"
             clearable
-            filterable
-            placeholder="请选择归属部门"
-          >
-            <template #default="{ node, data }">
-              <span>{{ data.name }}</span>
-              <span v-if="!node.isLeaf"> ({{ data.children.length }}) </span>
-            </template>
-          </el-cascader>
+            placeholder="请输入真实姓名"
+          />
         </el-form-item>
       </re-col>
       <re-col
@@ -162,13 +159,22 @@ defineExpose({ getRef });
         </el-form-item>
       </re-col>
 
-      <re-col>
-        <el-form-item label="备注">
-          <el-input
-            v-model="newFormInline.remark"
-            placeholder="请输入备注信息"
-            type="textarea"
-          />
+      <re-col :value="24" :xs="24" :sm="24">
+        <el-form-item label="归属部门">
+          <el-cascader
+            v-model="newFormInline.deptId"
+            class="w-full"
+            :options="newFormInline.higherDeptOptions"
+            :props="cascaderProps"
+            clearable
+            filterable
+            placeholder="请选择归属部门"
+          >
+            <template #default="{ node, data }">
+              <span>{{ data.name }}</span>
+              <span v-if="!node.isLeaf"> ({{ data.children.length }}) </span>
+            </template>
+          </el-cascader>
         </el-form-item>
       </re-col>
     </el-row>

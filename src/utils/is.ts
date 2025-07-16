@@ -135,3 +135,10 @@ export const isEmpty = <T = unknown>(val: T): val is T => {
 
   return false;
 };
+
+/** 断言 地址URL */
+export const isUrl = (path: string): boolean => {
+  const reg =
+    /(((^https?:(?:\/\/)?)(?:[-:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&%@.\w_]*)#?(?:[\w]*))?)$/;
+  return reg.test(path);
+};

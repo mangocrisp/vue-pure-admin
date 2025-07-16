@@ -22,6 +22,20 @@ const props = withDefaults(defineProps<FormProps>(), {
 
 const ruleFormRef = ref();
 const newFormInline = ref(props.formInline);
+const typeOptions = [
+  {
+    label: "公司",
+    value: 1
+  },
+  {
+    label: "分公司",
+    value: 2
+  },
+  {
+    label: "部门",
+    value: 3
+  }
+];
 
 function getRef() {
   return ruleFormRef.value;
@@ -97,6 +111,22 @@ defineExpose({ getRef });
             clearable
             placeholder="请输入部门全称"
           />
+        </el-form-item>
+      </re-col>
+      <re-col :value="12" :xs="24" :sm="24">
+        <el-form-item label="部门类型">
+          <el-select
+            v-model="newFormInline.type"
+            placeholder="请选择部门类型"
+            clearable
+          >
+            <el-option
+              v-for="item in typeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
         </el-form-item>
       </re-col>
       <re-col :value="12" :xs="24" :sm="24">

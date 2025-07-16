@@ -13,7 +13,6 @@ import type {
 import NProgress from "../progress";
 import { getToken, formatToken } from "@/utils/auth";
 import { useUserStoreHook } from "@/store/modules/user";
-import cancelRepeatRequest from "./cancelRepeatRequest";
 import { ElMessage, ElNotification } from "element-plus";
 
 // 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
@@ -106,8 +105,6 @@ class PureHttp {
           PureHttp.initConfig.beforeRequestCallback(config);
           return config;
         }
-        // 存储请求，防止重复请求
-        cancelRepeatRequest.set(config);
         // 查询参数为空串改为undefine, 达到不传递到后端的要求
         if (config.params) {
           Object.entries(config.params).reduce((acc, [key, value]) => {
@@ -173,9 +170,6 @@ class PureHttp {
             });
       },
       error => {
-        if (error?.config) {
-          cancelRepeatRequest.del(error.config);
-        }
         return Promise.reject(error);
       }
     );
@@ -189,7 +183,6 @@ class PureHttp {
         const $config = response.config;
         const { data, headers } = response || {};
         const { code = "", message = "", success = undefined } = data || {};
-        cancelRepeatRequest.del($config);
         // 关闭进度条动画
         NProgress.done();
         // 优先判断post/get等方法是否传入回调，否则执行初始化设置等回调
@@ -221,9 +214,6 @@ class PureHttp {
       },
       async (error: PureHttpError<ResponseBody>) => {
         const $error = error;
-        if ($error?.config) {
-          cancelRepeatRequest.del($error.config);
-        }
         if ($error.code === "ERR_CANCELED") {
           ElNotification({
             title: "重复查询",

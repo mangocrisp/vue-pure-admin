@@ -7,11 +7,15 @@ import {
   routerArrays,
   storageLocal
 } from "../utils";
-import User, { type UserResult } from "@/api/user";
+import type UserResult from "@/api/user";
 import { useMultiTagsStoreHook } from "./multiTags";
 import { type DataInfo, setToken, removeToken, userKey } from "@/utils/auth";
 import { useEncrypt } from "@/hooks";
 import Auth from "@/api/auth";
+import SystemUserApi from "@/api/system/user";
+import staticAvatar from "@/assets/user.jpg";
+import AdminFileApi from "@/api/admin/file";
+import { blobToDataURI } from "@/utils";
 
 let reLoginHandler!: Promise<any> | null;
 
@@ -92,14 +96,22 @@ export const useUserStore = defineStore("pure-user", {
                 loginResult.expires_in * 1000 + new Date().getTime()
               )
             });
-            const { data: myInfo } = await User.myInfo();
+            const { data: myInfo } = await SystemUserApi.myInfo();
+            if (myInfo.avatar) {
+              setTimeout(async () => {
+                const dataURI = await AdminFileApi.fileDownload(
+                  myInfo.avatar
+                ).then(async (res: Blob) => await blobToDataURI(res));
+                this.SET_AVATAR(dataURI);
+              });
+            }
             setToken({
               accessToken: loginResult.access_token,
               refreshToken: loginResult.refresh_token,
               expires: new Date(
                 loginResult.expires_in * 1000 + new Date().getTime()
               ),
-              avatar: myInfo.avatar,
+              avatar: staticAvatar,
               username: myInfo.username,
               nickname: myInfo.nickname,
               roles: myInfo.roles,
@@ -108,7 +120,7 @@ export const useUserStore = defineStore("pure-user", {
             resolve({
               success: true,
               data: {
-                avatar: myInfo.avatar,
+                avatar: staticAvatar,
                 username: myInfo.username,
                 nickname: myInfo.nickname,
                 roles: myInfo.roles,

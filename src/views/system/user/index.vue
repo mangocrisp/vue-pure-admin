@@ -34,6 +34,7 @@ const {
   buttonClass,
   deviceDetection,
   onSearch,
+  lazyLoad,
   resetForm,
   onbatchDel,
   openDialog,
@@ -57,6 +58,7 @@ const {
       :class="['mr-2', deviceDetection() ? 'w-full' : 'min-w-[200px]']"
       :treeData="treeData"
       :treeLoading="treeLoading"
+      :lazy-load="lazyLoad"
       @tree-select="onTreeSelect"
     />
     <div
@@ -203,7 +205,6 @@ const {
                   type="primary"
                   :size="size"
                   :icon="useRenderIcon(More)"
-                  @click="handleUpdate(row)"
                 />
                 <template #dropdown>
                   <el-dropdown-menu>

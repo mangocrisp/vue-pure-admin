@@ -223,7 +223,6 @@ export function useDept() {
         }
         FormRef.validate(async valid => {
           if (valid) {
-            console.log("curData", curData);
             const { formInline: formInlineData } = curData;
             const pidAllArr = formInlineData.pidAll as string[];
             const saveData = {

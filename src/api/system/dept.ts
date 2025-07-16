@@ -36,4 +36,19 @@ export default class SystemDeptApi {
       url: `${URL}/${id}`
     });
   };
+  /**获取用户部门 */
+  static loadDeptUser = (userId: string) =>
+    request.post<Res<{ deptId: string; userId: string }[]>>({
+      url: `${URL}/user`,
+      data: {
+        userId
+      }
+    });
+
+  /**保存用户部门 */
+  static saveDeptUser = (data: { deptId: string; userId: string }[]) =>
+    request.put<Res<string>>({
+      url: `${URL}/user`,
+      data
+    });
 }
