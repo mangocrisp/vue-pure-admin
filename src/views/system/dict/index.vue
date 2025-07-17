@@ -1,18 +1,42 @@
 <script setup lang="ts">
 import { usePermission } from "./utils/hook";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
-import { deviceDetection } from "@pureadmin/utils";
+import { deviceDetection, storageSession } from "@pureadmin/utils";
 
 import Delete from "~icons/ep/delete";
 import EditPen from "~icons/ep/edit-pen";
 import Refresh from "~icons/ep/refresh";
 import AddFill from "~icons/ri/add-circle-line";
+import AntDesignLeftOutlined from "~icons/ant-design/left-outlined";
+import { useRouter } from "vue-router";
 
 defineOptions({
-  name: "permission"
+  name: "dictType"
 });
+
+const router = useRouter();
+
+const cachePathKey = "_dict_item_goback_route_";
+
+const goBack = () => {
+  const lastRoute = storageSession().getItem(cachePathKey);
+  if (lastRoute === router.currentRoute.value.fullPath) {
+    // 没有历史记录，跳转到默认页面
+    router.replace({ path: "/dict-type" });
+    storageSession().removeItem(cachePathKey);
+    return;
+  }
+  storageSession().setItem(cachePathKey, router.currentRoute.value.fullPath);
+  if (history.length > 1) {
+    // 有历史记录，后退一步
+    history.go(-1);
+  } else {
+    // 没有历史记录，跳转到默认页面
+    router.replace({ path: "/dict-type" });
+  }
+};
 
 const formRef = ref();
 const tableRef = ref();
@@ -43,10 +67,18 @@ const {
       :model="form"
       class="search-form bg-bg_color w-full pl-8 pt-[12px] overflow-auto"
     >
-      <el-form-item label="权限名称：" prop="name">
+      <el-form-item label="字典键：" prop="title">
         <el-input
-          v-model="form.name"
-          placeholder="请输入权限名称"
+          v-model="form.dictKey"
+          placeholder="请输入字典键"
+          clearable
+          class="w-[180px]!"
+        />
+      </el-form-item>
+      <el-form-item label="字典值：" prop="title">
+        <el-input
+          v-model="form.dictVal"
+          placeholder="请输入字典值"
           clearable
           class="w-[180px]!"
         />
@@ -70,7 +102,20 @@ const {
       ref="contentRef"
       :class="['flex', deviceDetection() ? 'flex-wrap' : '']"
     >
-      <PureTableBar title="权限管理" :columns="columns" @refresh="onSearch">
+      <PureTableBar :columns="columns" @refresh="onSearch">
+        <template #title>
+          <div style="text-align: left">
+            <el-button
+              type="primary"
+              :icon="useRenderIcon(AntDesignLeftOutlined)"
+              @click="goBack"
+            >
+              返回
+            </el-button>
+            <el-divider direction="vertical" />
+            <span>字典管理</span>
+          </div>
+        </template>
         <template #buttons>
           <el-button
             type="primary"
@@ -81,7 +126,7 @@ const {
           </el-button>
 
           <el-popconfirm
-            title="是否批量删除勾选权限?"
+            title="是否批量删除勾选字典?"
             placement="right"
             @confirm="handleDeleteBatch"
           >
@@ -130,7 +175,7 @@ const {
                 修改
               </el-button>
               <el-popconfirm
-                :title="`是否确认删除权限名称为${row.name}的这条数据`"
+                :title="`是否确认删除字典名称为${row.name}的这条数据`"
                 @confirm="handleDelete(row)"
               >
                 <template #reference>

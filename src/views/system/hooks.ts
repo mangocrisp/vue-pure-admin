@@ -5,6 +5,12 @@ import { useDark } from "@pureadmin/utils";
 export function usePublicHooks() {
   const { isDark } = useDark();
 
+  const linkStyle = computed(() => {
+    return {
+      color: "var(--el-color-primary)"
+    };
+  });
+
   const switchStyle = computed(() => {
     return {
       "--el-switch-on-color": "#6abe39",
@@ -34,6 +40,8 @@ export function usePublicHooks() {
     /** 表现更鲜明的`el-switch`组件  */
     switchStyle,
     /** 表现更鲜明的`el-tag`组件  */
-    tagStyle
+    tagStyle,
+    /** 链接样式 */
+    linkStyle
   };
 }
