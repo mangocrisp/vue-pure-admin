@@ -149,7 +149,7 @@ export function usePermission() {
    * @param row 当前行
    */
   async function handleDelete(row) {
-    message(`您删除了权限名称为${row.name}的这条数据`, { type: "success" });
+    message(`您删除了字典名称为${row.name}的这条数据`, { type: "success" });
     await SystemDictApi.remove(row.id);
     onSearch();
   }
@@ -226,7 +226,7 @@ export function usePermission() {
    */
   function openDialog(title = "新增", row?: SystemDictType.Dict) {
     addDialog({
-      title: `${title}权限`,
+      title: `${title}字典`,
       props: {
         formInline: {
           id: row?.id,
@@ -250,7 +250,7 @@ export function usePermission() {
         const curData = options.props as DictEditFormDTO;
         function chores() {
           message(
-            `您${title}了权限名称为${curData.formInline.dictVal}的这条数据`,
+            `您${title}了字典名称为${curData.formInline.dictVal}的这条数据`,
             {
               type: "success"
             }
@@ -281,7 +281,7 @@ export function usePermission() {
     });
   }
 
-  /** 高亮当前权限选中行 */
+  /** 高亮当前字典选中行 */
   function rowStyle({ row: { id } }) {
     return {
       cursor: "pointer",
