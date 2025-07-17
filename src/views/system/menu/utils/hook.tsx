@@ -17,6 +17,8 @@ export function useMenu() {
 
   const formRef = ref();
   const dataList = ref([]);
+  // 纯菜单树，不包含权限
+  const menuList = ref([]);
   const loading = ref(true);
 
   const getMenuType = (type, text = false) => {
@@ -152,6 +154,7 @@ export function useMenu() {
       name: form.name
     });
     dataList.value = handleTree(mixMenuPermData(menuData, permData)); // 处理成树结构
+    menuList.value = handleTree(menuData.filter(item => item.parentId)); // 处理成树结构
     setTimeout(() => {
       loading.value = false;
     }, 500);
@@ -268,14 +271,10 @@ export function useMenu() {
     if (!treeList || !treeList.length) return;
     const newTreeList = [];
     for (let i = 0; i < treeList.length; i++) {
-      if (treeList[i].menuData.name) {
-        treeList[i].menuData.name = transformI18n(treeList[i].menuData.name);
+      if (treeList[i].name) {
+        treeList[i].name = transformI18n(treeList[i].name);
       }
-      if (treeList[i].permData.name) {
-        treeList[i].permData.name = transformI18n(treeList[i].permData.name);
-      }
-      treeList[i].title =
-        treeList[i].menuData.name || treeList[i].permData.name;
+      treeList[i].title = treeList[i].name;
       formatHigherMenuOptions(treeList[i].children);
       newTreeList.push(treeList[i]);
     }
@@ -287,7 +286,7 @@ export function useMenu() {
       title: `${title}菜单`,
       props: {
         formInline: {
-          higherMenuOptions: formatHigherMenuOptions(cloneDeep(dataList.value)),
+          higherMenuOptions: formatHigherMenuOptions(cloneDeep(menuList.value)),
           parentId: row?.parentId,
           menuType: row?.menuType ?? 0,
           meta: row?.meta ?? {

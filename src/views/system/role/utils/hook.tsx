@@ -119,7 +119,7 @@ export function useRole(treeRef: Ref) {
   // });
 
   /** 选中的行 */
-  const selectedRows = reactive<SystemRoleType.Role[]>([]);
+  const selectedRows: SystemRoleType.Role[] = [];
 
   /**
    * 状态修改
@@ -182,10 +182,10 @@ export function useRole(treeRef: Ref) {
     }
     loading.value = true;
     try {
-      const { message } = await SystemRoleApi.batchRemove(
+      const { message: msg } = await SystemRoleApi.batchRemove(
         selectedRows.map(item => item.id)
       );
-      message(message, { type: "success" });
+      message(msg, { type: "success" });
       selectedRows.length = 0;
       onSearch();
     } catch (error) {

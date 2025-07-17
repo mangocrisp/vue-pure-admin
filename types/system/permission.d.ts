@@ -9,31 +9,7 @@ declare namespace SystemPermissionType {
     menuName: string;
     urlPerm: string;
     btnPerm: string;
-  }
-
-  export interface PermissionPageReturn {
-    (params: any): HttpReturnPage<Permission>;
-  }
-  export interface PermissionListReturn {
-    (params?: any): HttpReturn<Permission[]>;
-  }
-
-  interface PermissionListGroupWithMenu {
-    groupId: string;
-    groupName: string;
-    menuId: string;
-    menuName: string;
-    permissionVOS: Permission[];
-  }
-
-  export interface PermissionListGroupWithMenuReturn {
-    (): HttpReturn<PermissionListGroupWithMenu[]>;
-  }
-
-  export interface BatchSave {
-    (
-      params: OmitDefaultParams<Permission>[] | [{ menuId: string }]
-    ): HttpReturn<string>;
+    roles: SystemRoleType.Role[];
   }
 
   /** 新增对象 */
@@ -52,5 +28,9 @@ declare namespace SystemPermissionType {
     menuId: string;
     urlPerm: string;
     btnPerm: string;
+  }
+
+  export interface PermissionEditFormDTO {
+    formInline: PermissionAddDTO | PermissionUpdateDTO;
   }
 }

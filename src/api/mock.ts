@@ -112,7 +112,7 @@ export const systemMonitorRouter = {
 };
 
 export const permissionRouter = {
-  path: "/permission",
+  path: "/perm",
   meta: {
     title: "menus.purePermission",
     icon: "ep:lollipop",
@@ -120,7 +120,7 @@ export const permissionRouter = {
   },
   children: [
     {
-      path: "/permission/page/index",
+      path: "/perm/page/index",
       name: "PermissionPage",
       meta: {
         title: "menus.purePermissionPage",
@@ -128,14 +128,14 @@ export const permissionRouter = {
       }
     },
     {
-      path: "/permission/button",
+      path: "/perm/button",
       meta: {
         title: "menus.purePermissionButton",
         roles: ["admin", "common"]
       },
       children: [
         {
-          path: "/permission/button/router",
+          path: "/perm/button/router",
           component: "permission/button/index",
           name: "PermissionButtonRouter",
           meta: {
@@ -148,7 +148,7 @@ export const permissionRouter = {
           }
         },
         {
-          path: "/permission/button/login",
+          path: "/perm/button/login",
           component: "permission/button/perms",
           name: "PermissionButtonLogin",
           meta: {

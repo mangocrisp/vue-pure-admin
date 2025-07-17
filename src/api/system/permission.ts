@@ -7,7 +7,9 @@ const URL = "/system/v1/permission";
 
 export default class SystemPermissionApi {
   /** 权限管理列表(分页) */
-  static page: SystemPermissionType.PermissionPageReturn = params => {
+  static page = (
+    params: any
+  ): HttpReturnPage<SystemPermissionType.Permission> => {
     return request.get({
       url: `${URL}/pageWithMenu`,
       params
@@ -15,23 +17,19 @@ export default class SystemPermissionApi {
   };
 
   /** 权限管理列表 */
-  static list: SystemPermissionType.PermissionListReturn = params => {
+  static list = (
+    params?: any
+  ): HttpReturn<SystemPermissionType.Permission[]> => {
     return request.get({
       url: `${URL}/list`,
       params
     });
   };
 
-  /** 按关联菜单进行分组的权限列表 */
-  static listGroupWithMenu: SystemPermissionType.PermissionListGroupWithMenuReturn =
-    () => {
-      return request.get({
-        url: `${URL}/listGroupWithMenu`
-      });
-    };
-
   /** 添加与菜单关联字段的权限列表 */
-  static listWithMenu: SystemPermissionType.PermissionListReturn = params => {
+  static listWithMenu = (
+    params?: any
+  ): HttpReturn<SystemPermissionType.Permission[]> => {
     return request.get({
       url: `${URL}/listWithMenu`,
       params
@@ -47,7 +45,11 @@ export default class SystemPermissionApi {
   };
 
   /** 保存菜单与权限关联 */
-  static batchSave: SystemPermissionType.BatchSave = data => {
+  static batchSave = (
+    data:
+      | OmitDefaultParams<SystemPermissionType.Permission>[]
+      | [{ menuId: string }]
+  ): HttpReturn<string> => {
     return request.post<any>({
       url: `${URL}/batch`,
       data
