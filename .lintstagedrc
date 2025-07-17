@@ -11,10 +11,12 @@
   ],
   "*.vue": [
     "prettier --write",
-    "eslint --cache --fix"
+    "eslint --cache --fix",
+    "stylelint --fix --allow-empty-input"
   ],
   "*.{css,scss,html}": [
-    "prettier --cache --ignore-unknown --write"
+    "prettier --cache --ignore-unknown --write",
+    "stylelint --fix --allow-empty-input"
   ],
   "*.md": [
     "prettier --cache --ignore-unknown --write"
