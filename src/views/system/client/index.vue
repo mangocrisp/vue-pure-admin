@@ -5,7 +5,5 @@ defineOptions({
 </script>
 
 <template>
-  <div>客户端管理</div>
+  <div class="main">客户端管理</div>
 </template>
-
-<style lang="scss" scoped></style>
