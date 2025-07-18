@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { formRules } from "./utils/rule";
-import { transformI18n } from "@/plugins/i18n";
 import type { DictEditFormDTO } from "./utils/types";
 
 const props = withDefaults(defineProps<DictEditFormDTO>(), {
