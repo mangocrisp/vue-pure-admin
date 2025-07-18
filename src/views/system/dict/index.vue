@@ -67,7 +67,7 @@ const {
       :model="form"
       class="search-form bg-bg_color w-full pl-8 pt-[12px] overflow-auto"
     >
-      <el-form-item label="字典键：" prop="title">
+      <el-form-item label="字典键：" prop="dictKey">
         <el-input
           v-model="form.dictKey"
           placeholder="请输入字典键"
@@ -75,7 +75,7 @@ const {
           class="w-[180px]!"
         />
       </el-form-item>
-      <el-form-item label="字典值：" prop="title">
+      <el-form-item label="字典值：" prop="dictVal">
         <el-input
           v-model="form.dictVal"
           placeholder="请输入字典值"

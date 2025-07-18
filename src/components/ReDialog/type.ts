@@ -211,6 +211,14 @@ interface DialogOptions extends DialogProps {
     options: DialogOptions;
     index: number;
   }) => void;
+  /** 重置表单，只要设置了这个方法，就会在按钮组里面出现一个重置按钮，点击重置，就能调用设置的重置方法了 */
+  resetForm?: ({
+    options,
+    index
+  }: {
+    options: DialogOptions;
+    index: number;
+  }) => void;
   /** `Dialog` 关闭后的回调。 `args` 返回的 `command` 值解析：`cancel` 点击取消按钮、`sure` 点击确定按钮、`close` 点击右上角关闭按钮或空白页或按下了esc键  */
   closeCallBack?: ({
     options,

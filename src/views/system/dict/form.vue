@@ -54,11 +54,11 @@ defineExpose({ getRef });
         placeholder="请输入样式值"
       />
     </el-form-item>
-    <el-form-item label="状态值">
+    <el-form-item label="状态样式">
       <el-input
         v-model="newFormInline.statusClass"
         clearable
-        placeholder="请输入状态值"
+        placeholder="请输入状态样式"
       />
     </el-form-item>
     <el-form-item label="备注">

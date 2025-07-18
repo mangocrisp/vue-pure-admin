@@ -105,7 +105,7 @@ export function usePermission() {
       `确认要<strong>${
         row.status === 0 ? "停用" : "启用"
       }</strong><strong style='color:var(--el-color-primary)'>${
-        row.name
+        row.dictVal
       }</strong>吗?`,
       "系统提示",
       {
@@ -132,7 +132,7 @@ export function usePermission() {
             loading: false
           }
         );
-        message(`已${row.status === 0 ? "停用" : "启用"}${row.title}`, {
+        message(`已${row.status === 0 ? "停用" : "启用"}${row.dictVal}`, {
           type: "success"
         });
       })
@@ -142,7 +142,7 @@ export function usePermission() {
   }
 
   /** 选中的行 */
-  const selectedRows: SystemPermissionType.Permission[] = [];
+  const selectedRows: SystemDictType.Dict[] = [];
 
   /**
    * 删除

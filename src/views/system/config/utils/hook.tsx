@@ -7,15 +7,17 @@ import type { PaginationProps } from "@pureadmin/table";
 import { deviceDetection } from "@pureadmin/utils";
 import { reactive, ref, onMounted, h, toRaw } from "vue";
 import { ElMessageBox } from "element-plus";
-import SystemDictTypeApi from "@/api/system/dictType";
 import { usePublicHooks } from "../../hooks";
-import { RouterLink } from "vue-router";
-import type { DictTtypeEditFormDTO } from "./types";
+import type { EditFormDTO } from "./types";
+import SystemParamsApi from "@/api/system/params";
+import { ParamsType } from "./enums";
 
 export function usePermission() {
   /** 查询表单 */
   const form = reactive({
-    title: undefined
+    title: "",
+    paramsVal: "",
+    paramsKey: ""
   });
   /** 当前行 */
   const curRow = ref();
@@ -24,7 +26,7 @@ export function usePermission() {
   /** 列表数据 */
   const dataList = ref([]);
   const switchLoadMap = ref({});
-  const { switchStyle, linkStyle } = usePublicHooks();
+  const { switchStyle } = usePublicHooks();
   /** 加载中 */
   const loading = ref(true);
   /** 分页 */
@@ -37,21 +39,20 @@ export function usePermission() {
   /** 列名 */
   const columns: TableColumnList = [
     {
-      label: "字典名称",
+      label: "参数名",
       prop: "title"
     },
     {
-      label: "字典编码",
-      cellRenderer: scope => (
-        <RouterLink
-          to={{
-            path: `/dict/${scope.row.dictCode}`
-          }}
-        >
-          <a style={linkStyle.value}>{scope.row.dictCode}</a>
-        </RouterLink>
-      ),
-      minWidth: 90
+      label: "参数键",
+      prop: "paramsKey"
+    },
+    {
+      label: "参数值",
+      prop: "paramsVal"
+    },
+    {
+      label: "类型",
+      prop: "type"
     },
     {
       label: "状态",
@@ -126,7 +127,11 @@ export function usePermission() {
             loading: true
           }
         );
-        await SystemDictTypeApi.update({ id: row.id, status: row.status });
+        await SystemParamsApi.update({
+          id: row.id,
+          status: row.status,
+          paramsKey: row.paramsKey
+        });
         switchLoadMap.value[index] = Object.assign(
           {},
           switchLoadMap.value[index],
@@ -144,15 +149,15 @@ export function usePermission() {
   }
 
   /** 选中的行 */
-  const selectedRows: SystemPermissionType.Permission[] = [];
+  const selectedRows: SystemParamsType.Params[] = [];
 
   /**
    * 删除
    * @param row 当前行
    */
   async function handleDelete(row) {
-    message(`您删除了权限名称为${row.name}的这条数据`, { type: "success" });
-    await SystemDictTypeApi.remove(row.id);
+    message(`您删除了字典名称为${row.name}的这条数据`, { type: "success" });
+    await SystemParamsApi.remove(row.id);
     onSearch();
   }
 
@@ -164,7 +169,7 @@ export function usePermission() {
     }
     loading.value = true;
     try {
-      const { message: msg } = await SystemDictTypeApi.batchRemove(
+      const { message: msg } = await SystemParamsApi.batchRemove(
         selectedRows.map(item => item.id)
       );
       message(msg, { type: "success" });
@@ -203,7 +208,7 @@ export function usePermission() {
   /** 搜索 */
   async function onSearch() {
     loading.value = true;
-    const { data } = await SystemDictTypeApi.page({
+    const { data } = await SystemParamsApi.page({
       ...{ pageNum: pagination.currentPage, pageSize: pagination.pageSize },
       ...toRaw(form)
     });
@@ -226,14 +231,20 @@ export function usePermission() {
    * @param title 表单标题
    * @param row 编辑的数据
    */
-  function openDialog(title = "新增", row?: SystemDictTypeType.DictType) {
+  function openDialog(title = "新增", row?: SystemParamsType.Params) {
+    console.log("row :>> ", row);
     addDialog({
-      title: `${title}权限`,
+      title: `${title}字典`,
       props: {
+        isAddForm: title === "新增",
         formInline: {
           id: row?.id,
+          type: row?.type ?? ParamsType.STRING,
           title: row?.title,
-          dictCode: row?.dictCode,
+          paramsKey: row?.paramsKey,
+          paramsVal: row?.paramsVal,
+          realValue: row?.realValue,
+          status: row?.status,
           remark: row?.remark
         }
       },
@@ -243,12 +254,13 @@ export function usePermission() {
       fullscreenIcon: true,
       closeOnClickModal: false,
       contentRenderer: () => h(editForm, { ref: formRef, formInline: null }),
+      resetForm: () => formRef.value.resetForm(),
       beforeSure: (done, { options }) => {
-        const FormRef = formRef.value.getRef();
-        const curData = options.props as DictTtypeEditFormDTO;
+        const FormRef = formRef.value.getFormRef();
+        const curData = options.props as EditFormDTO;
         function chores() {
           message(
-            `您${title}了权限名称为${curData.formInline.title}的这条数据`,
+            `您${title}了字典名称为${curData.formInline.title}的这条数据`,
             {
               type: "success"
             }
@@ -262,14 +274,14 @@ export function usePermission() {
             // 表单规则校验通过
             if (title === "新增") {
               // 实际开发先调用新增接口，再进行下面操作
-              await SystemDictTypeApi.add(
-                curData.formInline as SystemDictTypeType.DictTypeAddDTO
+              await SystemParamsApi.add(
+                curData.formInline as SystemParamsType.ParamsAddDTO
               );
               chores();
             } else {
               // 实际开发先调用修改接口，再进行下面操作
-              await SystemDictTypeApi.update(
-                curData.formInline as SystemDictTypeType.DictTypeUpdateDTO
+              await SystemParamsApi.update(
+                curData.formInline as SystemParamsType.ParamsUpdateDTO
               );
               chores();
             }
@@ -279,7 +291,7 @@ export function usePermission() {
     });
   }
 
-  /** 高亮当前权限选中行 */
+  /** 高亮当前字典选中行 */
   function rowStyle({ row: { id } }) {
     return {
       cursor: "pointer",
@@ -293,7 +305,6 @@ export function usePermission() {
 
   return {
     form,
-    curRow,
     loading,
     columns,
     rowStyle,
@@ -305,7 +316,6 @@ export function usePermission() {
     handleDelete,
     handleDeleteBatch,
     transformI18n,
-    // handleDatabase,
     handleSizeChange,
     handleCurrentChange,
     handleSelectionChange

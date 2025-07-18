@@ -171,6 +171,16 @@ function handleClose(
         <component :is="options?.footerRenderer({ options, index })" />
       </template>
       <span v-else>
+        <el-button
+          v-if="options.resetForm"
+          type="warning"
+          text
+          bg
+          plain
+          @click="options.resetForm({ options, index })"
+        >
+          还原
+        </el-button>
         <template v-for="(btn, key) in footerButtons(options)" :key="key">
           <el-popconfirm
             v-if="btn.popconfirm"

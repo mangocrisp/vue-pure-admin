@@ -3,7 +3,7 @@ import { ref } from "vue";
 import ReCol from "@/components/ReCol";
 import { formRules } from "./utils/rule";
 import { FormProps } from "./utils/types";
-import { usePublicHooks } from "../hooks";
+import { typeOptions } from "./utils/enums";
 
 const props = withDefaults(defineProps<FormProps>(), {
   formInline: () => ({
@@ -22,20 +22,6 @@ const props = withDefaults(defineProps<FormProps>(), {
 
 const ruleFormRef = ref();
 const newFormInline = ref(props.formInline);
-const typeOptions = [
-  {
-    label: "公司",
-    value: 1
-  },
-  {
-    label: "分公司",
-    value: 2
-  },
-  {
-    label: "部门",
-    value: 3
-  }
-];
 
 function getRef() {
   return ruleFormRef.value;
