@@ -20,7 +20,15 @@ import { useUserStoreHook } from "@/store/modules/user";
 import { initRouter, getTopMenu } from "@/router/utils";
 import { bg, avatar, illustration } from "./utils/static";
 import { ReImageVerify } from "@/components/ReImageVerify";
-import { ref, toRaw, reactive, watch, computed, onMounted } from "vue";
+import {
+  ref,
+  toRaw,
+  reactive,
+  watch,
+  computed,
+  onMounted,
+  nextTick
+} from "vue";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import { useTranslationLang } from "@/layout/hooks/useTranslationLang";
 import { useDataThemeChange } from "@/layout/hooks/useDataThemeChange";
@@ -133,7 +141,11 @@ const onLogin = async (formEl: FormInstance | undefined) => {
                     redirect.substring(13)
                   );
                 } else {
-                  await router.push({ path: redirect });
+                  await router.push({ path: "/" });
+                  nextTick(() => {
+                    router.replace({ path: redirect });
+                  });
+                  // 没有历史记录，跳转到默认页面
                   message(t("login.pureLoginSuccess"), { type: "success" });
                 }
               } finally {

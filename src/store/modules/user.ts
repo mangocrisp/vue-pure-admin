@@ -143,7 +143,6 @@ export const useUserStore = defineStore("pure-user", {
       const avatar = this.avatar;
       this.SET_AVATAR(staticAvatar);
       setTimeout(async () => {
-        ``;
         AdminFileApi.fileDownload(avatar)
           .then((res: Blob) => {
             blobToDataURI(res)
