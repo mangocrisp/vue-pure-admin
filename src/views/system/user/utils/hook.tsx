@@ -584,17 +584,13 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         dangerouslyUseHTMLString: true,
         draggable: true
       }
-    )
-      .then(async () => {
-        await SystemUserApi.resetPassword([row.id]);
-        message(`已成功重置 ${row.username} 用户的密码`, {
-          type: "success"
-        });
-        onSearch(); // 刷新表格数据
-      })
-      .catch(() => {
-        row.status === 0 ? (row.status = 1) : (row.status = 0);
+    ).then(async () => {
+      await SystemUserApi.resetPassword([row.id]);
+      message(`已成功重置 ${row.username} 用户的密码`, {
+        type: "success"
       });
+      onSearch(); // 刷新表格数据
+    });
   }
 
   /** 分配角色 */

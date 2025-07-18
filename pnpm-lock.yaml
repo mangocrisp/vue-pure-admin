@@ -149,6 +149,12 @@ importers:
       swiper:
         specifier: ^11.2.8
         version: 11.2.8
+      ts-md5:
+        specifier: ^2.0.1
+        version: 2.0.1
+      ts-uuid:
+        specifier: ^0.2.0
+        version: 0.2.0
       typeit:
         specifier: ^8.8.7
         version: 8.8.7
@@ -5141,6 +5147,13 @@ packages:
     engines: {node: '>=18.12'}
     peerDependencies:
       typescript: '>=4.8.4'
+
+  ts-md5@2.0.1:
+    resolution: {integrity: sha512-yF35FCoEOFBzOclSkMNEUbFQZuv89KEQ+5Xz03HrMSGUGB1+r+El+JiGOFwsP4p9RFNzwlrydYoTLvPOuICl9w==}
+    engines: {node: '>=18'}
+
+  ts-uuid@0.2.0:
+    resolution: {integrity: sha512-B+gNVljJdewUJWlBo81Ap5gB4B0n9ER5URvJIE/eGikGCe4iNaOvZCUUzAUtS9bwjLH5McDfAla1iGmnSICFfQ==}
 
   tslib@2.3.0:
     resolution: {integrity: sha512-N82ooyxVNm6h1riLCoyS9e3fuJ3AMG2zIZs2Gd1ATcSFjSA23Q0fzjjZeh0jbJvWVDZ0cJT8yaNNaaXHzueNjg==}
@@ -10837,6 +10850,10 @@ snapshots:
   ts-api-utils@2.1.0(typescript@5.8.3):
     dependencies:
       typescript: 5.8.3
+
+  ts-md5@2.0.1: {}
+
+  ts-uuid@0.2.0: {}
 
   tslib@2.3.0: {}
 

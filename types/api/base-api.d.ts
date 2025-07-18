@@ -70,4 +70,27 @@ declare namespace BaseApi {
     T extends { id: any },
     K extends keyof T = "id"
   > = Omit<T, K> & Partial<Pick<T, K>>;
+
+  /**SQL 查询参数 */
+  export interface SqlQueryParams {
+    /**分页页码 */
+    pageNum?: number;
+    /**分页大小 */
+    pageSize?: number;
+    /**排序字段 */
+    pageOrder?: string;
+  }
+  /**SQL 分页参数 */
+  export interface SqlPageParams {
+    /**分页页码 */
+    pageNum?: number;
+    /**分页大小 */
+    pageSize?: number;
+    /**是否查询总数 */
+    countTotal?: boolean;
+    /**排序字段 */
+    pageOrder?: string;
+    /**按哪些字段排序 asc（正序） 或者 desc（倒序），这个是个集合 */
+    sort?: string[];
+  }
 }
