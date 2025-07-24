@@ -44,6 +44,15 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
       exclude
     },
     build: {
+      minify: "terser", // 明确指定使用 terser 压缩
+      terserOptions: {
+        compress: {
+          //drop_console: true, // 移除所有 console
+          drop_debugger: true, // 同时移除 debugger
+          // 如需保留特定 console 方法，例如保留 console.error
+          pure_funcs: ["console.log", "console.warn"] // 可选：只移除 log 和 warn
+        }
+      },
       // https://cn.vitejs.dev/guide/build.html#browser-compatibility
       target: "es2015",
       sourcemap: false,
