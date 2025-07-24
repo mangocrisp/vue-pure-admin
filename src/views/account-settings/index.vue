@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { getMine } from "@/api/user";
+import { useUserStoreHook } from "@/store/modules/user";
 import { useRouter } from "vue-router";
-import { ref, onBeforeMount } from "vue";
+import { ref, onBeforeMount, computed, onMounted } from "vue";
 import { ReText } from "@/components/ReText";
 import Profile from "./components/Profile.vue";
 import Preferences from "./components/Preferences.vue";
 import SecurityLog from "./components/SecurityLog.vue";
-import { useGlobal, deviceDetection } from "@pureadmin/utils";
+import { useGlobal, deviceDetection, isAllEmpty } from "@pureadmin/utils";
 import AccountManagement from "./components/AccountManagement.vue";
 import { useDataThemeChange } from "@/layout/hooks/useDataThemeChange";
 import LaySidebarTopCollapse from "@/layout/components/lay-sidebar/components/SidebarTopCollapse.vue";
+import Avatar from "@/assets/user.jpg";
 
 import leftLine from "~icons/ri/arrow-left-s-line";
 import ProfileIcon from "~icons/ri/user-3-line";
@@ -24,15 +25,30 @@ defineOptions({
 const router = useRouter();
 const isOpen = ref(deviceDetection() ? false : true);
 const { $storage } = useGlobal<GlobalPropertiesApi>();
+
 onBeforeMount(() => {
   useDataThemeChange().dataThemeChange($storage.layout?.overallStyle);
 });
 
-const userInfo = ref({
-  avatar: "",
-  username: "",
-  nickname: ""
+/** 头像（如果头像为空则使用 src/assets/user.jpg ） */
+const userAvatar = computed(() => {
+  return isAllEmpty(useUserStoreHook()?.avatar)
+    ? Avatar
+    : useUserStoreHook()?.avatar;
 });
+
+/** 昵称（如果昵称为空则显示用户名） */
+const nickname = computed(() => {
+  return isAllEmpty(useUserStoreHook()?.nickname)
+    ? useUserStoreHook()?.username
+    : useUserStoreHook()?.nickname;
+});
+
+/** 昵称（如果昵称为空则显示用户名） */
+const username = computed(() => {
+  return useUserStoreHook()?.username;
+});
+
 const panes = [
   {
     key: "profile",
@@ -61,8 +77,8 @@ const panes = [
 ];
 const witchPane = ref("profile");
 
-getMine().then(res => {
-  userInfo.value = res.data;
+onMounted(() => {
+  useUserStoreHook().setAvatarBase64();
 });
 </script>
 
@@ -84,13 +100,13 @@ getMine().then(res => {
           </div>
         </el-menu-item>
         <div class="flex items-center ml-8 mt-4 mb-4">
-          <el-avatar :size="48" :src="userInfo.avatar" />
+          <el-avatar :size="48" :src="userAvatar" />
           <div class="ml-4 flex flex-col max-w-[130px]">
             <ReText class="font-bold self-baseline!">
-              {{ userInfo.nickname }}
+              {{ nickname }}
             </ReText>
             <ReText class="self-baseline!" type="info">
-              {{ userInfo.username }}
+              {{ username }}
             </ReText>
           </div>
         </div>

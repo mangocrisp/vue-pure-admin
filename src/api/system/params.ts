@@ -20,7 +20,7 @@ export default class SystemParamsApi {
   /** 参数新增 */
   static add = (
     data: SystemParamsType.ParamsAddDTO
-  ): HttpReturnPage<SystemParamsType.Params> => {
+  ): HttpReturn<SystemParamsType.Params> => {
     return request.post({
       url: `${URL}`,
       data
@@ -30,7 +30,7 @@ export default class SystemParamsApi {
   /** 参数编辑 */
   static update = (
     data: SystemParamsType.ParamsUpdateDTO
-  ): HttpReturnPage<SystemParamsType.Params> => {
+  ): HttpReturn<SystemParamsType.Params> => {
     return request.put({
       url: `${URL}`,
       data
@@ -56,7 +56,7 @@ export default class SystemParamsApi {
    * @param paramsKey
    * @return
    */
-  static get = (paramsKey: string): HttpReturnPage<SystemParamsType.Params> => {
+  static get = (paramsKey: string): HttpReturn<SystemParamsType.Params> => {
     return request.get<Res<any>>({
       url: `${URL}/cache/${paramsKey}`
     });

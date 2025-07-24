@@ -2,31 +2,38 @@
 import { ref } from "vue";
 import { message } from "@/utils/message";
 import { deviceDetection } from "@pureadmin/utils";
+import { useAccount } from "./hooks/hook";
 
 defineOptions({
   name: "AccountManagement"
 });
 
+const { handleResetPassword } = useAccount();
+
 const list = ref([
   {
     title: "账户密码",
     illustrate: "当前密码强度：强",
-    button: "修改"
+    button: "修改",
+    onClick: handleResetPassword
   },
   {
     title: "密保手机",
     illustrate: "已经绑定手机：158****6789",
-    button: "修改"
+    button: "修改",
+    onClick: onClick
   },
   {
     title: "密保问题",
     illustrate: "未设置密保问题，密保问题可有效保护账户安全",
-    button: "修改"
+    button: "修改",
+    onClick: onClick
   },
   {
     title: "备用邮箱",
     illustrate: "已绑定邮箱：pure***@163.com",
-    button: "修改"
+    button: "修改",
+    onClick: onClick
   }
 ]);
 
@@ -50,7 +57,7 @@ function onClick(item) {
           <p>{{ item.title }}</p>
           <el-text class="mx-1" type="info">{{ item.illustrate }}</el-text>
         </div>
-        <el-button type="primary" text @click="onClick(item)">
+        <el-button type="primary" text @click="item.onClick(item)">
           {{ item.button }}
         </el-button>
       </div>

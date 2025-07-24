@@ -30,4 +30,7 @@ declare namespace SystemParamsType {
     status?: NumStatus;
     remark?: string;
   }
+  export interface ParamsType {
+    [key: string]: Params;
+  }
 }

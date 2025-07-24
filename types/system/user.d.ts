@@ -51,6 +51,7 @@ declare namespace SystemUserType {
     email?: string;
     id?: string;
     nickname?: string;
+    gender?: string;
     roles?: string[];
     status?: number;
     userType?: string;

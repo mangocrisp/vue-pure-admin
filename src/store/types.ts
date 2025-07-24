@@ -46,6 +46,7 @@ export type setType = {
 };
 
 export type userType = {
+  id?: string;
   avatar?: string;
   username?: string;
   nickname?: string;
@@ -55,4 +56,11 @@ export type userType = {
   currentPage?: number;
   isRemembered?: boolean;
   loginDay?: number;
+};
+/**
+ * 系统字典和参数
+ */
+export type SystemDictConfigType = {
+  dict: SystemDictType.DictsType;
+  params: SystemParamsType.ParamsType;
 };

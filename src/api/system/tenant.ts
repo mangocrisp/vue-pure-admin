@@ -25,7 +25,7 @@ export default class SystemTenantApi {
   static list = (
     queryDTO: SystemTenantType.QueryDTO,
     page: BaseApi.SqlQueryParams
-  ): HttpReturnPage<SystemTenantType.Domain> => {
+  ): HttpReturn<SystemTenantType.Domain> => {
     return request.get({
       url: `${URL}/list`,
       params: {

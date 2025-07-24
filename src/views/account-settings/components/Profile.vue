@@ -1,12 +1,23 @@
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import { formUpload } from "@/api/mock";
 import { message } from "@/utils/message";
 import { type UserInfo, getMine } from "@/api/user";
 import type { FormInstance, FormRules } from "element-plus";
 import ReCropperPreview from "@/components/ReCropperPreview";
-import { createFormData, deviceDetection } from "@pureadmin/utils";
+import {
+  createFormData,
+  deviceDetection,
+  storageLocal
+} from "@pureadmin/utils";
 import uploadLine from "~icons/ri/upload-line";
+import SystemUserApi from "@/api/system/user";
+import staticAvatar from "@/assets/user.jpg";
+import AdminFileApi from "@/api/admin/file";
+import { blobToDataURI } from "@/utils";
+import { useUserStoreHook } from "@/store/modules/user";
+import { userKey } from "@/utils/auth";
+import { useSystemDictParamsStoreHook } from "@/store/modules/system-dict-params";
 
 defineOptions({
   name: "Profile"
@@ -20,16 +31,21 @@ const isShow = ref(false);
 const userInfoFormRef = ref<FormInstance>();
 
 const userInfos = reactive({
-  avatar: "",
-  nickname: "",
-  email: "",
-  phone: "",
-  description: ""
+  id: undefined,
+  avatar: undefined,
+  nickname: undefined,
+  email: undefined,
+  phone: undefined,
+  gender: undefined,
+  realName: undefined
 });
 
 const rules = reactive<FormRules<UserInfo>>({
   nickname: [{ required: true, message: "昵称必填", trigger: "blur" }]
 });
+
+const genderOption =
+  useSystemDictParamsStoreHook().dictOptions("system-gender");
 
 function queryEmail(queryString, callback) {
   const emailList = [
@@ -68,29 +84,61 @@ const handleClose = () => {
 
 const onCropper = ({ blob }) => (cropperBlob.value = blob);
 
-const handleSubmitImage = () => {
-  const formData = createFormData({
-    files: new File([cropperBlob.value], "avatar")
-  });
-  formUpload(formData)
-    .then(({ success, data }) => {
-      if (success) {
-        message("更新头像成功", { type: "success" });
-        handleClose();
-      } else {
-        message("更新头像失败");
-      }
-    })
-    .catch(error => {
-      message(`提交异常 ${error}`, { type: "error" });
+const handleSubmitImage = async () => {
+  // const formData = createFormData({
+  //   files: new File([cropperBlob.value], "avatar")
+  // });
+  // formUpload(formData)
+  //   .then(({ success, data }) => {
+  //     if (success) {
+  //       message("更新头像成功", { type: "success" });
+  //       handleClose();
+  //     } else {
+  //       message("更新头像失败");
+  //     }
+  //   })
+  //   .catch(error => {
+  //     message(`提交异常 ${error}`, { type: "error" });
+  //   });
+  if (cropperBlob.value) {
+    const formData = new FormData();
+    formData.append("file", cropperBlob.value);
+    const { data } = await AdminFileApi.fileUpload(formData);
+    await SystemUserApi.patchMyInfo({
+      avatar: data[0]
     });
+    useUserStoreHook().SET_AVATAR(data[0]);
+    const cache = storageLocal().getItem(userKey) as object;
+    storageLocal().setItem(userKey, {
+      ...cache,
+      ...{
+        avatar: data[0]
+      }
+    });
+    useUserStoreHook().setAvatarBase64();
+    userInfos.avatar = imgSrc.value;
+    message("更新头像成功", { type: "success" });
+    handleClose();
+  }
 };
 
 // 更新信息
 const onSubmit = async (formEl: FormInstance) => {
-  await formEl.validate((valid, fields) => {
+  await formEl.validate(async (valid, fields) => {
     if (valid) {
       console.log(userInfos);
+      await SystemUserApi.patchMyInfo({
+        nickname: userInfos.nickname,
+        gender: userInfos.gender
+      });
+      useUserStoreHook().SET_NICKNAME(userInfos.nickname);
+      const cache = storageLocal().getItem(userKey) as object;
+      storageLocal().setItem(userKey, {
+        ...cache,
+        ...{
+          nickname: userInfos.nickname
+        }
+      });
       message("更新信息成功", { type: "success" });
     } else {
       console.log("error submit!", fields);
@@ -98,8 +146,22 @@ const onSubmit = async (formEl: FormInstance) => {
   });
 };
 
-getMine().then(res => {
-  Object.assign(userInfos, res.data);
+async function loadMyInfo() {
+  const { data: myInfo } = await SystemUserApi.myInfo();
+  setTimeout(async () => {
+    AdminFileApi.fileDownload(myInfo.avatar)
+      .then((res: Blob) => {
+        blobToDataURI(res)
+          .then(dataURI => (userInfos.avatar = dataURI))
+          .catch(() => (userInfos.avatar = staticAvatar));
+      })
+      .catch(() => (userInfos.avatar = staticAvatar));
+  });
+  Object.assign(userInfos, myInfo);
+}
+
+onMounted(() => {
+  loadMyInfo();
 });
 </script>
 
@@ -134,36 +196,47 @@ getMine().then(res => {
           </el-button>
         </el-upload>
       </el-form-item>
-      <el-form-item label="昵称" prop="nickname">
-        <el-input v-model="userInfos.nickname" placeholder="请输入昵称" />
-      </el-form-item>
-      <el-form-item label="邮箱" prop="email">
-        <el-autocomplete
-          v-model="userInfos.email"
-          :fetch-suggestions="queryEmail"
-          :trigger-on-focus="false"
-          placeholder="请输入邮箱"
-          clearable
-          class="w-full"
-        />
-      </el-form-item>
-      <el-form-item label="联系电话">
-        <el-input
-          v-model="userInfos.phone"
-          placeholder="请输入联系电话"
-          clearable
-        />
-      </el-form-item>
-      <el-form-item label="简介">
-        <el-input
-          v-model="userInfos.description"
-          placeholder="请输入简介"
-          type="textarea"
-          :autosize="{ minRows: 6, maxRows: 8 }"
-          maxlength="56"
-          show-word-limit
-        />
-      </el-form-item>
+      <el-row :gutter="20">
+        <el-col :span="8" :xs="24" :sm="8">
+          <el-form-item label="昵称" prop="nickname">
+            <el-input v-model="userInfos.nickname" placeholder="请输入昵称" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="8" :xs="24" :sm="8">
+          <el-form-item label="联系电话">
+            <el-input v-model="userInfos.phone" disabled readonly />
+          </el-form-item>
+        </el-col>
+        <el-col :span="8" :xs="24" :sm="8">
+          <el-form-item label="邮箱" prop="email">
+            <el-autocomplete
+              v-model="userInfos.email"
+              :fetch-suggestions="queryEmail"
+              :trigger-on-focus="false"
+              readonly
+              disabled
+              class="w-full"
+            />
+          </el-form-item>
+        </el-col>
+        <el-col :span="8" :xs="24" :sm="8">
+          <el-form-item label="性别" prop="nickname">
+            <el-select
+              v-model="userInfos.gender"
+              placeholder="请选择"
+              default-first-option
+              value-key="gender"
+            >
+              <el-option
+                v-for="(item, key) in genderOption"
+                :key="key"
+                :value="item.value"
+                :label="item.label"
+              />
+            </el-select>
+          </el-form-item>
+        </el-col>
+      </el-row>
       <el-button type="primary" @click="onSubmit(userInfoFormRef)">
         更新信息
       </el-button>

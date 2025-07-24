@@ -27,6 +27,7 @@ let reLoginHandler!: Promise<any> | null;
 
 export const useUserStore = defineStore("pure-user", {
   state: (): userType => ({
+    id: storageLocal().getItem<DataInfo<number>>(userKey)?.id ?? "",
     // 头像
     avatar: storageLocal().getItem<DataInfo<number>>(userKey)?.avatar ?? "",
     // 用户名
@@ -48,6 +49,10 @@ export const useUserStore = defineStore("pure-user", {
     loginDay: 7
   }),
   actions: {
+    /** 存储id */
+    SET_ID(id: string) {
+      this.id = id;
+    },
     /** 存储头像 */
     SET_AVATAR(avatar: string) {
       this.avatar = avatar;
@@ -105,6 +110,7 @@ export const useUserStore = defineStore("pure-user", {
             });
             const { data: myInfo } = await SystemUserApi.myInfo();
             const token = {
+              id: myInfo.id,
               avatar: myInfo.avatar ?? staticAvatar,
               username: myInfo.username,
               nickname: myInfo.nickname,
@@ -126,6 +132,21 @@ export const useUserStore = defineStore("pure-user", {
             reject(error);
           });
       });
+    },
+    // 更新当前登录用户信息
+    async updateMyInfo() {
+      const { data: myInfo } = await SystemUserApi.myInfo();
+      const token = {
+        id: myInfo.id,
+        avatar: myInfo.avatar ?? staticAvatar,
+        username: myInfo.username,
+        nickname: myInfo.nickname,
+        roles: myInfo.roles,
+        permissions: undefined
+      };
+      updateTokenInfo(token);
+      this.SET_AVATAR(token.avatar);
+      this.setAvatarBase64();
     },
     /**获取用户头像 */
     setAvatarBase64() {
@@ -164,7 +185,7 @@ export const useUserStore = defineStore("pure-user", {
       }
     },
     /** 清理关于登录的所有信息 */
-    clearLoginStatus() {
+    clearLoginStatus(redirect = true) {
       this.username = "";
       this.roles = [];
       this.permissions = [];
@@ -172,9 +193,11 @@ export const useUserStore = defineStore("pure-user", {
       useMultiTagsStoreHook().handleTags("equal", [...routerArrays]);
       resetRouter();
       // 清除缓存
-      //storageLocal().clear();
+      storageLocal().clear();
       // redirect
-      router.push("/login?redirect=" + router.currentRoute.value.fullPath);
+      redirect
+        ? router.push("/login?redirect=" + router.currentRoute.value.fullPath)
+        : router.push("/login");
     },
     /** 重新登录 */
     async reLogin(refreshToken: string) {

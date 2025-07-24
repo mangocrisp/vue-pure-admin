@@ -1,4 +1,5 @@
 import useAxios from "@/hooks/core/useAxios";
+import { groupBatchIds } from "@/utils";
 
 const request = useAxios();
 
@@ -64,6 +65,31 @@ export default class SystemUserApi {
     return request.patch({
       url: `${URL}`,
       data
+    });
+  };
+
+  /** 用户删除 */
+  static remove = (id: string) => {
+    return request.delete({
+      url: `${URL}/${id}`
+    });
+  };
+
+  /** 用户批量删除 */
+  static batchRemove = (ids: string[]) => {
+    return request.delete({
+      url: `${URL}/batch?${groupBatchIds(ids)}`
+    });
+  };
+
+  /** 用户修改密码 */
+  static editPassword = (params: {
+    now: string;
+    old: string;
+  }): HttpReturn<string> => {
+    return request.patch({
+      url: `${URL}/password`,
+      params
     });
   };
 

@@ -3,6 +3,8 @@ import { useUserStoreHook } from "@/store/modules/user";
 import { storageLocal, isString, isIncludeAllChildren } from "@pureadmin/utils";
 
 export interface DataInfo<T> {
+  /**用户 id */
+  id?: string;
   /** token */
   accessToken: string;
   /** `accessToken`的过期时间（时间戳） */
@@ -48,12 +50,14 @@ export function getToken(): DataInfo<number> {
  * @param param0 token 信息
  */
 export function updateTokenInfo({
+  id,
   avatar,
   username,
   nickname,
   roles,
   permissions
 }) {
+  useUserStoreHook().SET_ID(id);
   useUserStoreHook().SET_AVATAR(avatar);
   useUserStoreHook().SET_USERNAME(username);
   useUserStoreHook().SET_NICKNAME(nickname);
@@ -63,6 +67,7 @@ export function updateTokenInfo({
   storageLocal().setItem(userKey, {
     ...cache,
     ...{
+      id,
       avatar,
       username,
       nickname,
