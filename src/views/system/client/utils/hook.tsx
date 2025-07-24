@@ -11,8 +11,6 @@ import type { EditFormDTO } from "./types";
 import SystemClientApi from "@/api/system/client";
 import { ElMessageBox } from "element-plus";
 import { Uuid } from "ts-uuid";
-import { useRenderIcon } from "@/components/ReIcon/src/hooks";
-import Password from "~icons/ri/lock-password-line";
 
 export function usePermission() {
   /** 查询表单 */
@@ -28,6 +26,12 @@ export function usePermission() {
   const dataList = ref([]);
   /** 加载中 */
   const loading = ref(true);
+  /**重置密钥后弹窗显示重置后的密码，方便复制 */
+  const resetPasswordDialogConfig = reactive({
+    resetPasswordDialogVisible: false,
+    resetPasswordValue: "",
+    title: ""
+  });
   /** 分页 */
   const pagination = reactive<PaginationProps>({
     total: 0,
@@ -100,7 +104,7 @@ export function usePermission() {
    * @param row 当前行
    */
   async function handleDelete(row) {
-    message(`您删除了字典名称为${row.name}的这条数据`, { type: "success" });
+    message(`您删除了客户端名称为${row.name}的这条数据`, { type: "success" });
     await SystemClientApi.remove(row.id);
     onSearch();
   }
@@ -177,7 +181,7 @@ export function usePermission() {
    */
   function openDialog(title = "新增", row?: SystemClientType.Domain) {
     addDialog({
-      title: `${title}字典`,
+      title: `${title}客户端`,
       props: {
         isAddForm: title === "新增",
         formInline: {
@@ -212,7 +216,7 @@ export function usePermission() {
         const curData = options.props as EditFormDTO;
         function chores() {
           message(
-            `您${title}了字典名称为${curData.formInline.clientName}的这条数据`,
+            `您${title}了客户端名称为${curData.formInline.clientName}的这条数据`,
             {
               type: "success"
             }
@@ -232,15 +236,9 @@ export function usePermission() {
                 ...{ clientSecret: password }
               });
               chores();
-              ElMessageBox({
-                closeOnClickModal: false,
-                closeOnPressEscape: false,
-                type: "warning",
-                icon: useRenderIcon(Password),
-                title: `${curData.formInline.clientName} 客户端的密钥(请妥善保存，请勿外泄)`,
-                message: `<span copy="${copy(password)}"><b>${password}</b></span>`,
-                dangerouslyUseHTMLString: true
-              });
+              resetPasswordDialogConfig.resetPasswordDialogVisible = true;
+              resetPasswordDialogConfig.resetPasswordValue = password;
+              resetPasswordDialogConfig.title = `${curData.formInline.clientName} 客户端的密钥(请妥善保存，请勿外泄)`;
             } else {
               // 实际开发先调用修改接口，再进行下面操作
               await SystemClientApi.update(
@@ -274,44 +272,14 @@ export function usePermission() {
         id: row.id,
         clientSecret: password
       });
-      ElMessageBox({
-        closeOnClickModal: false,
-        closeOnPressEscape: false,
-        type: "success",
-        icon: useRenderIcon(Password),
-        title: `已成功重置 ${row.clientName} 客户端的密钥(请妥善保存，请勿外泄)`,
-        message: `<span copy="${copy(password)}"><b>${password}</b></span>`,
-        dangerouslyUseHTMLString: true
-      });
+      resetPasswordDialogConfig.resetPasswordDialogVisible = true;
+      resetPasswordDialogConfig.resetPasswordValue = password;
+      resetPasswordDialogConfig.title = `已成功重置 ${row.clientName} 客户端的密钥(请妥善保存，请勿外泄)`;
       onSearch(); // 刷新表格数据
     });
   }
 
-  /**
-   * 复制到剪贴板
-   * @param text 内容
-   */
-  async function copy(text) {
-    if (!text.trim()) return;
-    try {
-      // 现代方法：使用 Clipboard API
-      await navigator.clipboard.writeText(text);
-    } catch {
-      // 传统方法：使用 document.execCommand
-      const tempInput = document.createElement("textarea");
-      tempInput.value = text;
-      tempInput.style.position = "fixed";
-      tempInput.style.opacity = "0";
-      document.body.appendChild(tempInput);
-      tempInput.select();
-      document.execCommand("copy");
-      document.body.removeChild(tempInput);
-      return;
-    }
-    message("成功复制到剪贴板", { type: "success" });
-  }
-
-  /** 高亮当前字典选中行 */
+  /** 高亮当前选中行 */
   function rowStyle({ row: { id } }) {
     return {
       cursor: "pointer",
@@ -340,6 +308,6 @@ export function usePermission() {
     handleCurrentChange,
     handleSelectionChange,
     handleReset,
-    copy
+    resetPasswordDialogConfig
   };
 }

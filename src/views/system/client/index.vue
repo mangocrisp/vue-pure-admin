@@ -35,7 +35,8 @@ const {
   handleSizeChange,
   handleCurrentChange,
   handleSelectionChange,
-  handleReset
+  handleReset,
+  resetPasswordDialogConfig
 } = usePermission();
 </script>
 
@@ -172,6 +173,31 @@ const {
         </template>
       </PureTableBar>
     </div>
+    <el-dialog
+      v-model="resetPasswordDialogConfig.resetPasswordDialogVisible"
+      :title="resetPasswordDialogConfig.title"
+      width="500"
+      align-center
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      >点击复制密钥
+      <span
+        v-copy:click="resetPasswordDialogConfig.resetPasswordValue"
+        class="text-sky-500"
+        >{{ resetPasswordDialogConfig.resetPasswordValue }}</span
+      >
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button
+            type="primary"
+            @click="
+              resetPasswordDialogConfig.resetPasswordDialogVisible = false
+            "
+            >确定</el-button
+          >
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 

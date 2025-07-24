@@ -1,11 +1,195 @@
 <script setup lang="ts">
+import { usePermission } from "./utils/hook";
+import { ref } from "vue";
+import { PureTableBar } from "@/components/RePureTableBar";
+import { useRenderIcon } from "@/components/ReIcon/src/hooks";
+import { deviceDetection, storageSession } from "@pureadmin/utils";
+
+import Delete from "~icons/ep/delete";
+import EditPen from "~icons/ep/edit-pen";
+import Refresh from "~icons/ep/refresh";
+import AddFill from "~icons/ri/add-circle-line";
+import Password from "~icons/ri/lock-password-line";
+
 defineOptions({
-  name: "tenant"
+  name: "dictType"
 });
+
+const cachePathKey = "_dict_item_goback_route_";
+
+const formRef = ref();
+const tableRef = ref();
+const contentRef = ref();
+const {
+  form,
+  loading,
+  columns,
+  rowStyle,
+  dataList,
+  pagination,
+  onSearch,
+  resetForm,
+  openDialog,
+  handleDelete,
+  handleDeleteBatch,
+  handleSizeChange,
+  handleCurrentChange,
+  handleSelectionChange
+} = usePermission();
 </script>
 
 <template>
-  <div class="main">租户管理</div>
+  <div class="main">
+    <el-form
+      ref="formRef"
+      :inline="true"
+      :model="form"
+      class="search-form bg-bg_color w-full pl-8 pt-[12px] overflow-auto"
+    >
+      <el-form-item label="租户ID：" prop="tenantId">
+        <el-input
+          v-model="form.tenantId"
+          placeholder="请输入租户ID"
+          clearable
+          class="w-[180px]!"
+        />
+      </el-form-item>
+      <el-form-item label="租户名称：" prop="tenantName">
+        <el-input
+          v-model="form.tenantName"
+          placeholder="请输入租户名称"
+          clearable
+          class="w-[180px]!"
+        />
+      </el-form-item>
+      <el-form-item label="租户管理员：" prop="tenantManager">
+        <el-input
+          v-model="form.tenantManager"
+          placeholder="请输入租户管理员"
+          clearable
+          class="w-[180px]!"
+        />
+      </el-form-item>
+      <el-form-item label="状态：" prop="status">
+        <el-select
+          v-model="form.status"
+          placeholder="请选择"
+          clearable
+          class="w-[180px]!"
+        >
+          <el-option label="启用" value="1" />
+          <el-option label="禁用" value="0" />
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button
+          type="primary"
+          :icon="useRenderIcon('ri/search-line')"
+          :loading="loading"
+          @click="onSearch"
+        >
+          搜索
+        </el-button>
+        <el-button :icon="useRenderIcon(Refresh)" @click="resetForm(formRef)">
+          重置
+        </el-button>
+      </el-form-item>
+    </el-form>
+
+    <div
+      ref="contentRef"
+      :class="['flex', deviceDetection() ? 'flex-wrap' : '']"
+    >
+      <PureTableBar :columns="columns" title="系统租户" @refresh="onSearch">
+        <template #buttons>
+          <el-button
+            type="primary"
+            :icon="useRenderIcon(AddFill)"
+            @click="openDialog()"
+          >
+            新增
+          </el-button>
+
+          <el-popconfirm
+            title="是否批量删除勾选租户?"
+            placement="right"
+            @confirm="handleDeleteBatch"
+          >
+            <template #reference>
+              <el-button type="danger" :icon="useRenderIcon(Delete)">
+                删除
+              </el-button>
+            </template>
+          </el-popconfirm>
+        </template>
+        <template v-slot="{ size, dynamicColumns }">
+          <pure-table
+            ref="tableRef"
+            align-whole="center"
+            showOverflowTooltip
+            table-layout="auto"
+            :loading="loading"
+            :size="size"
+            adaptive
+            select-on-indeterminate
+            stripe
+            border
+            :row-style="rowStyle"
+            :adaptiveConfig="{ offsetBottom: 108 }"
+            :data="dataList"
+            :columns="dynamicColumns"
+            :pagination="{ ...pagination, size }"
+            :header-cell-style="{
+              background: 'var(--el-fill-color-light)',
+              color: 'var(--el-text-color-primary)'
+            }"
+            :row-key="row => row.id"
+            @selection-change="handleSelectionChange"
+            @page-size-change="handleSizeChange"
+            @page-current-change="handleCurrentChange"
+          >
+            <template #operation="{ row }">
+              <el-button
+                class="reset-margin"
+                link
+                type="primary"
+                :size="size"
+                :icon="useRenderIcon(EditPen)"
+                @click="openDialog('修改', row)"
+              >
+                修改
+              </el-button>
+              <el-button
+                class="reset-margin"
+                link
+                type="warning"
+                :size="size"
+                :icon="useRenderIcon(Password)"
+              >
+                进入租户
+              </el-button>
+              <el-popconfirm
+                :title="`是否确认删除租户名称为${row.clientName}的这条数据`"
+                @confirm="handleDelete(row)"
+              >
+                <template #reference>
+                  <el-button
+                    class="reset-margin"
+                    link
+                    type="danger"
+                    :size="size"
+                    :icon="useRenderIcon(Delete)"
+                  >
+                    删除
+                  </el-button>
+                </template>
+              </el-popconfirm>
+            </template>
+          </pure-table>
+        </template>
+      </PureTableBar>
+    </div>
+  </div>
 </template>
 
 <style lang="scss" scoped>

@@ -238,12 +238,14 @@ function initRouter() {
       MenuApi.loadRouter().then(({ data }) => {
         const menuData = convert(data);
         handleAsyncRoutes(
-          menuData.concat([
-            systemMonitorRouter,
-            permissionRouter,
-            frameRouter,
-            tabsRouter
-          ])
+          import.meta.env.DEV
+            ? menuData.concat([
+                systemMonitorRouter,
+                permissionRouter,
+                frameRouter,
+                tabsRouter
+              ])
+            : menuData
         );
         resolve(router);
       });
