@@ -10,6 +10,7 @@ import LaySidebarTopCollapse from "../lay-sidebar/components/SidebarTopCollapse.
 
 import GlobalizationIcon from "@/assets/svg/globalization.svg?component";
 import AccountSettingsIcon from "~icons/ri/user-settings-line";
+import ArcticonsTenantcloudPro from "~icons/arcticons/tenantcloud-pro";
 import LogoutCircleRLine from "~icons/ri/logout-circle-r-line";
 import Setting from "~icons/ri/settings-3-line";
 import Check from "~icons/ep/check";
@@ -25,6 +26,7 @@ const {
   avatarsStyle,
   toggleSideBar,
   toAccountSettings,
+  toogleTenant,
   getDropdownItemStyle,
   getDropdownItemClass
 } = useNav();
@@ -101,6 +103,13 @@ const { t, locale, translationCh, translationEn } = useTranslationLang();
                 style="margin: 5px"
               />
               {{ t("buttons.pureAccountSettings") }}
+            </el-dropdown-item>
+            <el-dropdown-item @click="toogleTenant">
+              <IconifyIconOffline
+                :icon="ArcticonsTenantcloudPro"
+                style="margin: 5px"
+              />
+              {{ t("buttons.toogleTenant") }}
             </el-dropdown-item>
             <el-dropdown-item @click="logout">
               <IconifyIconOffline

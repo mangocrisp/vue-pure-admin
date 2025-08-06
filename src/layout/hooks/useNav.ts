@@ -16,6 +16,8 @@ import { useEpThemeStoreHook } from "@/store/modules/epTheme";
 import { usePermissionStoreHook } from "@/store/modules/permission";
 import ExitFullscreen from "~icons/ri/fullscreen-exit-fill";
 import Fullscreen from "~icons/ri/fullscreen-fill";
+import { addDrawer, closeDrawer } from "@/components/ReDrawer";
+import layTenant from "@/layout/components/lay-tenant/index.vue";
 
 const errorInfo =
   "The current routing configuration is incorrect, please check the configuration";
@@ -118,6 +120,27 @@ export function useNav() {
     router.push({ name: "AccountSettings" });
   }
 
+  /**切换租户 */
+  function toogleTenant() {
+    // 切换租户
+    addDrawer({
+      title: "切换租户",
+      showClose: false,
+      size: "250px",
+      withHeader: false,
+      hideFooter: true,
+      contentRenderer: () => layTenant,
+      open: ({ options, index }) => {
+        emitter.on("closeChooseTenantPanel", () => {
+          closeDrawer(options, index);
+        });
+      },
+      closeCallBack: () => {
+        emitter.off("closeChooseTenantPanel");
+      }
+    });
+  }
+
   function toggleSideBar() {
     pureApp.toggleSideBar();
   }
@@ -184,6 +207,7 @@ export function useNav() {
     avatarsStyle,
     tooltipEffect,
     toAccountSettings,
+    toogleTenant,
     getDropdownItemStyle,
     getDropdownItemClass
   };

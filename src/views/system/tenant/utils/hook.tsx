@@ -10,6 +10,7 @@ import { ElMessageBox } from "element-plus";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import { usePublicHooks } from "../../hooks";
 import SystemTenantApi from "@/api/system/tenant";
+import router from "@/router";
 
 export function usePermission() {
   /** 查询表单 */
@@ -200,6 +201,16 @@ export function usePermission() {
     selectedRows.length = 0;
     selectedRows.push(...val);
   }
+  /**
+   * 选择租户
+   * @param tenant 租户信息
+   */
+  function handleChooseTenant(tenant: SystemTenantType.Domain) {
+    SystemTenantApi.changeCurrent(tenant.tenantId).then(async () => {
+      await router.push({ path: "/" });
+      location.reload();
+    });
+  }
   /** 搜索 */
   async function onSearch() {
     loading.value = true;
@@ -315,6 +326,7 @@ export function usePermission() {
     transformI18n,
     handleSizeChange,
     handleCurrentChange,
-    handleSelectionChange
+    handleSelectionChange,
+    handleChooseTenant
   };
 }

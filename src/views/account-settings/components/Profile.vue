@@ -202,23 +202,8 @@ onMounted(() => {
             <el-input v-model="userInfos.nickname" placeholder="请输入昵称" />
           </el-form-item>
         </el-col>
-        <el-col :span="8" :xs="24" :sm="8">
-          <el-form-item label="联系电话">
-            <el-input v-model="userInfos.phone" disabled readonly />
-          </el-form-item>
-        </el-col>
-        <el-col :span="8" :xs="24" :sm="8">
-          <el-form-item label="邮箱" prop="email">
-            <el-autocomplete
-              v-model="userInfos.email"
-              :fetch-suggestions="queryEmail"
-              :trigger-on-focus="false"
-              readonly
-              disabled
-              class="w-full"
-            />
-          </el-form-item>
-        </el-col>
+      </el-row>
+      <el-row :gutter="20">
         <el-col :span="8" :xs="24" :sm="8">
           <el-form-item label="性别" prop="nickname">
             <el-select
@@ -234,6 +219,27 @@ onMounted(() => {
                 :label="item.label"
               />
             </el-select>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row :gutter="20">
+        <el-col :span="8" :xs="24" :sm="8">
+          <el-form-item label="联系电话">
+            <el-input v-model="userInfos.phone" disabled readonly />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row :gutter="20">
+        <el-col :span="8" :xs="24" :sm="8">
+          <el-form-item label="邮箱" prop="email">
+            <el-autocomplete
+              v-model="userInfos.email"
+              :fetch-suggestions="queryEmail"
+              :trigger-on-focus="false"
+              readonly
+              disabled
+              class="w-full"
+            />
           </el-form-item>
         </el-col>
       </el-row>

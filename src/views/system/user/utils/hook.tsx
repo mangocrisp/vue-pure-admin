@@ -1,6 +1,7 @@
 import "./reset.css";
 import dayjs from "dayjs";
 import roleForm from "../form/role.vue";
+import tenantForm from "../form/tenant.vue";
 import editForm from "../form/index.vue";
 import { zxcvbn } from "@zxcvbn-ts/core";
 import { handleTree } from "@/utils/tree";
@@ -10,7 +11,7 @@ import { usePublicHooks } from "../../hooks";
 import { addDialog } from "@/components/ReDialog";
 import type { PaginationProps } from "@pureadmin/table";
 import ReCropperPreview from "@/components/ReCropperPreview";
-import type { RoleFormItemProps } from "../utils/types";
+import type { RoleFormItemProps, TenantFormItemProps } from "../utils/types";
 import {
   getKeyList,
   isAllEmpty,
@@ -40,6 +41,7 @@ import { useSm2CryptoStore } from "@/store/modules/sm2-crypto";
 import AdminFileApi from "@/api/admin/file";
 import { blobToDataURI } from "@/utils";
 import SystemRoleApi from "@/api/system/role";
+import SystemTenantApi from "@/api/system/tenant";
 
 export function useUser(tableRef: Ref, treeRef: Ref) {
   const form = reactive({
@@ -182,6 +184,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   // 当前密码强度（0-4）
   const curScore = ref();
   const roleOptions = ref([]);
+  const tenantOptions = ref([]);
 
   function onChange({ row, index }) {
     ElMessageBox.confirm(
@@ -632,6 +635,45 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     });
   }
 
+  /** 分配租户 */
+  async function handleTenant(row) {
+    // 选中的租户列表
+    const tenantIds =
+      (await SystemTenantApi.loadUserHaveTenant(row.id)).data.map(
+        item => item.tenantId
+      ) ?? [];
+
+    addDialog({
+      title: `分配 ${row.username} 用户的租户`,
+      props: {
+        formInline: {
+          username: row?.username ?? "",
+          nickname: row?.nickname ?? "",
+          tenantOptions: tenantOptions.value ?? [],
+          tenantIds
+        }
+      },
+      width: "400px",
+      draggable: true,
+      fullscreen: deviceDetection(),
+      fullscreenIcon: true,
+      closeOnClickModal: false,
+      contentRenderer: () => h(tenantForm),
+      beforeSure: async (done, { options }) => {
+        const curData = options.props.formInline as TenantFormItemProps;
+        const { tenantIds } = toRaw(curData);
+        if (tenantIds && tenantIds.length > 0) {
+          const saveData = tenantIds.map(tenantId => {
+            return { userId: row.id, tenantId: tenantId as unknown as string };
+          });
+          console.log("saveData :>> ", saveData);
+          await SystemTenantApi.loadUserSetTenant(saveData);
+        }
+        done(); // 关闭弹框
+      }
+    });
+  }
+
   /**
    * 加载部门树
    */
@@ -706,10 +748,16 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     roleOptions.value = (await SystemRoleApi.listFilterRole()).data;
   }
 
+  async function loadTenantData() {
+    // 租户列表
+    tenantOptions.value = (await SystemTenantApi.list({})).data;
+  }
+
   onMounted(async () => {
     onSearch();
     loadDeptTree();
     loadRoleData();
+    loadTenantData();
   });
 
   return {
@@ -734,6 +782,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     handleUpload,
     handleReset,
     handleRole,
+    handleTenant,
     handleSizeChange,
     onSelectionCancel,
     handleCurrentChange,

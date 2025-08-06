@@ -34,7 +34,8 @@ const {
   handleDeleteBatch,
   handleSizeChange,
   handleCurrentChange,
-  handleSelectionChange
+  handleSelectionChange,
+  handleChooseTenant
 } = usePermission();
 </script>
 
@@ -159,17 +160,25 @@ const {
               >
                 修改
               </el-button>
-              <el-button
-                class="reset-margin"
-                link
-                type="warning"
-                :size="size"
-                :icon="useRenderIcon(Password)"
-              >
-                进入租户
-              </el-button>
+
               <el-popconfirm
-                :title="`是否确认删除租户名称为${row.clientName}的这条数据`"
+                :title="`是否切换到【${row.tenantName}】`"
+                @confirm="handleChooseTenant(row)"
+              >
+                <template #reference>
+                  <el-button
+                    class="reset-margin"
+                    link
+                    type="warning"
+                    :size="size"
+                    :icon="useRenderIcon(Password)"
+                  >
+                    进入租户
+                  </el-button>
+                </template>
+              </el-popconfirm>
+              <el-popconfirm
+                :title="`是否确认删除租户名称为【${row.tenantName}】的这条数据`"
                 @confirm="handleDelete(row)"
               >
                 <template #reference>

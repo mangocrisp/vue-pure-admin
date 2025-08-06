@@ -23,15 +23,12 @@ export default class SystemTenantApi {
 
   /** 租户管理列表 */
   static list = (
-    queryDTO: SystemTenantType.QueryDTO,
-    page: BaseApi.SqlQueryParams
-  ): HttpReturn<SystemTenantType.Domain> => {
+    queryDTO: SystemTenantType.QueryDTO
+  ): HttpReturn<SystemTenantType.Domain[]> => {
     return request.get({
       url: `${URL}/list`,
       params: {
-        ...queryDTO,
-        ...page,
-        pageOrder: "update_time desc"
+        ...queryDTO
       }
     });
   };

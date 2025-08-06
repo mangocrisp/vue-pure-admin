@@ -20,4 +20,23 @@ interface RoleFormProps {
   formInline: RoleFormItemProps;
 }
 
-export type { FormProps, RoleFormItemProps, RoleFormProps };
+interface TenantFormItemProps {
+  username: string;
+  nickname: string;
+  /** 租户列表 */
+  tenantOptions: any[];
+  /** 选中的租户列表 */
+  tenantIds: Record<string, unknown>[];
+}
+
+interface TenantFormProps {
+  formInline: TenantFormItemProps;
+}
+
+export type {
+  FormProps,
+  RoleFormItemProps,
+  TenantFormItemProps,
+  TenantFormProps,
+  RoleFormProps
+};

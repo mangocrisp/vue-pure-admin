@@ -1,5 +1,6 @@
 buttons:
   pureAccountSettings: 账户设置
+  toogleTenant: 切换租户
   pureLoginOut: 退出系统
   pureLogin: 登录
   pureOpenSystemSet: 打开系统配置
