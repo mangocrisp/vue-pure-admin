@@ -137,4 +137,20 @@ export default class SystemUserApi {
       data: userRoles
     });
   };
+
+  /** 在线用户列表 */
+  static online = (params: any): HttpReturnPage<SystemUserType.OnlineUser> => {
+    return request.get({
+      url: `${URL}/online/page`,
+      params
+    });
+  };
+
+  /** 强制下线用户 */
+  static forceBatch = (data: string[]): HttpReturn<string> => {
+    return request.put({
+      url: `${URL}/forceAll`,
+      data
+    });
+  };
 }

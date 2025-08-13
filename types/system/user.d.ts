@@ -2,6 +2,20 @@
  * 用户管理
  */
 declare namespace SystemUserType {
+  /**在线用户 */
+  export interface OnlineUser {
+    id: string;
+    jti: string;
+    ip: string;
+    clientId: string;
+    userName: string;
+    loginTime: string;
+    exp: number;
+    expTime: string;
+    userId: number;
+    updateTime: string;
+    authMethod: string;
+  }
   export interface User extends DefaultParams {
     id: string;
     avatar: string;
