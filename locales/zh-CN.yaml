@@ -63,6 +63,7 @@ panel:
   pureHiddenFooter: 隐藏页脚
   pureMultiTagsCache: 页签持久化
 menus:
+  pureTmplate: 模板页面
   pureHome: 首页
   pureLogin: 登录
   pureEmpty: 无Layout页

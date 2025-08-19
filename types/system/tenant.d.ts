@@ -62,7 +62,7 @@ declare namespace SystemTenantType {
 
   /**查询实体 */
   export interface QueryBody {
-    queryDto: QueryDTO;
+    vueTemplateQueryDTO: QueryDTO;
   }
 
   /**

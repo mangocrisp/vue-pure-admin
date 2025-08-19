@@ -117,7 +117,9 @@ type ResPage<T> = Res<{
 }>;
 
 /** Promise封装普通响应体 */
-type HttpReturn<T extends object | boolean | string = any> = Promise<Res<T>>;
+type HttpReturn<T extends object | boolean | number | string = any> = Promise<
+  Res<T>
+>;
 /** Promise封装分页响应体 */
 type HttpReturnPage<T extends object | boolean | string = any> = Promise<
   ResPage<T>

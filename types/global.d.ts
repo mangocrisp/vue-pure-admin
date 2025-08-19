@@ -207,4 +207,30 @@ declare global {
       touched?: boolean;
     };
   }
+
+  /** 可选字段导出 Excel 类型 */
+  interface SelectionExportExcelType {
+    /** 格式 */
+    format?: string;
+    /** 字段，如果是MAP导出,这个是map的key */
+    key?: string;
+    /** 字段描述 */
+    name?: string;
+    /** 字段默认值 */
+    defaultValue?: null | AnyObject;
+    /** 是属于哪个表（标题分组） */
+    groupName?: string;
+    /** 字段排序 */
+    orderNum?: string;
+    /** 列宽 */
+    width?: number;
+    /** 是否需要合并 */
+    needMerge?: boolean;
+    /** 单元格纵向合并 */
+    mergeVertical?: boolean;
+    /** 替换规则，a_1,b_2 */
+    replace?: string[];
+    /** 字典名称 */
+    dict?: string;
+  }
 }
