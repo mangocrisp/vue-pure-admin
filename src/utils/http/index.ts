@@ -70,6 +70,9 @@ class PureHttp {
   /** 保存当前`Axios`实例对象 */
   private static axiosInstance: AxiosInstance = Axios.create(defaultConfig);
 
+  /** 记录鉴权失败 401 的接口次数，超过3次，则跳转登录页面 */
+  private static unauthorizedRequestMap: Map<string, number> = new Map();
+
   /** 重连原始请求 */
   private static retryOriginalRequest(config: PureHttpRequestConfig) {
     return new Promise(resolve => {
@@ -151,7 +154,9 @@ class PureHttp {
                       })
                       .catch(e => {
                         console.error(e);
-                        useUserStoreHook().clearLoginStatus();
+                        if (e.response?.status === 401) {
+                          useUserStoreHook().clearLoginStatus();
+                        }
                       })
                       .finally(() => {
                         PureHttp.isRefreshing = false;
@@ -235,6 +240,18 @@ class PureHttp {
             type: "error"
           });
         } else if ($error.response?.status === 401) {
+          const unauthorizedCount =
+            PureHttp.unauthorizedRequestMap.get($error.config.url) || 0;
+          if (unauthorizedCount > 2) {
+            PureHttp.unauthorizedRequestMap.delete($error.config.url);
+            useUserStoreHook().clearLoginStatus(false);
+            return Promise.reject($error);
+          }
+          PureHttp.unauthorizedRequestMap.set(
+            $error.config.url,
+            unauthorizedCount + 1
+          );
+
           if ($error.config?.url === "/auth/oauth/login") {
             return Promise.reject($error);
           }
@@ -252,7 +269,9 @@ class PureHttp {
               return PureHttp.axiosInstance($error.config);
             } catch (e) {
               console.error(e);
-              useUserStoreHook().clearLoginStatus();
+              if (e.response?.status === 401) {
+                useUserStoreHook().clearLoginStatus();
+              }
               // 所有的响应异常 区分来源为取消请求/非取消请求
               return Promise.reject($error);
             } finally {
@@ -262,7 +281,9 @@ class PureHttp {
           } else {
             return PureHttp.retryUnauthorizedRequest($error.config).catch(e => {
               console.error(e);
-              useUserStoreHook().clearLoginStatus();
+              if (e.response?.status === 401) {
+                useUserStoreHook().clearLoginStatus();
+              }
               return Promise.reject($error);
             });
           }
