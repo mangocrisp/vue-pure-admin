@@ -1,10 +1,22 @@
 <script setup lang="ts">
-import { ListItem } from "../data";
-import { ref, PropType, nextTick } from "vue";
+import { avatarCache, getAvatar, ListItem } from "../data";
+import {
+  ref,
+  PropType,
+  nextTick,
+  reactive,
+  computed,
+  watch,
+  onMounted
+} from "vue";
 import { useNav } from "@/layout/hooks/useNav";
 import { deviceDetection } from "@pureadmin/utils";
+import staticAvatar from "@/assets/user.jpg";
+import AdminFileApi from "@/api/admin/file";
+import { blobToDataURI } from "@/utils";
+import { UserFilled } from "@element-plus/icons-vue";
 
-defineProps({
+const props = defineProps({
   noticeItem: {
     type: Object as PropType<ListItem>,
     default: () => {}
@@ -13,6 +25,8 @@ defineProps({
 
 const titleRef = ref(null);
 const titleTooltip = ref(false);
+const extraRef = ref(null);
+const extraTooltip = ref(false);
 const descriptionRef = ref(null);
 const descriptionTooltip = ref(false);
 const { tooltipEffect } = useNav();
@@ -23,6 +37,14 @@ function hoverTitle() {
     titleRef.value?.scrollWidth > titleRef.value?.clientWidth
       ? (titleTooltip.value = true)
       : (titleTooltip.value = false);
+  });
+}
+
+function hoverExtra() {
+  nextTick(() => {
+    extraRef.value?.scrollWidth > extraRef.value?.clientWidth
+      ? (extraTooltip.value = true)
+      : (extraTooltip.value = false);
   });
 }
 
@@ -45,18 +67,31 @@ function hoverDescription(event, description) {
     ? (descriptionTooltip.value = true)
     : (descriptionTooltip.value = false);
 }
+
+const avatarComputed = computed(() => (avatarPath: string) => {
+  if (!avatarPath) {
+    return staticAvatar;
+  }
+  return avatarCache[avatarPath] || staticAvatar;
+});
+
+onMounted(() => {
+  getAvatar(props.noticeItem.avatar);
+});
 </script>
 
 <template>
   <div
     class="notice-container border-0 border-b-[1px] border-solid border-[#f0f0f0] dark:border-[#303030]"
   >
-    <el-avatar
-      v-if="noticeItem.avatar"
-      :size="30"
-      :src="noticeItem.avatar"
-      class="notice-container-avatar"
-    />
+    <div class="notice-container-avatar">
+      <el-avatar
+        v-if="noticeItem.avatar"
+        :icon="UserFilled"
+        :size="30"
+        :src="avatarComputed(noticeItem.avatar)"
+      />
+    </div>
     <div class="notice-container-text">
       <div class="notice-text-title text-[#000000d9] dark:text-white">
         <el-tooltip
@@ -75,14 +110,26 @@ function hoverDescription(event, description) {
             {{ noticeItem.title }}
           </div>
         </el-tooltip>
-        <el-tag
-          v-if="noticeItem?.extra"
-          :type="noticeItem?.status"
-          size="small"
-          class="notice-title-extra"
+        <el-tooltip
+          popper-class="notice-title-popper"
+          :content="noticeItem?.extra"
+          :disabled="!extraTooltip"
+          placement="top-start"
+          :effect="tooltipEffect"
+          :enterable="!isMobile"
         >
-          {{ noticeItem?.extra }}
-        </el-tag>
+          <el-tag
+            v-if="noticeItem?.extra"
+            :type="noticeItem?.status"
+            size="small"
+            class="notice-title-extra"
+            @mouseover="hoverExtra"
+          >
+            <div ref="extraRef" class="notice-title-extra-content">
+              {{ noticeItem?.extra }}
+            </div>
+          </el-tag>
+        </el-tooltip>
       </div>
 
       <el-tooltip
@@ -142,7 +189,7 @@ function hoverDescription(event, description) {
 
       .notice-title-content {
         flex: 1;
-        width: 200px;
+        width: 180px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -161,7 +208,16 @@ function hoverDescription(event, description) {
       line-height: 1.5715;
     }
 
-    .notice-text-description {
+    .notice-title-extra-content {
+      flex: 1;
+      max-width: 60px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .notice-text-description,
+    .notice-title-extra-content {
       display: -webkit-box;
       overflow: hidden;
       text-overflow: ellipsis;

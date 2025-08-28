@@ -5,6 +5,8 @@ import { storageLocal, isString, isIncludeAllChildren } from "@pureadmin/utils";
 export interface DataInfo<T> {
   /**用户 id */
   id?: string;
+  /** json web token id */
+  jti: string;
   /** token */
   accessToken: string;
   /** `accessToken`的过期时间（时间戳） */
@@ -85,10 +87,15 @@ export function updateTokenInfo({
  */
 export function setToken(data: DataInfo<Date>) {
   let expires = 0;
-  const { accessToken, refreshToken } = data;
+  const { accessToken, refreshToken, jti } = data;
   const { isRemembered, loginDay } = useUserStoreHook();
   expires = new Date(data.expires).getTime(); // 如果后端直接设置时间戳，将此处代码改为expires = data.expires，然后把上面的DataInfo<Date>改成DataInfo<number>即可
-  const cookieString = JSON.stringify({ accessToken, expires, refreshToken });
+  const cookieString = JSON.stringify({
+    jti,
+    accessToken,
+    expires,
+    refreshToken
+  });
 
   expires > 0
     ? Cookies.set(TokenKey, cookieString, {

@@ -104,6 +104,7 @@ export const useUserStore = defineStore("pure-user", {
               loginResult.access_token_exp * 1000 + new Date().getTime()
             );
             setToken({
+              jti: loginResult.jti,
               accessToken: loginResult.access_token,
               refreshToken: loginResult.refresh_token,
               expires
@@ -207,10 +208,12 @@ export const useUserStore = defineStore("pure-user", {
         Auth.reLogin(refreshToken)
           .then(({ data }) => {
             setToken({
+              jti: data.jti,
               accessToken: data.access_token,
               refreshToken: data.refresh_token,
               expires: new Date(data.expires_in * 1000 + new Date().getTime())
             });
+            this.updateMyInfo();
             resolve({
               success: true,
               data: {

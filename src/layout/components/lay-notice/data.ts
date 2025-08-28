@@ -1,4 +1,8 @@
 import { $t } from "@/plugins/i18n";
+import { reactive } from "vue";
+import staticAvatar from "@/assets/user.jpg";
+import AdminFileApi from "@/api/admin/file";
+import { blobToDataURI } from "@/utils";
 
 export interface ListItem {
   avatar: string;
@@ -10,6 +14,48 @@ export interface ListItem {
   extra?: string;
 }
 
+/**
+ * 通知类型
+ */
+export const NoticeType = [
+  /**系统通知 */
+  "SYS_NOTICE",
+  /**系统消息 */
+  "SYS_MESSAGE",
+  /**系统待办 */
+  "SYS_TODO"
+];
+
+export const avatarCache = reactive<{ [key: string]: string }>({});
+
+export const getAvatar = (
+  avatarPath: string,
+  callBack?: (base64Data: string) => void,
+  reject?: (error: any) => void
+) => {
+  if (!avatarPath || avatarCache[avatarPath]) {
+    callBack ? callBack(avatarCache[avatarPath]) : {};
+    return;
+  }
+  avatarCache[avatarPath] = staticAvatar;
+  AdminFileApi.fileDownload(avatarPath)
+    .then((res: Blob) => {
+      blobToDataURI(res)
+        .then(dataURI => {
+          avatarCache[avatarPath] = dataURI;
+          callBack ? callBack(dataURI) : {};
+        })
+        .catch(error => {
+          console.error(error);
+          reject ? reject(error) : {};
+        });
+    })
+    .catch(error => {
+      console.error(error);
+      reject ? reject(error) : {};
+    });
+};
+
 export interface TabItem {
   key: string;
   name: string;
@@ -19,13 +65,13 @@ export interface TabItem {
 
 export const noticesData: TabItem[] = [
   {
-    key: "1",
+    key: "SYS_NOTICE",
     name: $t("status.pureNotify"),
     list: [],
     emptyText: $t("status.pureNoNotify")
   },
   {
-    key: "2",
+    key: "SYS_MESSAGE",
     name: $t("status.pureMessage"),
     list: [
       {
@@ -54,7 +100,7 @@ export const noticesData: TabItem[] = [
     emptyText: $t("status.pureNoMessage")
   },
   {
-    key: "3",
+    key: "SYS_TODO",
     name: $t("status.pureTodo"),
     list: [
       {
