@@ -353,10 +353,13 @@ export function useRole(treeRef: Ref) {
     const halfCheckedMenus = treeRef.value.getHalfCheckedNodes().map(item => {
       return { menuId: item.id, roleId: id, checked: 0 };
     });
+    const roleMenus = checkedMenus.concat(halfCheckedMenus);
     await SystemRoleMenuApi.roleMenuBatch(
-      checkedMenus.concat(halfCheckedMenus)
+      roleMenus && roleMenus.length > 0 ? roleMenus : [{ roleId: id }]
     );
-    await SystemRolePermApi.rolePermBatch(checkedPerms);
+    await SystemRolePermApi.rolePermBatch(
+      checkedPerms && checkedPerms.length > 0 ? checkedPerms : [{ roleId: id }]
+    );
     message(`角色名称为${name}的菜单权限修改成功`, {
       type: "success"
     });

@@ -74,7 +74,7 @@ declare namespace SystemUserType {
 
   export interface UserRole {
     userId: string;
-    roleId: string;
+    roleId?: string;
   }
 
   export interface UserAvatarDTO {

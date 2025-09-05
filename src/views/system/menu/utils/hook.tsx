@@ -239,7 +239,7 @@ export function useMenu() {
               menuData: {
                 id: undefined,
                 name: undefined,
-                parentId: undefined,
+                parentId: "0",
                 alwaysShow: 1,
                 props: undefined,
                 sort: 0,
@@ -298,7 +298,7 @@ export function useMenu() {
           menuData: row?.menuData ?? {
             id: undefined,
             name: undefined,
-            parentId: undefined,
+            parentId: "0",
             alwaysShow: 1,
             props: undefined,
             sort: 0,
@@ -347,10 +347,14 @@ export function useMenu() {
               menuType === 3
                 ? formInlineData.permData.name
                 : formInlineData.menuData.name;
-
+            if (!formInlineData.parentId) {
+              // 如果没有指定父级，则默认是根目录
+              formInlineData.parentId = "0";
+              formInlineData.menuData.component = "Layout";
+            }
             // 菜单管理的菜单类型，默认是目录，如果有父级就是菜单
             let menuDataType = "M";
-            if (formInlineData.parentId) {
+            if (formInlineData.parentId !== "0") {
               menuDataType = "C";
             }
             // if (

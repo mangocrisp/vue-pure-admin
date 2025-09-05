@@ -1,0 +1,883 @@
+{
+    "nodes": [
+        {
+            "id": "1a445f98-e105-451c-bbd5-ee30b713ce07",
+            "type": "custom-node-start",
+            "x": -780,
+            "y": -130,
+            "properties": {
+                "isActivated": true
+            },
+            "text": {
+                "x": -780,
+                "y": -130,
+                "value": "开始"
+            }
+        },
+        {
+            "id": "43bdc607-9597-4159-b08e-396492d7730b",
+            "type": "custom-node-user",
+            "x": -620,
+            "y": -130,
+            "properties": {
+                "isActivated": true
+            },
+            "text": {
+                "x": -620,
+                "y": -130,
+                "value": "上报问题"
+            }
+        },
+        {
+            "id": "96c4cde4-a24c-4803-bccb-0fee4dbd9881",
+            "type": "custom-node-service",
+            "x": -460,
+            "y": -130,
+            "properties": {
+                "isActivated": true
+            },
+            "text": {
+                "x": -460,
+                "y": -130,
+                "value": "识别问题"
+            }
+        },
+        {
+            "id": "fa269249-3f6f-4906-89da-1809edaed464",
+            "type": "custom-node-user",
+            "x": -290,
+            "y": -130,
+            "properties": {
+                "isActivated": true
+            },
+            "text": {
+                "x": -290,
+                "y": -130,
+                "value": "处理"
+            }
+        },
+        {
+            "id": "787cd52c-d5c5-4bba-9e92-3e268c9a73dd",
+            "type": "custom-node-user",
+            "x": -470,
+            "y": -300,
+            "properties": {},
+            "text": {
+                "x": -470,
+                "y": -300,
+                "value": "延期审批"
+            }
+        },
+        {
+            "id": "53508016-4284-43f7-af4b-31e99fbbb8b9",
+            "type": "custom-node-service",
+            "x": 2,
+            "y": -300,
+            "properties": {},
+            "text": {
+                "x": -14,
+                "y": -300,
+                "value": "系统任务"
+            }
+        },
+        {
+            "id": "9fe6f72b-b3b0-4093-8873-f8bd2145d1c8",
+            "type": "custom-node-service",
+            "x": -10,
+            "y": -130,
+            "properties": {
+                "isActivated": true
+            },
+            "text": {
+                "x": -11,
+                "y": -130,
+                "value": "识别审核人"
+            }
+        },
+        {
+            "id": "d4c6dfbc-b806-432c-a416-cc6acca306cb",
+            "type": "custom-node-judgment",
+            "x": 190,
+            "y": -130,
+            "properties": {
+                "isActivated": true
+            },
+            "text": {
+                "x": 190,
+                "y": -130,
+                "value": "条件判断"
+            }
+        },
+        {
+            "id": "2a6f941f-a85c-4836-85e4-97e9f4337364",
+            "type": "custom-node-judgment",
+            "x": 320,
+            "y": -130,
+            "properties": {
+                "isActivated": true
+            },
+            "text": {
+                "x": 320,
+                "y": -130,
+                "value": "条件判断"
+            }
+        },
+        {
+            "id": "1621293b-673d-4fd3-84fb-505199d12e1e",
+            "type": "custom-node-service",
+            "x": -330,
+            "y": 70,
+            "properties": {},
+            "text": {
+                "x": -330,
+                "y": 70,
+                "value": "系统任务"
+            }
+        },
+        {
+            "id": "338dd17d-0f64-49be-84f0-32a5b2c0ae14",
+            "type": "custom-node-user",
+            "x": -10,
+            "y": 50,
+            "properties": {},
+            "text": {
+                "x": -10,
+                "y": 50,
+                "value": "作业单位审核"
+            }
+        },
+        {
+            "id": "668f8f09-179c-4064-95a6-744e1045c77b",
+            "type": "custom-node-judgment",
+            "x": 190,
+            "y": 50,
+            "properties": {},
+            "text": {
+                "x": 190,
+                "y": 50,
+                "value": "条件判断"
+            }
+        },
+        {
+            "id": "e003f9f1-8451-4608-b449-1f1f0257d656",
+            "type": "custom-node-judgment",
+            "x": 320,
+            "y": 50,
+            "properties": {},
+            "text": {
+                "x": 320,
+                "y": 50,
+                "value": "条件判断"
+            }
+        },
+        {
+            "id": "ace8f27a-e642-4915-8368-1cb867f924e4",
+            "type": "custom-node-user",
+            "x": 530,
+            "y": 50,
+            "properties": {
+                "isActivated": true
+            },
+            "text": {
+                "x": 530,
+                "y": 50,
+                "value": "发起人审核"
+            }
+        },
+        {
+            "id": "e8f6d8d9-8393-444c-9f71-72a82be79fa6",
+            "type": "custom-node-user",
+            "x": 320,
+            "y": 230,
+            "properties": {},
+            "text": {
+                "x": 320,
+                "y": 230,
+                "value": "市政所审核"
+            }
+        },
+        {
+            "id": "aa451dcf-3b99-4fc5-87a0-8ed81860af8f",
+            "type": "custom-node-judgment",
+            "x": 530,
+            "y": 230,
+            "properties": {},
+            "text": {
+                "x": 530,
+                "y": 230,
+                "value": "条件判断"
+            }
+        },
+        {
+            "id": "1e5413d7-fa8e-4876-b90e-6c1531bf9c9e",
+            "type": "custom-node-judgment",
+            "x": 730,
+            "y": 140,
+            "properties": {
+                "isActivated": true
+            },
+            "text": {
+                "x": 730,
+                "y": 140,
+                "value": "条件判断"
+            }
+        },
+        {
+            "id": "624593eb-44c5-4306-9376-8ab28059188b",
+            "type": "custom-node-end",
+            "x": 720,
+            "y": -70,
+            "properties": {
+                "success": true,
+                "isActivated": true
+            },
+            "text": {
+                "x": 720,
+                "y": -70,
+                "value": "结束"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "5fea7b14-78a3-4ff8-8997-fb7984c91beb",
+            "type": "custom-edge-polyline",
+            "sourceNodeId": "fa269249-3f6f-4906-89da-1809edaed464",
+            "targetNodeId": "787cd52c-d5c5-4bba-9e92-3e268c9a73dd",
+            "startPoint": {
+                "x": -315,
+                "y": -170
+            },
+            "endPoint": {
+                "x": -420,
+                "y": -300
+            },
+            "properties": {},
+            "pointsList": [
+                {
+                    "x": -315,
+                    "y": -170
+                },
+                {
+                    "x": -315,
+                    "y": -300
+                },
+                {
+                    "x": -420,
+                    "y": -300
+                }
+            ]
+        },
+        {
+            "id": "2f9764ae-99ad-4d8d-ba69-39f2edb6d218",
+            "type": "custom-edge-line",
+            "sourceNodeId": "fa269249-3f6f-4906-89da-1809edaed464",
+            "targetNodeId": "53508016-4284-43f7-af4b-31e99fbbb8b9",
+            "startPoint": {
+                "x": -290,
+                "y": -170
+            },
+            "endPoint": {
+                "x": -48,
+                "y": -300
+            },
+            "properties": {}
+        },
+        {
+            "id": "a9f8a63d-ef67-4575-8fef-b49dfde3eb2a",
+            "type": "custom-edge-line",
+            "sourceNodeId": "787cd52c-d5c5-4bba-9e92-3e268c9a73dd",
+            "targetNodeId": "fa269249-3f6f-4906-89da-1809edaed464",
+            "startPoint": {
+                "x": -470,
+                "y": -260
+            },
+            "endPoint": {
+                "x": -290,
+                "y": -170
+            },
+            "properties": {}
+        },
+        {
+            "id": "a8d2ffc9-cd3f-4512-a401-7324778fca4b",
+            "type": "custom-edge-line",
+            "sourceNodeId": "d4c6dfbc-b806-432c-a416-cc6acca306cb",
+            "targetNodeId": "338dd17d-0f64-49be-84f0-32a5b2c0ae14",
+            "startPoint": {
+                "x": 190,
+                "y": -80
+            },
+            "endPoint": {
+                "x": -10,
+                "y": 10
+            },
+            "properties": {}
+        },
+        {
+            "id": "52fd2f1f-2ddd-4969-9431-a6873e9318e4",
+            "type": "custom-edge-line",
+            "sourceNodeId": "338dd17d-0f64-49be-84f0-32a5b2c0ae14",
+            "targetNodeId": "668f8f09-179c-4064-95a6-744e1045c77b",
+            "startPoint": {
+                "x": 40,
+                "y": 50
+            },
+            "endPoint": {
+                "x": 160,
+                "y": 50
+            },
+            "properties": {}
+        },
+        {
+            "id": "a07391b4-7834-4ee7-a07a-5073091bcbd0",
+            "type": "custom-edge-line",
+            "sourceNodeId": "2a6f941f-a85c-4836-85e4-97e9f4337364",
+            "targetNodeId": "e003f9f1-8451-4608-b449-1f1f0257d656",
+            "startPoint": {
+                "x": 320,
+                "y": -80
+            },
+            "endPoint": {
+                "x": 320,
+                "y": 0
+            },
+            "properties": {}
+        },
+        {
+            "id": "4bcbed99-7d35-441b-b0cc-76ca9d69ee1d",
+            "type": "custom-edge-line",
+            "sourceNodeId": "668f8f09-179c-4064-95a6-744e1045c77b",
+            "targetNodeId": "2a6f941f-a85c-4836-85e4-97e9f4337364",
+            "startPoint": {
+                "x": 190,
+                "y": 0
+            },
+            "endPoint": {
+                "x": 320,
+                "y": -80
+            },
+            "properties": {}
+        },
+        {
+            "id": "f75add92-5070-4d8d-b34a-717d40f33ade",
+            "type": "custom-edge-line",
+            "sourceNodeId": "e003f9f1-8451-4608-b449-1f1f0257d656",
+            "targetNodeId": "ace8f27a-e642-4915-8368-1cb867f924e4",
+            "startPoint": {
+                "x": 350,
+                "y": 50
+            },
+            "endPoint": {
+                "x": 480,
+                "y": 50
+            },
+            "properties": {}
+        },
+        {
+            "id": "57d4e89b-d0b5-4653-8470-0796ec024118",
+            "type": "custom-edge-line",
+            "sourceNodeId": "e003f9f1-8451-4608-b449-1f1f0257d656",
+            "targetNodeId": "e8f6d8d9-8393-444c-9f71-72a82be79fa6",
+            "startPoint": {
+                "x": 320,
+                "y": 100
+            },
+            "endPoint": {
+                "x": 320,
+                "y": 190
+            },
+            "properties": {}
+        },
+        {
+            "id": "8b49646d-7f14-4642-a89d-167d874bcb04",
+            "type": "custom-edge-line",
+            "sourceNodeId": "e8f6d8d9-8393-444c-9f71-72a82be79fa6",
+            "targetNodeId": "aa451dcf-3b99-4fc5-87a0-8ed81860af8f",
+            "startPoint": {
+                "x": 370,
+                "y": 230
+            },
+            "endPoint": {
+                "x": 500,
+                "y": 230
+            },
+            "properties": {}
+        },
+        {
+            "id": "56f0ebbe-db45-4b4c-82d2-f22fc5564be1",
+            "type": "custom-edge-line",
+            "sourceNodeId": "aa451dcf-3b99-4fc5-87a0-8ed81860af8f",
+            "targetNodeId": "ace8f27a-e642-4915-8368-1cb867f924e4",
+            "startPoint": {
+                "x": 530,
+                "y": 180
+            },
+            "endPoint": {
+                "x": 530,
+                "y": 90
+            },
+            "properties": {}
+        },
+        {
+            "id": "cf12f05c-dee3-4a1f-b273-01e447ad8644",
+            "type": "custom-edge-polyline",
+            "sourceNodeId": "668f8f09-179c-4064-95a6-744e1045c77b",
+            "targetNodeId": "fa269249-3f6f-4906-89da-1809edaed464",
+            "startPoint": {
+                "x": 190,
+                "y": 100
+            },
+            "endPoint": {
+                "x": -240,
+                "y": -117
+            },
+            "properties": {},
+            "pointsList": [
+                {
+                    "x": 190,
+                    "y": 100
+                },
+                {
+                    "x": 190,
+                    "y": 109
+                },
+                {
+                    "x": -159,
+                    "y": 109
+                },
+                {
+                    "x": -159,
+                    "y": -117
+                },
+                {
+                    "x": -240,
+                    "y": -117
+                }
+            ]
+        },
+        {
+            "id": "07833573-1814-4cf4-813a-d684a773b573",
+            "type": "custom-edge-polyline",
+            "sourceNodeId": "fa269249-3f6f-4906-89da-1809edaed464",
+            "targetNodeId": "1621293b-673d-4fd3-84fb-505199d12e1e",
+            "startPoint": {
+                "x": -256,
+                "y": -90
+            },
+            "endPoint": {
+                "x": -330,
+                "y": 110
+            },
+            "properties": {},
+            "pointsList": [
+                {
+                    "x": -256,
+                    "y": -90
+                },
+                {
+                    "x": -256,
+                    "y": 140
+                },
+                {
+                    "x": -330,
+                    "y": 140
+                },
+                {
+                    "x": -330,
+                    "y": 110
+                }
+            ]
+        },
+        {
+            "id": "40965001-f6c3-4f70-b5cd-18c4ce8606df",
+            "type": "custom-edge-polyline",
+            "sourceNodeId": "aa451dcf-3b99-4fc5-87a0-8ed81860af8f",
+            "targetNodeId": "fa269249-3f6f-4906-89da-1809edaed464",
+            "startPoint": {
+                "x": 530,
+                "y": 280
+            },
+            "endPoint": {
+                "x": -240,
+                "y": -97
+            },
+            "properties": {},
+            "pointsList": [
+                {
+                    "x": 530,
+                    "y": 280
+                },
+                {
+                    "x": 530,
+                    "y": 292
+                },
+                {
+                    "x": -194,
+                    "y": 292
+                },
+                {
+                    "x": -194,
+                    "y": -97
+                },
+                {
+                    "x": -240,
+                    "y": -97
+                }
+            ]
+        },
+        {
+            "id": "92db6454-f5b0-451b-8551-36e324e055be",
+            "type": "custom-edge-polyline",
+            "sourceNodeId": "1621293b-673d-4fd3-84fb-505199d12e1e",
+            "targetNodeId": "fa269249-3f6f-4906-89da-1809edaed464",
+            "startPoint": {
+                "x": -322,
+                "y": 30
+            },
+            "endPoint": {
+                "x": -322,
+                "y": -90
+            },
+            "properties": {},
+            "pointsList": [
+                {
+                    "x": -322,
+                    "y": 30
+                },
+                {
+                    "x": -322,
+                    "y": -90
+                }
+            ]
+        },
+        {
+            "id": "12a4aebd-bef0-429c-8903-f61902c48b69",
+            "type": "custom-edge-polyline",
+            "sourceNodeId": "1e5413d7-fa8e-4876-b90e-6c1531bf9c9e",
+            "targetNodeId": "fa269249-3f6f-4906-89da-1809edaed464",
+            "startPoint": {
+                "x": 730,
+                "y": 190
+            },
+            "endPoint": {
+                "x": -340,
+                "y": -107
+            },
+            "properties": {},
+            "pointsList": [
+                {
+                    "x": 730,
+                    "y": 190
+                },
+                {
+                    "x": 730,
+                    "y": 316
+                },
+                {
+                    "x": -397,
+                    "y": 316
+                },
+                {
+                    "x": -397,
+                    "y": -107
+                },
+                {
+                    "x": -340,
+                    "y": -107
+                }
+            ]
+        },
+        {
+            "id": "93c610c4-cce9-4581-914a-2868f50b4f18",
+            "type": "custom-edge-polyline",
+            "sourceNodeId": "1a445f98-e105-451c-bbd5-ee30b713ce07",
+            "targetNodeId": "43bdc607-9597-4159-b08e-396492d7730b",
+            "startPoint": {
+                "x": -730,
+                "y": -130
+            },
+            "endPoint": {
+                "x": -670,
+                "y": -130
+            },
+            "properties": {
+                "isActivated": true
+            },
+            "pointsList": [
+                {
+                    "x": -730,
+                    "y": -130
+                },
+                {
+                    "x": -670,
+                    "y": -130
+                }
+            ]
+        },
+        {
+            "id": "3e880034-5555-4c66-92ba-3ec238313437",
+            "type": "custom-edge-polyline",
+            "sourceNodeId": "43bdc607-9597-4159-b08e-396492d7730b",
+            "targetNodeId": "96c4cde4-a24c-4803-bccb-0fee4dbd9881",
+            "startPoint": {
+                "x": -570,
+                "y": -130
+            },
+            "endPoint": {
+                "x": -510,
+                "y": -130
+            },
+            "properties": {
+                "isActivated": true
+            },
+            "pointsList": [
+                {
+                    "x": -570,
+                    "y": -130
+                },
+                {
+                    "x": -510,
+                    "y": -130
+                }
+            ]
+        },
+        {
+            "id": "a275845c-9f67-436e-a0b2-d8f6814b86d3",
+            "type": "custom-edge-polyline",
+            "sourceNodeId": "96c4cde4-a24c-4803-bccb-0fee4dbd9881",
+            "targetNodeId": "fa269249-3f6f-4906-89da-1809edaed464",
+            "startPoint": {
+                "x": -410,
+                "y": -130
+            },
+            "endPoint": {
+                "x": -340,
+                "y": -130
+            },
+            "properties": {
+                "isActivated": true
+            },
+            "pointsList": [
+                {
+                    "x": -410,
+                    "y": -130
+                },
+                {
+                    "x": -340,
+                    "y": -130
+                }
+            ]
+        },
+        {
+            "id": "d87b10d8-6a7e-4f6e-b1d0-740150f8be6b",
+            "type": "custom-edge-polyline",
+            "sourceNodeId": "fa269249-3f6f-4906-89da-1809edaed464",
+            "targetNodeId": "9fe6f72b-b3b0-4093-8873-f8bd2145d1c8",
+            "startPoint": {
+                "x": -240,
+                "y": -130
+            },
+            "endPoint": {
+                "x": -60,
+                "y": -130
+            },
+            "properties": {
+                "isActivated": true
+            },
+            "pointsList": [
+                {
+                    "x": -240,
+                    "y": -130
+                },
+                {
+                    "x": -60,
+                    "y": -130
+                }
+            ]
+        },
+        {
+            "id": "aadfdd2c-312d-439f-9bdf-db12520085f7",
+            "type": "custom-edge-polyline",
+            "sourceNodeId": "9fe6f72b-b3b0-4093-8873-f8bd2145d1c8",
+            "targetNodeId": "d4c6dfbc-b806-432c-a416-cc6acca306cb",
+            "startPoint": {
+                "x": 40,
+                "y": -130
+            },
+            "endPoint": {
+                "x": 160,
+                "y": -130
+            },
+            "properties": {
+                "isActivated": true
+            },
+            "pointsList": [
+                {
+                    "x": 40,
+                    "y": -130
+                },
+                {
+                    "x": 160,
+                    "y": -130
+                }
+            ]
+        },
+        {
+            "id": "1a4ac489-db10-4621-945c-572cae551423",
+            "type": "custom-edge-polyline",
+            "sourceNodeId": "d4c6dfbc-b806-432c-a416-cc6acca306cb",
+            "targetNodeId": "2a6f941f-a85c-4836-85e4-97e9f4337364",
+            "startPoint": {
+                "x": 220,
+                "y": -130
+            },
+            "endPoint": {
+                "x": 290,
+                "y": -130
+            },
+            "properties": {
+                "isActivated": true
+            },
+            "pointsList": [
+                {
+                    "x": 220,
+                    "y": -130
+                },
+                {
+                    "x": 290,
+                    "y": -130
+                }
+            ]
+        },
+        {
+            "id": "4e119726-71d8-4138-9dc3-a59d0aa1ab99",
+            "type": "custom-edge-line",
+            "sourceNodeId": "2a6f941f-a85c-4836-85e4-97e9f4337364",
+            "targetNodeId": "ace8f27a-e642-4915-8368-1cb867f924e4",
+            "startPoint": {
+                "x": 350,
+                "y": -130
+            },
+            "endPoint": {
+                "x": 530,
+                "y": 10
+            },
+            "properties": {
+                "isActivated": true
+            },
+            "pointsList": [
+                {
+                    "x": 350,
+                    "y": -130
+                },
+                {
+                    "x": 530,
+                    "y": -130
+                },
+                {
+                    "x": 530,
+                    "y": 10
+                }
+            ]
+        },
+        {
+            "id": "8e08503d-7c51-4538-aa16-3af0c721d912",
+            "type": "custom-edge-line",
+            "sourceNodeId": "ace8f27a-e642-4915-8368-1cb867f924e4",
+            "targetNodeId": "1e5413d7-fa8e-4876-b90e-6c1531bf9c9e",
+            "startPoint": {
+                "x": 580,
+                "y": 50
+            },
+            "endPoint": {
+                "x": 700,
+                "y": 140
+            },
+            "properties": {
+                "isActivated": true
+            },
+            "pointsList": [
+                {
+                    "x": 580,
+                    "y": 50
+                },
+                {
+                    "x": 670,
+                    "y": 50
+                },
+                {
+                    "x": 670,
+                    "y": 140
+                },
+                {
+                    "x": 700,
+                    "y": 140
+                }
+            ]
+        },
+        {
+            "id": "a0a235b2-254c-49c8-9997-f03e597ada5f",
+            "type": "custom-edge-line",
+            "sourceNodeId": "1e5413d7-fa8e-4876-b90e-6c1531bf9c9e",
+            "targetNodeId": "624593eb-44c5-4306-9376-8ab28059188b",
+            "startPoint": {
+                "x": 730,
+                "y": 90
+            },
+            "endPoint": {
+                "x": 720,
+                "y": -20
+            },
+            "properties": {
+                "isActivated": true
+            },
+            "pointsList": [
+                {
+                    "x": 730,
+                    "y": 90
+                },
+                {
+                    "x": 730,
+                    "y": 35
+                },
+                {
+                    "x": 720,
+                    "y": 35
+                },
+                {
+                    "x": 720,
+                    "y": -20
+                }
+            ]
+        },
+        {
+            "id": "cd917cda-9a7d-4460-9840-78e44b5ecdb8",
+            "type": "custom-edge-polyline",
+            "sourceNodeId": "53508016-4284-43f7-af4b-31e99fbbb8b9",
+            "targetNodeId": "fa269249-3f6f-4906-89da-1809edaed464",
+            "startPoint": {
+                "x": -48,
+                "y": -300
+            },
+            "endPoint": {
+                "x": -265,
+                "y": -170
+            },
+            "properties": {},
+            "pointsList": [
+                {
+                    "x": -48,
+                    "y": -300
+                },
+                {
+                    "x": -265,
+                    "y": -300
+                },
+                {
+                    "x": -265,
+                    "y": -170
+                }
+            ]
+        }
+    ]
+}

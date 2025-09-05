@@ -22,7 +22,7 @@ import {
 const props = withDefaults(defineProps<FormProps>(), {
   formInline: () => ({
     higherMenuOptions: [],
-    parentId: undefined,
+    parentId: "0",
     menuType: 0,
     meta: {
       frameLoading: true,
@@ -33,7 +33,7 @@ const props = withDefaults(defineProps<FormProps>(), {
     menuData: {
       id: undefined,
       name: undefined,
-      parentId: undefined,
+      parentId: "0",
       alwaysShow: 1,
       props: undefined,
       sort: 0,

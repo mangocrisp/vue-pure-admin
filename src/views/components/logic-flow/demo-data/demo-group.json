@@ -1,0 +1,475 @@
+{
+    "nodes": [
+        {
+            "id": "4a223018-6bcd-456d-b67a-177764e313de",
+            "type": "custom-group",
+            "x": -280,
+            "y": 260,
+            "properties": {
+                "nodeSize": {
+                    "width": 351.5,
+                    "height": 898.5
+                }
+            },
+            "text": {
+                "x": -431,
+                "y": -205.80263157894734,
+                "value": "网络员"
+            },
+            "children": [
+                "1e9a9a84-c570-4ab1-83f0-eef512e10735",
+                "8c065cf1-944d-49ba-a40f-6555ff6299f7",
+                "796183ea-9022-474b-8aa8-63bbde6a6206",
+                "41b1910c-ed1c-4718-afa3-a43f5cf5a270",
+                "13aa4f19-6519-4373-abfd-ce9cdddf0b5f"
+            ]
+        },
+        {
+            "id": "1e9a9a84-c570-4ab1-83f0-eef512e10735",
+            "type": "custom-node-start",
+            "x": -290,
+            "y": -90,
+            "properties": {
+                "nodeSize": {
+                    "rx": 37.5,
+                    "ry": 35.5
+                }
+            },
+            "text": {
+                "x": -290.75,
+                "y": -89.75,
+                "value": "开始"
+            }
+        },
+        {
+            "id": "8c065cf1-944d-49ba-a40f-6555ff6299f7",
+            "type": "custom-node-user",
+            "x": -290,
+            "y": 50,
+            "properties": {},
+            "text": {
+                "x": -280,
+                "y": 50,
+                "value": "上报"
+            }
+        },
+        {
+            "id": "a7402c61-6ee1-4104-b7a6-4b5a124b0259",
+            "type": "custom-group",
+            "x": 90,
+            "y": 260,
+            "properties": {
+                "nodeSize": {
+                    "width": 376.75,
+                    "height": 899.75
+                }
+            },
+            "text": {
+                "x": -48.25,
+                "y": -206.69736842105266,
+                "value": "街镇网络中心"
+            },
+            "children": [
+                "93908437-4fa9-4755-8206-996904647593",
+                "5149f750-1861-4f90-9dc1-dc2489399c12"
+            ]
+        },
+        {
+            "id": "5d22716e-5580-4f7a-bd0f-0e94d3e8b451",
+            "type": "custom-group",
+            "x": 460,
+            "y": 260,
+            "properties": {
+                "nodeSize": {
+                    "width": 345.3289473684206,
+                    "height": 897.4342105263158
+                }
+            },
+            "text": {
+                "x": 335.7894736842108,
+                "y": -204.40789473684208,
+                "value": "街镇业务部门"
+            },
+            "children": [
+                "c39b2dc1-202d-4984-bb7a-886ad529bf15",
+                "6f455551-21ac-4a08-b656-2f2710719bf6"
+            ]
+        },
+        {
+            "id": "93908437-4fa9-4755-8206-996904647593",
+            "type": "custom-node-user",
+            "x": 80,
+            "y": -50,
+            "properties": {},
+            "text": {
+                "x": 80,
+                "y": -50,
+                "value": "返回"
+            }
+        },
+        {
+            "id": "5149f750-1861-4f90-9dc1-dc2489399c12",
+            "type": "custom-node-user",
+            "x": 80,
+            "y": 140,
+            "properties": {},
+            "text": {
+                "x": 80,
+                "y": 140,
+                "value": "分发"
+            }
+        },
+        {
+            "id": "c39b2dc1-202d-4984-bb7a-886ad529bf15",
+            "type": "custom-node-judgment",
+            "x": 480,
+            "y": 140,
+            "properties": {
+                "nodeSize": {
+                    "rx": 86.25,
+                    "ry": 90
+                }
+            },
+            "text": {
+                "x": 480,
+                "y": 140,
+                "value": "缺失资料,分发\n错误,协助处理"
+            }
+        },
+        {
+            "id": "6f455551-21ac-4a08-b656-2f2710719bf6",
+            "type": "custom-node-user",
+            "x": 480,
+            "y": 340,
+            "properties": {},
+            "text": {
+                "x": 480,
+                "y": 340,
+                "value": "处理"
+            }
+        },
+        {
+            "id": "41b1910c-ed1c-4718-afa3-a43f5cf5a270",
+            "type": "custom-node-user",
+            "x": -280,
+            "y": 420,
+            "properties": {
+                "nodeSize": {
+                    "width": 100.86206896551724,
+                    "height": 40.34482758620703
+                }
+            },
+            "text": {
+                "x": -280,
+                "y": 420,
+                "value": "评价"
+            }
+        },
+        {
+            "id": "796183ea-9022-474b-8aa8-63bbde6a6206",
+            "type": "custom-node-user",
+            "x": -280,
+            "y": 500,
+            "properties": {
+                "nodeSize": {
+                    "width": 100.86206896551724,
+                    "height": 40.34482758620703
+                }
+            },
+            "text": {
+                "x": -280,
+                "y": 500,
+                "value": "办结"
+            }
+        },
+        {
+            "id": "13aa4f19-6519-4373-abfd-ce9cdddf0b5f",
+            "type": "custom-node-end",
+            "x": -280,
+            "y": 640,
+            "properties": {
+                "success": true
+            },
+            "text": {
+                "x": -280,
+                "y": 640,
+                "value": "结束"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": "6ca571dc-78d8-44be-8732-95e585aaf08f",
+            "type": "custom-edge-polyline",
+            "sourceNodeId": "1e9a9a84-c570-4ab1-83f0-eef512e10735",
+            "targetNodeId": "8c065cf1-944d-49ba-a40f-6555ff6299f7",
+            "startPoint": {
+                "x": -288.75,
+                "y": -53.25
+            },
+            "endPoint": {
+                "x": -288.75,
+                "y": 11.25
+            },
+            "properties": {},
+            "pointsList": [
+                {
+                    "x": -288.75,
+                    "y": -53.25
+                },
+                {
+                    "x": -288.75,
+                    "y": 11.25
+                }
+            ]
+        },
+        {
+            "id": "200bc3d4-ebcb-42f3-8fb6-a23d194a7170",
+            "type": "custom-edge-polyline",
+            "sourceNodeId": "8c065cf1-944d-49ba-a40f-6555ff6299f7",
+            "targetNodeId": "5149f750-1861-4f90-9dc1-dc2489399c12",
+            "startPoint": {
+                "x": -238.75,
+                "y": 51.25
+            },
+            "endPoint": {
+                "x": 80,
+                "y": 100
+            },
+            "properties": {},
+            "pointsList": [
+                {
+                    "x": -238.75,
+                    "y": 51.25
+                },
+                {
+                    "x": 80,
+                    "y": 51.25
+                },
+                {
+                    "x": 80,
+                    "y": 100
+                }
+            ]
+        },
+        {
+            "id": "2a07f5a0-b16f-4d29-bac3-cb827b0ef223",
+            "type": "custom-edge-polyline",
+            "sourceNodeId": "93908437-4fa9-4755-8206-996904647593",
+            "targetNodeId": "5149f750-1861-4f90-9dc1-dc2489399c12",
+            "startPoint": {
+                "x": 80,
+                "y": -10
+            },
+            "endPoint": {
+                "x": 80,
+                "y": 100
+            },
+            "properties": {},
+            "pointsList": [
+                {
+                    "x": 80,
+                    "y": -10
+                },
+                {
+                    "x": 80,
+                    "y": 100
+                }
+            ]
+        },
+        {
+            "id": "4e3cc7b2-fbca-4304-b7de-effdb3c9e65d",
+            "type": "custom-edge-polyline",
+            "sourceNodeId": "5149f750-1861-4f90-9dc1-dc2489399c12",
+            "targetNodeId": "c39b2dc1-202d-4984-bb7a-886ad529bf15",
+            "startPoint": {
+                "x": 130,
+                "y": 140
+            },
+            "endPoint": {
+                "x": 393.75,
+                "y": 140
+            },
+            "properties": {},
+            "pointsList": [
+                {
+                    "x": 130,
+                    "y": 140
+                },
+                {
+                    "x": 393.75,
+                    "y": 140
+                }
+            ]
+        },
+        {
+            "id": "742cfe0a-f9f1-487a-8390-b1199be61937",
+            "type": "custom-edge-polyline",
+            "sourceNodeId": "c39b2dc1-202d-4984-bb7a-886ad529bf15",
+            "targetNodeId": "93908437-4fa9-4755-8206-996904647593",
+            "startPoint": {
+                "x": 480,
+                "y": 50
+            },
+            "endPoint": {
+                "x": 130,
+                "y": -50
+            },
+            "properties": {},
+            "text": {
+                "x": 418.01190476190493,
+                "y": -50,
+                "value": "否"
+            },
+            "pointsList": [
+                {
+                    "x": 480,
+                    "y": 50
+                },
+                {
+                    "x": 480,
+                    "y": -50
+                },
+                {
+                    "x": 130,
+                    "y": -50
+                }
+            ]
+        },
+        {
+            "id": "c7ec8e70-4b96-48aa-bbd0-28923334e194",
+            "type": "custom-edge-polyline",
+            "sourceNodeId": "c39b2dc1-202d-4984-bb7a-886ad529bf15",
+            "targetNodeId": "6f455551-21ac-4a08-b656-2f2710719bf6",
+            "startPoint": {
+                "x": 480,
+                "y": 230
+            },
+            "endPoint": {
+                "x": 480,
+                "y": 300
+            },
+            "properties": {},
+            "text": {
+                "x": 480,
+                "y": 265,
+                "value": "是"
+            },
+            "pointsList": [
+                {
+                    "x": 480,
+                    "y": 230
+                },
+                {
+                    "x": 480,
+                    "y": 300
+                }
+            ]
+        },
+        {
+            "id": "8024a93b-bb31-4f1f-b5d9-2b4bbd5ff901",
+            "type": "custom-edge-polyline",
+            "sourceNodeId": "6f455551-21ac-4a08-b656-2f2710719bf6",
+            "targetNodeId": "41b1910c-ed1c-4718-afa3-a43f5cf5a270",
+            "startPoint": {
+                "x": 430,
+                "y": 340
+            },
+            "endPoint": {
+                "x": -280,
+                "y": 399.8275862068965
+            },
+            "properties": {},
+            "text": {
+                "x": 29.951559934318766,
+                "y": 340,
+                "value": "已处理"
+            },
+            "pointsList": [
+                {
+                    "x": 430,
+                    "y": 340
+                },
+                {
+                    "x": -280,
+                    "y": 340
+                },
+                {
+                    "x": -280,
+                    "y": 399.8275862068965
+                }
+            ]
+        },
+        {
+            "id": "50fd188f-540a-40f6-867f-d29b2c0ee15c",
+            "type": "custom-edge-polyline",
+            "sourceNodeId": "41b1910c-ed1c-4718-afa3-a43f5cf5a270",
+            "targetNodeId": "796183ea-9022-474b-8aa8-63bbde6a6206",
+            "startPoint": {
+                "x": -280,
+                "y": 440.1724137931035
+            },
+            "endPoint": {
+                "x": -280,
+                "y": 479.8275862068965
+            },
+            "properties": {},
+            "pointsList": [
+                {
+                    "x": -280,
+                    "y": 440.1724137931035
+                },
+                {
+                    "x": -280,
+                    "y": 470.1724137931035
+                },
+                {
+                    "x": -280,
+                    "y": 470.1724137931035
+                },
+                {
+                    "x": -280,
+                    "y": 449.8275862068965
+                },
+                {
+                    "x": -280,
+                    "y": 449.8275862068965
+                },
+                {
+                    "x": -280,
+                    "y": 479.8275862068965
+                }
+            ]
+        },
+        {
+            "id": "4d886815-6167-479c-8059-89dbab38090d",
+            "type": "custom-edge-polyline",
+            "sourceNodeId": "796183ea-9022-474b-8aa8-63bbde6a6206",
+            "targetNodeId": "13aa4f19-6519-4373-abfd-ce9cdddf0b5f",
+            "startPoint": {
+                "x": -280,
+                "y": 520.1724137931035
+            },
+            "endPoint": {
+                "x": -280,
+                "y": 590
+            },
+            "properties": {},
+            "text": {
+                "x": -280,
+                "y": 555.898604269294,
+                "value": "已经归档"
+            },
+            "pointsList": [
+                {
+                    "x": -280,
+                    "y": 520.1724137931035
+                },
+                {
+                    "x": -280,
+                    "y": 590
+                }
+            ]
+        }
+    ]
+}

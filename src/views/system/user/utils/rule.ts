@@ -26,7 +26,7 @@ export const formRules = reactive(<FormRules>{
   email: [
     {
       validator: (rule, value, callback) => {
-        if (value === "") {
+        if (!value) {
           callback();
         } else if (!isEmail(value)) {
           callback(new Error("请输入正确的邮箱格式"));

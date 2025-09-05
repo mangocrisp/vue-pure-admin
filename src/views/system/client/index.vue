@@ -15,8 +15,6 @@ defineOptions({
   name: "dictType"
 });
 
-const cachePathKey = "_dict_item_goback_route_";
-
 const formRef = ref();
 const tableRef = ref();
 const contentRef = ref();

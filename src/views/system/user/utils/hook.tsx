@@ -378,6 +378,10 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       fullscreenIcon: true,
       closeOnClickModal: false,
       contentRenderer: () => h(editForm, { ref: formRef, formInline: null }),
+      closeCallBack: () => {
+        editUserDetail.value = null;
+      },
+
       beforeSure: (done, { options }) => {
         const FormRef = formRef.value.getRef();
         const curData = options.props as SystemUserType.UserEditFormDTO;
@@ -623,13 +627,15 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       beforeSure: async (done, { options }) => {
         const curData = options.props.formInline as RoleFormItemProps;
         const { ids } = toRaw(curData);
-        if (ids && ids.length > 0) {
-          const saveData = ids.map(id => {
-            return { userId: row.id, roleId: id as unknown as string };
-          });
-          console.log("saveData :>> ", saveData);
-          await SystemUserApi.userRoleBatch(saveData);
-        }
+        const saveData = ids.map(id => {
+          return { userId: row.id, roleId: id as unknown as string };
+        });
+        await SystemUserApi.userRoleBatch(
+          saveData && saveData.length > 0 ? saveData : [{ userId: row.id }]
+        );
+        message("绑定角色成功", {
+          type: "success"
+        });
         done(); // 关闭弹框
       }
     });

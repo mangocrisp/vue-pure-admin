@@ -1,0 +1,45 @@
+#flow-box {
+  .lf-mini-map {
+    top: 45px !important;
+    right: 20px !important;
+    padding-top: 0 !important;
+  }
+
+  .lf-mini-map-header {
+    display: none !important;
+  }
+
+  .lf-mini-map-close {
+    display: none !important;
+  }
+
+  .lf-mini-map-graph {
+    width: 200px !important;
+    height: 150px !important;
+  }
+
+  .lf-dnd-shape {
+    background-size: cover;
+  }
+
+  .el-drawer__body {
+    padding: 10px;
+  }
+
+  .el-drawer__header {
+    margin-bottom: 10px;
+  }
+
+  .el-popover.el-popper {
+    z-index: 1999 !important;
+  }
+
+  .lf-menu,
+  .lf-text-input {
+    color: black;
+  }
+
+  .lf-dndpanel {
+    color: black;
+  }
+}

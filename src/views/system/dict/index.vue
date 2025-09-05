@@ -22,7 +22,7 @@ const cachePathKey = "_dict_item_goback_route_";
 
 const goBack = () => {
   const lastRoute = storageSession().getItem(cachePathKey);
-  if (lastRoute === router.currentRoute.value.fullPath) {
+  if (!lastRoute || lastRoute === router.currentRoute.value.fullPath) {
     // 没有历史记录，跳转到默认页面
     router.replace({ path: "/dict-type" });
     storageSession().removeItem(cachePathKey);

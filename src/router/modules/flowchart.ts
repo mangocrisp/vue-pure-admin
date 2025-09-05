@@ -15,7 +15,19 @@ export default {
       name: "FlowChart",
       component: () => import("@/views/flow-chart/index.vue"),
       meta: {
+        icon: "hugeicons:flow",
         title: $t("menus.pureFlowChart")
+        // hiddenTag: false,
+        // showLink: false
+      }
+    },
+    {
+      path: "/logic-flow/index",
+      name: "LogicFlow",
+      component: () => import("@/views/components/logic-flow/index.vue"),
+      meta: {
+        icon: "clarity:flow-chart-line",
+        title: $t("menus.logicFlow")
       }
     }
   ]

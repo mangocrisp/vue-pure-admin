@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { type SystemDictConfigType, store } from "../utils";
 import SystemDictApi from "@/api/system/dict";
 import SystemParamsApi from "@/api/system/params";
-import { computed } from "vue";
+import { computed, type ComputedRef } from "vue";
 
 /** 存储正在执行的字典请求 */
 const dictRequestList: { key: string; response: Promise<any> }[] = [];
@@ -43,7 +43,7 @@ export const useSystemDictParamsStore = defineStore("system-dict-params", {
      * @param {DictCodeType} key
      * @return
      */
-    async loadDict(key: string) {
+    async loadDict(key: string): Promise<SystemDictType.Dict[]> {
       // 当字典长度大于0, 判断为已经获取, 直接返回
       const dict = this.dict[key] || [];
       if (dict.length > 0) return dict;
@@ -52,7 +52,7 @@ export const useSystemDictParamsStore = defineStore("system-dict-params", {
       const index = dictRequestList.map(item => item.key).indexOf(key);
       if (index > -1) return dictRequestList[index].response;
 
-      const response = new Promise((resolve, reject) => {
+      const response = new Promise<SystemDictType.Dict[]>((resolve, reject) => {
         SystemDictApi.cache(key)
           .then(({ data }) => {
             this.SET_DICT_VALUE(key, data);
@@ -77,7 +77,7 @@ export const useSystemDictParamsStore = defineStore("system-dict-params", {
      * @param {DictCodeType} key
      * @return
      */
-    async loadParams(key: string) {
+    async loadParams(key: string): Promise<SystemParamsType.Params> {
       // 如果能找到参数, 判断为已经获取, 直接返回
       const params = this.params[key];
       if (params) return params;
@@ -86,20 +86,22 @@ export const useSystemDictParamsStore = defineStore("system-dict-params", {
       const index = paramsRequestList.map(item => item.key).indexOf(key);
       if (index > -1) return paramsRequestList[index].response;
 
-      const response = new Promise((resolve, reject) => {
-        SystemParamsApi.get(key)
-          .then(({ data }) => {
-            this.SET_PARAMS_VALUE(key, data);
-            resolve(data);
-          })
-          .catch(error => reject(error))
-          .finally(() => {
-            paramsRequestList.splice(
-              paramsRequestList.map(item => item.key).indexOf(key),
-              1
-            );
-          });
-      });
+      const response = new Promise<SystemParamsType.Params>(
+        (resolve, reject) => {
+          SystemParamsApi.get(key)
+            .then(({ data }) => {
+              this.SET_PARAMS_VALUE(key, data);
+              resolve(data);
+            })
+            .catch(error => reject(error))
+            .finally(() => {
+              paramsRequestList.splice(
+                paramsRequestList.map(item => item.key).indexOf(key),
+                1
+              );
+            });
+        }
+      );
       paramsRequestList.push({
         key,
         response
@@ -110,7 +112,7 @@ export const useSystemDictParamsStore = defineStore("system-dict-params", {
     /**
      * 字典选项
      */
-    dictOptions(key: string) {
+    dictOptions(key: string): ComputedRef<DictOption[]> {
       this.loadDict(key);
       return computed(() => {
         return this.dict[key]?.map(item => {
@@ -127,12 +129,13 @@ export const useSystemDictParamsStore = defineStore("system-dict-params", {
      * @param dictKey 字典键
      * @returns 翻译后的值
      */
-    dictK2V(dictCode: string, dictKey: string) {
+    dictK2V(dictCode: string, dictKey: string): ComputedRef<string> {
+      this.loadDict(dictCode);
       return computed(() => {
         const v = this.dict[dictCode]
           ?.filter(item => item.dictKey === dictKey)
           .map(item => item.dictVal);
-        return v && v.length === 0 ? v[0] : "";
+        return v && v.length === 1 ? v[0] : "";
       });
     },
     /**
@@ -141,7 +144,8 @@ export const useSystemDictParamsStore = defineStore("system-dict-params", {
      * @param dictVal 字典值
      * @returns 翻译后的值
      */
-    dictV2K(dictCode: string, dictVal: string) {
+    dictV2K(dictCode: string, dictVal: string): ComputedRef<string[]> {
+      this.loadDict(dictCode);
       return computed(() => {
         const v = this.dict[dictCode]
           ?.filter(item => item.dictVal === dictVal)
@@ -154,7 +158,8 @@ export const useSystemDictParamsStore = defineStore("system-dict-params", {
      * @param paramsKey 参数键
      * @returns 翻译后的值
      */
-    paramsK2V(paramsKey: string) {
+    paramsK2V(paramsKey: string): ComputedRef<string> {
+      this.loadParams(paramsKey);
       return computed(() => {
         return this.params[paramsKey]?.realValue ?? "";
       });
