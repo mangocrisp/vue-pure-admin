@@ -112,6 +112,16 @@ const generatSelectOption = (properties: LogicFlowTypes.BusinessProperties) => {
       };
     });
   }
+  if (properties.formBind) {
+    formBindChoseList.value.length = 0;
+    formBindChoseList.value = [
+      {
+        key: properties.formBind.id,
+        label: properties.formBind.name,
+        value: { id: properties.formBind.id, name: properties.formBind.name }
+      }
+    ];
+  }
 };
 
 /**
@@ -153,6 +163,29 @@ const remoteDept = (value: any) => {
 const remoteUser = (value: any) => {
   emit("remoteMethod", { forWhat: "user", value });
 };
+
+/**
+ * 远程表单查询方法
+ * @param value 搜索值
+ */
+const remoteForm = (value: any) => {
+  emit("remoteMethod", { forWhat: "form", value });
+};
+
+/**
+ * 远程表单预览方法
+ * @param value 搜索值
+ */
+const remoteFormPreview = (value: any) => {
+  emit("remoteMethod", { forWhat: "formPreview", value });
+};
+/**
+ * 远程表单设计方法
+ */
+const remoteFormDesign = () => {
+  emit("remoteMethod", { forWhat: "formDesign", value: undefined });
+};
+
 /**
  * 提交
  * @param formEl 表单对象
@@ -206,7 +239,7 @@ const addFormItem = () => {
     form.value.properties.fields ? form.value.properties.fields : []
   ).concat([
     {
-      key: Uuid.create().toString().replace(/-/g, ""),
+      key: "f" + Uuid.create().toString().replace(/-/g, ""),
       name: `field${len + 1}`,
       title: `字段${len + 1}`,
       type: "STRING",
@@ -252,6 +285,13 @@ const validateDynamicField = (
   prop: LogicFlowTypes.BusinessField,
   callback: any
 ) => {
+  if (
+    form.value.properties.fields.some(
+      f => f.name === prop.name && f.key !== prop.key
+    )
+  ) {
+    callback(new Error("字段【" + prop.name + "】已存在"));
+  }
   // console.log(prop)
   if (prop.name === "") {
     callback(new Error("字段名不能为空"));
@@ -571,23 +611,43 @@ const chooseInputType = (type: string) => {
 
     <el-form-item
       v-if="['custom-node-start', 'custom-node-user'].indexOf(form.type) > -1"
-      label="绑定表单"
+      label="绑定动态表单"
       prop="properties.formBind"
     >
-      <el-select
+      <el-select-v2
         v-model="form.properties.formBind"
-        placeholder="绑定表单"
-        style="width: 240px"
-        clearable
+        style="width: 100%"
         filterable
+        placeholder="绑定动态表单"
+        remote
+        :remote-method="remoteForm"
+        clearable
+        :options="formBindChoseList"
+        value-key="value"
+      />
+
+      <el-button
+        style="margin-top: 10px; margin-bottom: 10px"
+        type="success"
+        size="small"
+        @click="remoteFormDesign"
       >
-        <el-option
-          v-for="item in formBindChoseList"
-          :key="item.key"
-          :label="item.label"
-          :value="item.value"
-        />
-      </el-select>
+        表单设计
+      </el-button>
+      <el-button
+        v-show="form.properties?.formBind?.name"
+        style="margin-top: 10px; margin-bottom: 10px"
+        type="primary"
+        link
+        @click="remoteFormPreview(form.properties?.formBind?.id)"
+      >
+        {{ `已经选择【${form.properties?.formBind?.name}】点击预览` }}
+      </el-button>
+      <el-alert
+        type="warning"
+        description="注意,表单字段只是指定当前步骤需要填写的字段，但是实际怎么填写怎么布局需要绑定动态表单"
+        :closable="false"
+      />
     </el-form-item>
     <el-form-item
       v-if="['custom-node-start', 'custom-node-user'].indexOf(form.type) > -1"

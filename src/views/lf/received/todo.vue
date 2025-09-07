@@ -3,7 +3,7 @@ import { defineAsyncComponent, ref } from "vue";
 
 /**可选字段导出面板 */
 const ReceivedList = defineAsyncComponent(
-  () => import("@/views/lf/received/components/list.vue")
+  () => import("@/views/lf/received/list.vue")
 );
 /**
  * 代码编码器

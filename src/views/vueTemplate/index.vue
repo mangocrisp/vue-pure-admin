@@ -75,7 +75,8 @@ const requestUpload = () => Promise.resolve();
           placeholder="先选择日期"
           @change="
             range => (
-              (queryForm.date_ge = range[0]), (queryForm.date_le = range[1])
+              (queryForm.date_ge = range[0]),
+              (queryForm.date_le = range[1])
             )
           "
         />

@@ -8,6 +8,9 @@ import { useEcharts } from "@/plugins/echarts";
 import { createApp, type Directive } from "vue";
 import { useVxeTable } from "@/plugins/vxeTable";
 import { useElementPlus } from "@/plugins/elementPlus";
+// 引入 form-create 组件库
+import formCreate from "@form-create/element-ui";
+import FcDesigner from "@form-create/designer";
 import { injectResponsiveStorage } from "@/utils/responsive";
 
 import Table from "@pureadmin/table";
@@ -25,6 +28,11 @@ import "./assets/iconfont/iconfont.js";
 import "./assets/iconfont/iconfont.css";
 
 const app = createApp(App);
+
+// 引入 form-create 组件库
+app.use(formCreate);
+app.use(FcDesigner);
+app.use(FcDesigner.formCreate);
 
 // 自定义指令
 import * as directives from "@/directives";

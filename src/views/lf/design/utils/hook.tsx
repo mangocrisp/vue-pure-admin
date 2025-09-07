@@ -266,6 +266,8 @@ export function useLfDesign() {
       props: {
         isAddForm: title === "新增",
         formInline: {
+          /** id */
+          id: row?.id,
           /** 名称 */
           name: row?.name,
           /** 备注说明 */

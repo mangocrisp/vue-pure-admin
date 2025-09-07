@@ -8,7 +8,7 @@ const request = useAxios();
 const modulePath = "/lf";
 
 /**请求对接的接口 */
-const URL = `${modulePath}/v1/lfForm`;
+const URL = `${modulePath}/v1/form`;
 
 export default class LfFormApi {
   /**
@@ -17,8 +17,8 @@ export default class LfFormApi {
    * @returns 新增后的数据
    */
   static publish = (
-    data: LfReleaseType.AddDTO
-  ): HttpReturn<LfReleaseType.Domain> => {
+    data: LfFormReleaseType.AddDTO
+  ): HttpReturn<LfFormReleaseType.Domain> => {
     return request.post({
       url: `${URL}/release`,
       data
@@ -31,9 +31,9 @@ export default class LfFormApi {
    * @returns 分页
    */
   static publishList = (
-    queryDto: LfReleaseType.QueryDTO,
+    queryDto: LfFormReleaseType.QueryDTO,
     pageParams: BaseApi.SqlPageParams
-  ): HttpReturnPage<LfReleaseType.Domain> => {
+  ): HttpReturnPage<LfFormReleaseType.Domain> => {
     return request.post({
       url: `${URL}/release/publishList`,
       data: queryDto,
@@ -49,7 +49,7 @@ export default class LfFormApi {
    * @param id 查询主键
    * @returns 数据详情
    */
-  static publishDetail = (id: string): HttpReturn<LfReleaseType.Domain> => {
+  static publishDetail = (id: string): HttpReturn<LfFormReleaseType.Domain> => {
     return request.get({
       url: `${URL}/release/${id}`
     });

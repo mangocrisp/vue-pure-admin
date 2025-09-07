@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useLfRelease } from "./utils/hook";
-import { ref } from "vue";
+import { useLfFormRelease } from "./utils/hook";
+import { defineAsyncComponent, ref } from "vue";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import { deviceDetection, storageSession } from "@pureadmin/utils";
@@ -8,19 +8,20 @@ import { deviceDetection, storageSession } from "@pureadmin/utils";
 import Refresh from "~icons/ep/refresh";
 import AntDesignLeftOutlined from "~icons/ant-design/left-outlined";
 import IconoirDesignPencil from "~icons/iconoir/design-pencil";
+import IconParkOutlinePreviewOpen from "~icons/icon-park-outline/preview-open";
 import { useMultiTagsStoreHook } from "@/store/modules/multiTags";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
 
-const cachePathKey = "_flow_release_goback_route_";
+const cachePathKey = "_flow_form_release_goback_route_";
 
 const goBack = () => {
-  useMultiTagsStoreHook().handleTags("splice", "/lf/rl/:id");
+  useMultiTagsStoreHook().handleTags("splice", "/lf/frl/:id");
   const lastRoute = storageSession().getItem(cachePathKey);
   if (!lastRoute || lastRoute === router.currentRoute.value.fullPath) {
     // 没有历史记录，跳转到默认页面
-    router.replace({ path: "/lf/design" });
+    router.replace({ path: "/lf/form/design" });
     storageSession().removeItem(cachePathKey);
     return;
   }
@@ -30,12 +31,11 @@ const goBack = () => {
     history.go(-1);
   } else {
     // 没有历史记录，跳转到默认页面
-    router.replace({ path: "/lf/design" });
+    router.replace({ path: "/lf/form/design" });
   }
 };
-
 defineOptions({
-  name: "LfDesignReleaseList"
+  name: "LfFormReleaseList"
 });
 
 const formRef = ref();
@@ -53,9 +53,13 @@ const {
   resetForm,
   handleSizeChange,
   handleCurrentChange,
+  designD,
   dictOption,
-  designD
-} = useLfRelease();
+  formPreview
+} = useLfFormRelease();
+
+/**覆盖默认的上传行为 */
+const requestUpload = () => Promise.resolve();
 </script>
 
 <template>
@@ -69,15 +73,15 @@ const {
       <el-form-item label="发布 id" prop="id">
         <el-input
           v-model="queryForm.id"
-          placeholder="请输入主键"
+          placeholder="请输入发布 id"
           clearable
           class="w-[180px]!"
         />
       </el-form-item>
-      <el-form-item label="流程图 id" prop="designId">
+      <el-form-item label="表单 id" prop="formId">
         <el-input
-          v-model="queryForm.designId"
-          placeholder="请输入流程图 id"
+          v-model="queryForm.formId"
+          placeholder="请输入表单 id"
           clearable
           class="w-[180px]!"
         />
@@ -123,7 +127,7 @@ const {
           class="w-[180px]!"
         />
       </el-form-item>
-      <el-form-item label="流程类型" prop="type">
+      <el-form-item label="表单类型" prop="type">
         <el-select
           v-model="queryForm.type"
           placeholder="请选择"
@@ -133,7 +137,7 @@ const {
           class="w-[180px]!"
         >
           <el-option
-            v-for="(item, key) in dictOption('lf_process_type')"
+            v-for="(item, key) in dictOption('lf_form_type')"
             :key="key"
             :value="item.value"
             :label="item.label"
@@ -209,7 +213,7 @@ const {
             @page-current-change="handleCurrentChange"
           >
             <template #operation="{ row }">
-              <el-button
+              <!-- <el-button
                 class="reset-margin"
                 link
                 type="primary"
@@ -218,6 +222,16 @@ const {
                 @click="designD(row)"
               >
                 设计流程图
+              </el-button> -->
+              <el-button
+                class="reset-margin"
+                link
+                type="primary"
+                :size="size"
+                :icon="useRenderIcon(IconParkOutlinePreviewOpen)"
+                @click="formPreview(row)"
+              >
+                预览表单
               </el-button>
             </template>
           </pure-table>

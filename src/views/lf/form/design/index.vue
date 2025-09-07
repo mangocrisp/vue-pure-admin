@@ -12,9 +12,10 @@ import AddFill from "~icons/ri/add-circle-line";
 import More2Fill from "~icons/ri/more-2-fill";
 import IconoirDesignPencil from "~icons/iconoir/design-pencil";
 import FluentMdl2ReleaseDefinition from "~icons/fluent-mdl2/release-definition";
+import IconParkOutlinePreviewOpen from "~icons/icon-park-outline/preview-open";
 
 defineOptions({
-  name: "permission"
+  name: "LfFormDesignList"
 });
 
 const formRef = ref();
@@ -38,6 +39,7 @@ const {
   handleSelectionChange,
   dictOption,
   formD,
+  formPreview,
   formR
 } = useLfForm();
 </script>
@@ -226,6 +228,18 @@ const {
                         @click="formD(row)"
                       >
                         设计表单
+                      </el-button>
+                    </el-dropdown-item>
+                    <el-dropdown-item>
+                      <el-button
+                        class="reset-margin"
+                        link
+                        type="primary"
+                        :size="size"
+                        :icon="useRenderIcon(IconParkOutlinePreviewOpen)"
+                        @click="formPreview(row)"
+                      >
+                        预览表单
                       </el-button>
                     </el-dropdown-item>
                     <el-dropdown-item>

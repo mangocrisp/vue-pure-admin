@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, provide, Ref } from "vue";
+import { ref, onMounted, provide, Ref, defineAsyncComponent, h } from "vue";
 import LfDesignApi from "@/api/lf/lfDesign";
 import {
   type RouteParamsGeneric,
@@ -10,15 +10,31 @@ import {
 } from "vue-router";
 import LoginFlow from "@/views/components/logic-flow/index.vue";
 import Role from "@/api/system/role";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import AntDesignLeftOutlined from "~icons/ant-design/left-outlined";
-import { storageSession } from "@pureadmin/utils";
+import { deviceDetection, storageSession } from "@pureadmin/utils";
 import { useMultiTagsStoreHook } from "@/store/modules/multiTags";
 import LfReleaseApi from "@/api/lf/lfRelease";
 import SystemDeptApi from "@/api/system/dept";
 import SystemUserApi from "@/api/system/user";
-import { key } from "localforage";
+import LfFormApi from "@/api/lf/lfForm";
+import { addDialog } from "@/components/ReDialog";
+import { message } from "@/utils/message";
+
+defineOptions({
+  name: "LogicFlowDesigner"
+});
+
+export interface LogicFlowDesignerProps {
+  showCloseButton?: boolean;
+}
+
+const props = withDefaults(defineProps<LogicFlowDesignerProps>(), {
+  showCloseButton: true
+});
+
+const showCloseButtonRef = ref<boolean>(props.showCloseButton);
 
 const route = useRoute();
 
@@ -78,15 +94,24 @@ const form = {
  * 重新加载数据
  */
 const reloadData = async (source: string, id: string) => {
+  if (!source || !id) {
+    return;
+  }
+  loading.value = true;
   switch (source) {
     case "design":
+      // 设计阶段
       sourceDesignData.value = (await LfDesignApi.detail(id)).data;
       designData.value = sourceDesignData.value.data ?? "{}";
       break;
     case "release":
     case "processInitiate":
+      // 发布预览阶段
       sourceReleaseData.value = (await LfReleaseApi.detail(id)).data;
       designData.value = sourceReleaseData.value.data ?? "{}";
+      break;
+    case "process":
+      // 流程进行中
       break;
   }
   Object.assign(form, {
@@ -98,6 +123,8 @@ const reloadData = async (source: string, id: string) => {
   if (source === "release" || source === "processInitiate") {
     // 如果只读
     loginFlowRef.value?.setReadonly(true);
+  } else {
+    loginFlowRef.value?.setReadonly(false);
   }
 };
 
@@ -180,14 +207,29 @@ const getComponentsList = () => {
 /**
  * 获取表单列表
  */
-const getformBindChoseList = () => {
-  formBindChoseListRef.value = [
-    {
-      key: "form1",
-      value: "form1",
-      label: "表单1"
-    }
-  ];
+const getformBindChoseList = async (keyword: string) => {
+  try {
+    const { data } = await LfFormApi.publishList(
+      {
+        name: keyword,
+        type: "form",
+        showNewVersion: true
+      },
+      {
+        pageNum: 1,
+        pageSize: 50
+      }
+    );
+    formBindChoseListRef.value = data.records.map(d =>
+      Object.assign({
+        key: d.id,
+        value: { id: d.id, name: d.name },
+        label: d.name
+      })
+    );
+  } catch (error) {
+    console.error("error =>", error);
+  }
 };
 
 /**
@@ -211,7 +253,7 @@ const deptChoseListRef = ref<LogicFlowTypes.SelectOptionItem[]>([]);
  */
 const userChoseListRef = ref<LogicFlowTypes.SelectOptionItem[]>([]);
 
-const loading = ref(true);
+const loading = ref(false);
 
 /**
  * 提供可选择的角色列表
@@ -271,21 +313,119 @@ const remoteMethod = ({ forWhat, value }) => {
         getUserPage(value);
       }
       break;
+    case "form":
+      // 处理表单远程方法
+      if (value) {
+        getformBindChoseList(value);
+      }
+      break;
+    case "formPreview":
+      formPreview(value);
+      break;
+    case "formDesign":
+      formDesign();
+      break;
   }
 };
 
+const formDesign = () => {
+  router.push({
+    name: "FlowDesign"
+  });
+  useMultiTagsStoreHook().handleTags("push", {
+    path: `/lf/form/design`,
+    name: "FlowFormDesign",
+    meta: {
+      title: {
+        zh: `动态表单设计`,
+        en: `Flow Form Design`
+      }
+    }
+  });
+  router.push({ name: "FlowFormDesign" });
+};
+
+/**可选字段导出面板 */
+const FormCreateCreator = defineAsyncComponent(
+  () => import("@/views/components/form-create/form-creator/index.vue")
+);
+const FormCreateCreatorRef = ref<InstanceType<typeof FormCreateCreator> | null>(
+  null
+);
+/**
+ * 动态表单预览
+ * @param row 表单
+ */
+const formPreview = async (id: string) => {
+  const { data: lfForm } = await LfFormApi.publishDetail(id);
+  const { rule, options } = JSON.parse(lfForm.data);
+  addDialog({
+    title: `${lfForm.name}`,
+    props: {
+      isAddForm: false,
+      rule: JSON.parse(rule),
+      options: {
+        ...JSON.parse(options),
+        ...{ submitBtn: false, resetBtn: false }
+      },
+      formData: {}
+    },
+    width: "40%",
+    draggable: true,
+    fullscreen: deviceDetection(),
+    fullscreenIcon: true,
+    closeOnClickModal: false,
+    resetForm: () => FormCreateCreatorRef.value.resetForm(),
+    contentRenderer: () =>
+      h(FormCreateCreator, { ref: FormCreateCreatorRef, formData: null }),
+    beforeSure: (done, {}) => {
+      const ApiRef = FormCreateCreatorRef.value.getApiRef();
+      function chores() {
+        message(`操作成功`, {
+          type: "success"
+        });
+        done(); // 关闭弹框
+        //onSearch(); // 刷新表格数据
+      }
+      ApiRef.validate((valid, fail) => {
+        if (valid === true) {
+          // 实际开发先调用新增接口，再进行下面操作
+          const formData = ApiRef.formData();
+          ElMessageBox.alert(formData, "表单提交结果");
+          console.log(formData);
+          chores();
+        } else {
+          console.log("表单验证未通过", fail);
+        }
+      })
+        .then(() => {
+          //推荐
+          console.log("Promise resolved: 表单验证通过");
+        })
+        .catch(() => {
+          console.log("Promise rejected: 表单验证未通过");
+        });
+    }
+  });
+};
+
 onMounted(() => {
+  // 如果只读
+  loginFlowRef.value?.setReadonly(true);
   routeParams.value = route.params;
   routeQuery.value = route.query;
-  reloadData(route.params.source as string, route.params.id as string);
+  if (route.name === "FlowDesign") {
+    reloadData(route.params.source as string, route.params.id as string);
+  }
   getRoleList();
   getComponentsList();
-  getformBindChoseList();
   userChoseListRef.value = [];
 });
 
 onBeforeRouteUpdate(to => {
-  reloadData(to.params.source as string, to.params.id as string);
+  if (to.name === "FlowDesign") {
+    reloadData(to.params.source as string, to.params.id as string);
+  }
 });
 
 const saveData = async data => {
@@ -300,10 +440,13 @@ const saveData = async data => {
     loading.value = false;
   }
 };
+
+defineExpose({ reloadData });
 </script>
 <template>
   <div v-loading="loading" class="flow-container">
     <el-button
+      v-show="showCloseButtonRef"
       type="primary"
       :icon="useRenderIcon(AntDesignLeftOutlined)"
       class="go-back-btn"

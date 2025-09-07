@@ -62,6 +62,10 @@ panel:
   pureHiddenFooter: Hidden Footer
   pureMultiTagsCache: MultiTags Cache
 menus:
+  pureTmplate: Template Page
+  formCreate: Form Create
+  formCreator: Form Creator
+  formDesigner: Form Designer
   pureHome: Home
   pureLogin: Login
   pureEmpty: Empty Page

@@ -64,6 +64,9 @@ panel:
   pureMultiTagsCache: 页签持久化
 menus:
   pureTmplate: 模板页面
+  formCreate: 动态表单
+  formCreator: 动态表单生成器
+  formDesigner: 动态表单设计器
   pureHome: 首页
   pureLogin: 登录
   pureEmpty: 无Layout页

@@ -6,7 +6,7 @@ declare namespace LogicFlowTypes {
   type SelectOptionItem = {
     key: string;
     label: string;
-    value: string;
+    value: any;
   };
   /**
    * 拖拽面板 DndPanel
@@ -169,7 +169,7 @@ declare namespace LogicFlowTypes {
     /**
      * 绑定表单
      */
-    formBind?: string;
+    formBind?: any;
     /**
      * 是否自动处理,当节点是系统节点时,默认为 true,如果节点是用户节点,还希望自动处理逻辑,可以开启
      */
