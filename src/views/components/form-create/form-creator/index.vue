@@ -1,17 +1,14 @@
 <script setup lang="ts">
 import { cloneDeep } from "@pureadmin/utils";
-import { ref } from "vue";
+import { type FormCreateCreatorProps } from "./utils/types";
+import { computed, ref } from "vue";
+import { useI18n } from "vue-i18n";
+
+const { locale: $locale } = useI18n();
 
 defineOptions({
   name: "FormCreateCreator"
 });
-
-export interface FormCreateCreatorProps {
-  isAddForm?: boolean;
-  rule?: Array<object>;
-  options?: object;
-  formData?: any;
-}
 
 const props = withDefaults(defineProps<FormCreateCreatorProps>(), {
   isAddForm: false,
@@ -40,17 +37,18 @@ const props = withDefaults(defineProps<FormCreateCreatorProps>(), {
     submitBtn: false,
     resetBtn: false
   }),
-  formData: () => ({})
+  modelValue: () => ({}),
+  api: null
 });
 
 const isAddForm = ref(props.isAddForm);
-const creatorRef = ref(null);
-const formDataRef = ref(props.formData);
-const apiRef = ref(null);
+const modelValueRef = ref(props.modelValue);
 const ruleRef = ref(props.rule);
 const optionsRef = ref(props.options);
+const apiRef = ref(props.api);
+const creatorRef = ref(null);
 /** 重置表单方法 Ref */
-const restFormValue = cloneDeep(props.formData);
+const restFormValue = cloneDeep(props.modelValue);
 
 /**
  * 定义钩子
@@ -58,6 +56,8 @@ const restFormValue = cloneDeep(props.formData);
 const emit = defineEmits<{
   /**保存数据 */
   (e: "submit", value: any): void;
+  (e: "update:api", value: any): void;
+  (e: "update:modelValue", value: any): void;
 }>();
 /**
  * 提交表单
@@ -74,11 +74,24 @@ const handleSubmit = (value: any) => emit("submit", value);
 const loadData = ({ rule, options, formData }) => {
   ruleRef.value = rule;
   optionsRef.value = options;
-  formDataRef.value = formData;
+  modelValueRef.value = formData;
 };
 
 const getCreatorRef = () => creatorRef.value;
 const getApiRef = () => apiRef.value;
+
+/**
+ * 国际化和系统的语言切换关联
+ */
+const locale = computed(() => {
+  switch ($locale.value) {
+    case "en":
+      return "en";
+    case "zh":
+      return "zh-cn";
+  }
+  return "zh-cn";
+});
 
 /**
  * 重置表单
@@ -91,10 +104,20 @@ function resetForm() {
     apiRef.value.resetFields();
   } else {
     // 如果是修改表单，则把数据覆盖到表单中
-    formDataRef.value = cloneDeep(restFormValue);
-    apiRef.value.coverValue(formDataRef.value);
+    modelValueRef.value = cloneDeep(restFormValue);
+    apiRef.value.coverValue(modelValueRef.value);
   }
 }
+
+const handleModelValueChange = (modelValue: any) => {
+  modelValueRef.value = modelValue;
+  emit("update:modelValue", modelValueRef.value);
+};
+
+const handleApiChange = (api: any) => {
+  apiRef.value = api;
+  emit("update:api", apiRef.value);
+};
 
 defineExpose({ getCreatorRef, getApiRef, resetForm, loadData });
 </script>
@@ -103,10 +126,13 @@ defineExpose({ getCreatorRef, getApiRef, resetForm, loadData });
   <form-create
     v-if="ruleRef.length"
     ref="creatorRef"
-    v-model="formDataRef"
-    v-model:api="apiRef"
+    :locale="locale"
+    :api="apiRef"
+    :modelValue="modelValueRef"
     :rule="ruleRef"
     :option="optionsRef"
     @submit="handleSubmit"
+    @update:modelValue="handleModelValueChange"
+    @update:api="handleApiChange"
   />
 </template>

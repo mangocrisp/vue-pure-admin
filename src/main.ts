@@ -32,7 +32,7 @@ const app = createApp(App);
 // 引入 form-create 组件库
 app.use(formCreate);
 app.use(FcDesigner);
-app.use(FcDesigner.formCreate);
+// app.use(FcDesigner.formCreate);
 
 // 自定义指令
 import * as directives from "@/directives";

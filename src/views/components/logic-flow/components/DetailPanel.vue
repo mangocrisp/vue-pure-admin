@@ -636,6 +636,7 @@ const chooseInputType = (type: string) => {
       </el-button>
       <el-button
         v-show="form.properties?.formBind?.name"
+        :disabled="false"
         style="margin-top: 10px; margin-bottom: 10px"
         type="primary"
         link
@@ -705,7 +706,7 @@ const chooseInputType = (type: string) => {
           type="danger"
           size="small"
           @click.prevent="removeFormItem(index)"
-          ><Icon icon="ep:delete" class="mr-5px" />删除</el-button
+          >删除</el-button
         >
         <el-input
           v-model="field.sort"

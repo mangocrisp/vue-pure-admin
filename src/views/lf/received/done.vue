@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { defineAsyncComponent, ref } from "vue";
 
-/**可选字段导出面板 */
+/**待办列表 */
 const ReceivedList = defineAsyncComponent(
   () => import("@/views/lf/received/list.vue")
 );

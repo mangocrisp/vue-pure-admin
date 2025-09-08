@@ -91,7 +91,11 @@ const configRef = ref<Config>(
       resetBtn: {
         //是否显示重置按钮
         show: false
-      }
+      },
+      localeOptions: [
+        { value: "zh-cn", label: "简体中文" },
+        { value: "en", label: "English" }
+      ]
     },
     props.config
   )
@@ -123,7 +127,7 @@ const loadData = ({ rule, options }) => {
  */
 const translation = (locale: string) => {
   localeS.value = locale;
-  if (locale === "zh") {
+  if (locale === "zh-cn") {
     localeRef.value = Zh;
   } else if (locale === "en") {
     localeRef.value = En;
@@ -154,7 +158,7 @@ defineExpose({ getDesignerRef, loadData });
           </el-button>
           <template #dropdown>
             <el-dropdown-menu class="translation">
-              <el-dropdown-item @click="translation('zh')">
+              <el-dropdown-item @click="translation('zh-cn')">
                 <IconifyIconOffline
                   v-show="localeS === 'zh'"
                   class="check-zh"

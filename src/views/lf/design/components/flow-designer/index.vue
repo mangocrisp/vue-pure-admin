@@ -4,7 +4,6 @@ import LfDesignApi from "@/api/lf/lfDesign";
 import {
   type RouteParamsGeneric,
   type LocationQuery,
-  onBeforeRouteUpdate,
   useRoute,
   useRouter
 } from "vue-router";
@@ -21,6 +20,11 @@ import SystemUserApi from "@/api/system/user";
 import LfFormApi from "@/api/lf/lfForm";
 import { addDialog } from "@/components/ReDialog";
 import { message } from "@/utils/message";
+import { useFormCostumComponents } from "@/views/lf/form/components/form-designer/utils/costumComponents";
+
+// 加载自定义组件
+const { loadCostumComponents } = useFormCostumComponents(null);
+loadCostumComponents();
 
 defineOptions({
   name: "LogicFlowDesigner"
@@ -28,13 +32,17 @@ defineOptions({
 
 export interface LogicFlowDesignerProps {
   showCloseButton?: boolean;
+  autoloadFromRoute?: boolean;
 }
 
 const props = withDefaults(defineProps<LogicFlowDesignerProps>(), {
-  showCloseButton: true
+  showCloseButton: true,
+  autoloadFromRoute: true
 });
 
 const showCloseButtonRef = ref<boolean>(props.showCloseButton);
+
+const autoloadFromRouteRef = ref<boolean>(props.autoloadFromRoute);
 
 const route = useRoute();
 
@@ -120,7 +128,11 @@ const reloadData = async (source: string, id: string) => {
   });
   loginFlowRef.value?.iniLogicFlow(false, JSON.parse(designData.value));
   loading.value = false;
-  if (source === "release" || source === "processInitiate") {
+  if (
+    source === "release" ||
+    source === "processInitiate" ||
+    source === "process"
+  ) {
     // 如果只读
     loginFlowRef.value?.setReadonly(true);
   } else {
@@ -329,29 +341,35 @@ const remoteMethod = ({ forWhat, value }) => {
 };
 
 const formDesign = () => {
-  router.push({
-    name: "FlowDesign"
-  });
-  useMultiTagsStoreHook().handleTags("push", {
-    path: `/lf/form/design`,
-    name: "FlowFormDesign",
-    meta: {
-      title: {
-        zh: `动态表单设计`,
-        en: `Flow Form Design`
-      }
-    }
-  });
-  router.push({ name: "FlowFormDesign" });
+  // router.push({
+  //   name: "FlowDesign"
+  // });
+  // useMultiTagsStoreHook().handleTags("push", {
+  //   path: `/lf/form/design`,
+  //   name: "FlowFormDesign",
+  //   meta: {
+  //     title: {
+  //       zh: `动态表单设计`,
+  //       en: `Flow Form Design`
+  //     }
+  //   }
+  // });
+  // router.push({ name: "FlowFormDesign" });
+
+  window.open(
+    location.href.replace(route.fullPath, "/lf/form/design"),
+    "_blank"
+  );
 };
 
-/**可选字段导出面板 */
+/**动态表单创建渲染器 */
 const FormCreateCreator = defineAsyncComponent(
   () => import("@/views/components/form-create/form-creator/index.vue")
 );
 const FormCreateCreatorRef = ref<InstanceType<typeof FormCreateCreator> | null>(
   null
 );
+
 /**
  * 动态表单预览
  * @param row 表单
@@ -368,7 +386,7 @@ const formPreview = async (id: string) => {
         ...JSON.parse(options),
         ...{ submitBtn: false, resetBtn: false }
       },
-      formData: {}
+      modelValue: {}
     },
     width: "40%",
     draggable: true,
@@ -414,7 +432,7 @@ onMounted(() => {
   loginFlowRef.value?.setReadonly(true);
   routeParams.value = route.params;
   routeQuery.value = route.query;
-  if (route.name === "FlowDesign") {
+  if (autoloadFromRouteRef.value && route.name === "FlowDesignD") {
     reloadData(route.params.source as string, route.params.id as string);
   }
   getRoleList();
@@ -422,11 +440,11 @@ onMounted(() => {
   userChoseListRef.value = [];
 });
 
-onBeforeRouteUpdate(to => {
-  if (to.name === "FlowDesign") {
-    reloadData(to.params.source as string, to.params.id as string);
-  }
-});
+// onBeforeRouteUpdate(to => {
+//   if (to.name === "FlowDesignD") {
+//     reloadData(to.params.source as string, to.params.id as string);
+//   }
+// });
 
 const saveData = async data => {
   loading.value = true;

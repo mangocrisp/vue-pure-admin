@@ -7,7 +7,12 @@ import LfReleaseApi from "@/api/lf/lfRelease";
 import "v-contextmenu/dist/themes/default.css";
 import Refresh from "~icons/ep/refresh";
 import { useMultiTagsStoreHook } from "@/store/modules/multiTags";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
+import { useFormCostumComponents } from "@/views/lf/form/components/form-designer/utils/costumComponents";
+
+// 加载自定义组件
+const { loadCostumComponents } = useFormCostumComponents(null);
+loadCostumComponents();
 
 const router = useRouter();
 

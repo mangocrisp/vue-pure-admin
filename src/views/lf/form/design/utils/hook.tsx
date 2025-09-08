@@ -11,6 +11,11 @@ import { useSystemDictParamsStoreHook } from "@/store/modules/system-dict-params
 import { ElForm, ElFormItem, ElInput, ElMessageBox } from "element-plus";
 import { useRouter } from "vue-router";
 import { useMultiTagsStoreHook } from "@/store/modules/multiTags";
+import { useFormCostumComponents } from "@/views/lf/form/components/form-designer/utils/costumComponents";
+
+// 加载自定义组件
+const { loadCostumComponents } = useFormCostumComponents(null);
+loadCostumComponents();
 
 export function useLfForm() {
   const router = useRouter();
@@ -355,6 +360,7 @@ export function useLfForm() {
     releaseForm.formId = row.id;
     releaseForm.name =
       row.name + ".release." + dayjs(new Date()).format("YYYYMMDDHHmmss");
+    releaseForm.description = "";
     addDialog({
       title: `发布表单：${row.name}`,
       width: "30%",
@@ -431,7 +437,7 @@ export function useLfForm() {
     router.push({ name: "FlowFormDesignRL", params: { id: row.id } });
   };
 
-  /**可选字段导出面板 */
+  /**动态表单创建渲染器 */
   const FormCreateCreator = defineAsyncComponent(
     () => import("@/views/components/form-create/form-creator/index.vue")
   );
@@ -445,6 +451,8 @@ export function useLfForm() {
   const formPreview = async (row: LfFormType.Domain) => {
     const { data: lfForm } = await LfFormApi.detail(row.id);
     const { rule, options } = JSON.parse(lfForm.data);
+    console.log(JSON.parse(rule));
+    console.log(JSON.parse(options));
     addDialog({
       title: `${operateName}`,
       props: {
@@ -454,7 +462,7 @@ export function useLfForm() {
           ...JSON.parse(options),
           ...{ submitBtn: false, resetBtn: false }
         },
-        formData: {}
+        modelValue: {}
       },
       width: "40%",
       draggable: true,

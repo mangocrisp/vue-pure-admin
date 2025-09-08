@@ -9,6 +9,11 @@ import { addDialog } from "@/components/ReDialog";
 import { deviceDetection } from "@pureadmin/utils";
 import { message } from "@/utils/message";
 import { ElMessageBox } from "element-plus";
+import { useFormCostumComponents } from "@/views/lf/form/components/form-designer/utils/costumComponents";
+
+// 加载自定义组件
+const { loadCostumComponents } = useFormCostumComponents(null);
+loadCostumComponents();
 
 export function useLfFormRelease() {
   const route = useRoute();
@@ -179,7 +184,7 @@ export function useLfFormRelease() {
     });
   };
 
-  /**可选字段导出面板 */
+  /**动态表单创建渲染器 */
   const FormCreateCreator = defineAsyncComponent(
     () => import("@/views/components/form-create/form-creator/index.vue")
   );
@@ -202,7 +207,7 @@ export function useLfFormRelease() {
           ...JSON.parse(options),
           ...{ submitBtn: false, resetBtn: false }
         },
-        formData: {}
+        modelValue: {}
       },
       width: "40%",
       draggable: true,

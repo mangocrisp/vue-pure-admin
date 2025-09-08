@@ -8,96 +8,22 @@ import {
   Bell
 } from "@element-plus/icons-vue";
 import { defineAsyncComponent, h, nextTick, ref } from "vue";
-import { LfFormTodoInfo } from "./utils/types";
+import {
+  LfFormTodoInfo,
+  LfFormTodoInfoBasic,
+  LfFormTodoInfoModelValue,
+  LfFormTodoInfoRecord,
+  LfFormTodoInfoRecordDetail
+} from "./utils/types";
 
 defineOptions({
   name: "LfFormTodoInfo"
 });
 
 const props = withDefaults(defineProps<LfFormTodoInfo>(), {
-  basic: () => {
-    return {
-      border: true,
-      column: 2,
-      direction: "horizontal",
-      size: "default",
-      title: "",
-      extra: "",
-      labelWidth: 120,
-      children: [
-        {
-          label: "标题",
-          value: "标题"
-        },
-        {
-          label: "标题",
-          value: "标题"
-        },
-        {
-          label: "标题",
-          value: "标题"
-        },
-        {
-          label: "标题",
-          value: "标题"
-        },
-        {
-          label: "标题",
-          value: "标题"
-        }
-      ]
-    };
-  },
-  records: () => [
-    {
-      timestamp: "2021-09-01 09:00:00",
-      title: "标题",
-      description: "描述"
-    },
-    {
-      timestamp: "2021-09-01 10:00:00",
-      title: "标题",
-      description: "描述",
-      detail: {
-        title: "标题",
-        name: "名称",
-        basic: {
-          border: true,
-          column: 2,
-          direction: "horizontal",
-          size: "default",
-          title: "",
-          extra: "",
-          labelWidth: 120,
-          children: [
-            {
-              label: "标题",
-              value: "标题"
-            },
-            {
-              label: "标题",
-              value: "标题"
-            },
-            {
-              label: "标题",
-              value: "标题"
-            },
-            {
-              label: "标题",
-              value: "标题"
-            },
-            {
-              label: "标题",
-              value: "标题"
-            }
-          ]
-        }
-      }
-    }
-  ],
-  infoMap: () => {
-    let a = new Map();
-    a.set("dddd", {
+  modelValue: (): LfFormTodoInfoModelValue => {
+    let infoMap = new Map();
+    infoMap.set("dddd", {
       title: "相关信息",
       name: "dddd",
       basic: {
@@ -132,15 +58,101 @@ const props = withDefaults(defineProps<LfFormTodoInfo>(), {
         ]
       }
     });
-    return a;
+    return {
+      basic: {
+        border: true,
+        column: 2,
+        direction: "horizontal",
+        size: "default",
+        title: "",
+        extra: "",
+        labelWidth: 120,
+        children: [
+          {
+            label: "标题",
+            value: "标题"
+          },
+          {
+            label: "标题",
+            value: "标题"
+          },
+          {
+            label: "标题",
+            value: "标题"
+          },
+          {
+            label: "标题",
+            value: "标题"
+          },
+          {
+            label: "标题",
+            value: "标题"
+          }
+        ]
+      },
+      records: [
+        {
+          timestamp: "2021-09-01 09:00:00",
+          title: "标题",
+          description: "描述"
+        },
+        {
+          timestamp: "2021-09-01 10:00:00",
+          title: "标题",
+          description: "描述",
+          detail: {
+            title: "标题",
+            name: "名称",
+            basic: {
+              border: true,
+              column: 2,
+              direction: "horizontal",
+              size: "default",
+              title: "",
+              extra: "",
+              labelWidth: 120,
+              children: [
+                {
+                  label: "标题",
+                  value: "标题"
+                },
+                {
+                  label: "标题",
+                  value: "标题"
+                },
+                {
+                  label: "标题",
+                  value: "标题"
+                },
+                {
+                  label: "标题",
+                  value: "标题"
+                },
+                {
+                  label: "标题",
+                  value: "标题"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      infoMap
+    };
   }
 });
 
 const config = ref<LfFormTodoInfo>(props);
+const processId = ref<string>(props.modelValue.processId);
+const basic = ref<LfFormTodoInfoBasic>(props.modelValue.basic);
+const records = ref<LfFormTodoInfoRecord[]>(props.modelValue.records);
+const infoMap = ref<Map<string, LfFormTodoInfoRecordDetail>>(
+  props.modelValue.infoMap
+);
 
-/**可选字段导出面板 */
+/**流程图设计器 */
 const LogicFlowDesigner = defineAsyncComponent(
-  () => import("@/views/lf/design/components/d.vue")
+  () => import("@/views/lf/design/components/flow-designer/index.vue")
 );
 const FormTodoInfoRef = ref<InstanceType<typeof LogicFlowDesigner> | null>(
   null
@@ -149,23 +161,35 @@ const showFlowRef = ref(false);
 const handleInfoChange = (val: string) => {
   if (val === "flowChart") {
     nextTick(() => {
-      handleShowFlow(config.value.releaseId);
+      handleShowFlow(processId.value);
     });
   }
 };
 /**
  * 显示流程
- * @param releaseId 流程发布 id
+ * @param processId 流程实例 id
  */
-const handleShowFlow = (releaseId: string) => {
-  if (!releaseId) {
+const handleShowFlow = (processId: string) => {
+  if (!processId) {
     return;
   }
   if (showFlowRef.value) {
     return;
   }
-  FormTodoInfoRef.value.reloadData("release", releaseId);
+  FormTodoInfoRef.value.reloadData("process", processId);
 };
+
+/**
+ * 定义钩子
+ */
+const emit = defineEmits<{
+  /**保存数据 */
+  (e: "update:modelValue", value: LfFormTodoInfoModelValue): void;
+}>();
+
+const getConfig = () => config.value;
+
+defineExpose({ getConfig });
 </script>
 <template>
   <el-tabs type="border-card" class="lf-form-todo-info">
@@ -280,6 +304,7 @@ const handleShowFlow = (releaseId: string) => {
                 <LogicFlowDesigner
                   ref="FormTodoInfoRef"
                   :show-close-button="false"
+                  :autoload-from-route="false"
                 />
               </div>
             </template>
@@ -330,6 +355,7 @@ const handleShowFlow = (releaseId: string) => {
 <style lang="scss" scoped>
 .lf-form-todo-info {
   width: 100%;
+  margin-bottom: 20px;
 }
 
 .flow-container {

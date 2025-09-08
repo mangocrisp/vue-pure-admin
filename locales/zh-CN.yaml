@@ -67,6 +67,7 @@ menus:
   formCreate: 动态表单
   formCreator: 动态表单生成器
   formDesigner: 动态表单设计器
+  logicFlow: 流程图(LogicFlow)
   pureHome: 首页
   pureLogin: 登录
   pureEmpty: 无Layout页
@@ -108,7 +109,6 @@ menus:
   pureCountTo: 数字动画
   pureSelector: 范围选择器
   pureFlowChart: 流程图
-  logicFlow: 流程图(LogicFlow)
   pureSeamless: 无缝滚动
   pureContextmenu: 右键菜单
   pureTypeit: 打字机

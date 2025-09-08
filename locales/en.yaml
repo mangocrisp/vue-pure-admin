@@ -1,5 +1,6 @@
 buttons:
   pureAccountSettings: Account
+  toogleTenant: Tenant
   pureLoginOut: LoginOut
   pureLogin: Login
   pureOpenSystemSet: Open System Configs
@@ -66,6 +67,7 @@ menus:
   formCreate: Form Create
   formCreator: Form Creator
   formDesigner: Form Designer
+  logicFlow: logicFlow
   pureHome: Home
   pureLogin: Login
   pureEmpty: Empty Page
