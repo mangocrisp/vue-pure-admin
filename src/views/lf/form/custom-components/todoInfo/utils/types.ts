@@ -104,7 +104,7 @@ interface LfFormTodoInfoModelValue {
  * 待办信息
  */
 interface LfFormTodoInfo {
-  modelValue: LfFormTodoInfoModelValue;
+  modelValue?: LfFormTodoInfoModelValue;
 }
 
 export type {
