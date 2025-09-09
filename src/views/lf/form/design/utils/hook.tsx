@@ -4,18 +4,14 @@ import { message } from "@/utils/message";
 import { addDialog } from "@/components/ReDialog";
 import type { PaginationProps } from "@pureadmin/table";
 import { deviceDetection } from "@pureadmin/utils";
-import { reactive, ref, onMounted, h, defineAsyncComponent } from "vue";
+import { reactive, ref, onMounted, h } from "vue";
 import LfFormApi from "@/api/lf/lfForm";
 import type { EditFormDTO } from "./types";
 import { useSystemDictParamsStoreHook } from "@/store/modules/system-dict-params";
 import { ElForm, ElFormItem, ElInput, ElMessageBox } from "element-plus";
 import { useRouter } from "vue-router";
 import { useMultiTagsStoreHook } from "@/store/modules/multiTags";
-import { useFormCostumComponents } from "@/views/lf/form/components/form-designer/utils/costumComponents";
-
-// 加载自定义组件
-const { loadCostumComponents } = useFormCostumComponents(null);
-loadCostumComponents();
+import { logicFlowFormPreview } from "@/views/lf/form/components/form-designer/utils/custom";
 
 export function useLfForm() {
   const router = useRouter();
@@ -437,13 +433,6 @@ export function useLfForm() {
     router.push({ name: "FlowFormDesignRL", params: { id: row.id } });
   };
 
-  /**动态表单创建渲染器 */
-  const FormCreateCreator = defineAsyncComponent(
-    () => import("@/views/components/form-create/form-creator/index.vue")
-  );
-  const FormCreateCreatorRef = ref<InstanceType<
-    typeof FormCreateCreator
-  > | null>(null);
   /**
    * 动态表单预览
    * @param row 表单
@@ -451,56 +440,7 @@ export function useLfForm() {
   const formPreview = async (row: LfFormType.Domain) => {
     const { data: lfForm } = await LfFormApi.detail(row.id);
     const { rule, options } = JSON.parse(lfForm.data);
-    console.log(JSON.parse(rule));
-    console.log(JSON.parse(options));
-    addDialog({
-      title: `${operateName}`,
-      props: {
-        isAddForm: false,
-        rule: JSON.parse(rule),
-        options: {
-          ...JSON.parse(options),
-          ...{ submitBtn: false, resetBtn: false }
-        },
-        modelValue: {}
-      },
-      width: "40%",
-      draggable: true,
-      fullscreen: deviceDetection(),
-      fullscreenIcon: true,
-      closeOnClickModal: false,
-      resetForm: () => FormCreateCreatorRef.value.resetForm(),
-      contentRenderer: () =>
-        h(FormCreateCreator, { ref: FormCreateCreatorRef, formData: null }),
-      beforeSure: (done, {}) => {
-        const ApiRef = FormCreateCreatorRef.value.getApiRef();
-        function chores() {
-          message(`操作成功`, {
-            type: "success"
-          });
-          done(); // 关闭弹框
-          //onSearch(); // 刷新表格数据
-        }
-        ApiRef.validate((valid, fail) => {
-          if (valid === true) {
-            // 实际开发先调用新增接口，再进行下面操作
-            const formData = ApiRef.formData();
-            ElMessageBox.alert(formData, "表单提交结果");
-            console.log(formData);
-            chores();
-          } else {
-            console.log("表单验证未通过", fail);
-          }
-        })
-          .then(() => {
-            //推荐
-            console.log("Promise resolved: 表单验证通过");
-          })
-          .catch(() => {
-            console.log("Promise rejected: 表单验证未通过");
-          });
-      }
-    });
+    logicFlowFormPreview(rule, options);
   };
 
   onMounted(async () => {

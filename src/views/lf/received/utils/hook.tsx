@@ -10,7 +10,7 @@ import LfFormApi from "@/api/lf/lfForm";
 import { ElMessageBox } from "element-plus";
 import { message } from "@/utils/message";
 import { useFormCostumComponents } from "@/views/lf/form/components/form-designer/utils/costumComponents";
-import type { LfFormTodoInfoModelValue } from "../../form/custom-components/todoInfo/utils/types";
+import type { LfFormTodoInfoModelValue } from "@/views/lf/form/custom-components/todoInfo/utils/types";
 
 // 加载自定义组件
 const { loadCostumComponents } = useFormCostumComponents(null);

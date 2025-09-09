@@ -74,7 +74,19 @@ interface LfFormDeptSelector {
   };
   modelValue?: ChooseData[];
   /**高度 */
-  hteight?: string;
+  height?: string;
+  /** 是否在点击节点的时候展开或者收缩节点， 默认值为 true，如果为 false，则只有点箭头图标的时候才会展开或者收缩节点 */
+  expandOnClickNode?: boolean;
+  /** 是否在点击节点的时候选中节点，默认值为 false，即只有在点击复选框时才会选中节点 */
+  checkOnClickNode?: boolean;
+  /** 在显示复选框的情况下，是否严格的遵循父子不互相关联的做法，默认为 false */
+  checkStrictly?: boolean;
+  /** 相邻级节点间的水平缩进，单位为像素 */
+  indent?: number;
+  /** 自定义树节点的高度 */
+  itemSize?: number;
+  /** 自定义树节点图标组件 */
+  icon?: string;
 }
 export { DeptUserTreeNodeType };
 export type {

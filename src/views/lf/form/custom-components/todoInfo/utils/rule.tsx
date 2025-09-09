@@ -6,7 +6,7 @@ export function useFormCostumComponentsTodoInfo() {
   );
   /** 待办信息拖拽规则 */
   const LfFormTodoInfoRule = {
-    menu: "aide",
+    menu: "business",
     icon: "icon-descriptions",
     label: "流程信息",
     name: "LfFormTodoInfo",

@@ -1,5 +1,6 @@
 import FcDesigner from "@form-create/designer";
 import { useFormCostumComponentsTodoInfo } from "@/views/lf/form/custom-components/todoInfo/utils/rule";
+import { useFormCostumComponentsDeptSelector } from "@/views/lf/form/custom-components/deptSelector/utils/rule";
 export function useFormCostumComponents(FormCreateDesignerRef) {
   const componentMap = new Map<string, { component: any; rule: any }>();
 
@@ -8,10 +9,19 @@ export function useFormCostumComponents(FormCreateDesignerRef) {
    */
   const { LfFormTodoInfo, LfFormTodoInfoRule } =
     useFormCostumComponentsTodoInfo();
-
   componentMap.set("LfFormTodoInfo", {
     component: LfFormTodoInfo,
     rule: LfFormTodoInfoRule
+  });
+
+  /**
+   * 自定义组件 —— 部门选择器
+   */
+  const { LfFormDeptSelector, LfFormDeptSelectorRule } =
+    useFormCostumComponentsDeptSelector();
+  componentMap.set("LfFormDeptSelector", {
+    component: LfFormDeptSelector,
+    rule: LfFormDeptSelectorRule
   });
 
   /**

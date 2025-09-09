@@ -10,6 +10,8 @@ import {
 import LfFormApi from "@/api/lf/lfForm";
 import { ElMessage } from "element-plus";
 import { useFormCostumComponents } from "./costumComponents";
+import formCreate from "@form-create/element-ui";
+import { logicFlowFormRuleEnhance } from "./custom";
 
 export function useLogicFlowFormDesigner() {
   /**动态表单创建设计器 */
@@ -95,17 +97,18 @@ export function useLogicFlowFormDesigner() {
       data: designData.value
     });
     const { rule, options } = JSON.parse(form.data);
+    const ruleJSON = logicFlowFormRuleEnhance(rule);
     nextTick(() => {
       setTimeout(() => {
-        FormCreateDesignerRef.value.loadData({ rule, options });
+        FormCreateDesignerRef.value.loadData({ rule: ruleJSON, options });
         loading.value = false;
       }, 500);
     });
   };
 
   const handleSave = async ({ rule, options }) => {
-    console.log(JSON.parse(rule));
-    console.log(options);
+    console.log(formCreate.parseJson(rule));
+    console.log(formCreate.parseJson(rule));
     loading.value = true;
     try {
       form.data = JSON.stringify({ rule, options });

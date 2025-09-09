@@ -31,6 +31,10 @@ const app = createApp(App);
 
 // 引入 form-create 组件库
 app.use(formCreate);
+FcDesigner.addMenu({
+  name: "business",
+  title: "业务组件"
+});
 app.use(FcDesigner);
 // app.use(FcDesigner.formCreate);
 

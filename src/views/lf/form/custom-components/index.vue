@@ -2,16 +2,11 @@
 import { ref, defineAsyncComponent, h, onMounted, shallowRef } from "vue";
 import LfFormCustomComponentsCard from "./LfFormCustomComponentsCard.vue";
 import "v-contextmenu/dist/themes/default.css";
-import { useFormCostumComponents } from "@/views/lf/form/components/form-designer/utils/costumComponents";
 import { addDialog } from "@/components/ReDialog";
 import { deviceDetection } from "@pureadmin/utils";
 import { LfFormCustomComponent } from "./utils/types";
 import LfFormTodoInfo from "@/views/lf/form/custom-components/todoInfo/index.vue";
 import LfFormDeptSelector from "@/views/lf/form/custom-components/deptSelector/index.vue";
-
-// 加载自定义组件
-const { loadCostumComponents } = useFormCostumComponents(null);
-loadCostumComponents();
 
 defineOptions({
   name: "LfProcessInitiate"
@@ -43,7 +38,7 @@ const components = [
   {
     name: "部门选择器",
     status: 1,
-    icon: "material-symbols:info",
+    icon: "tdesign--component-space",
     type: "component",
     description:
       "部门选择器（虚拟树版本），可以同时选择到部门下面的用户，当然这个是可选的",

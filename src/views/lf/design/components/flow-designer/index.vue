@@ -20,11 +20,7 @@ import SystemUserApi from "@/api/system/user";
 import LfFormApi from "@/api/lf/lfForm";
 import { addDialog } from "@/components/ReDialog";
 import { message } from "@/utils/message";
-import { useFormCostumComponents } from "@/views/lf/form/components/form-designer/utils/costumComponents";
-
-// 加载自定义组件
-const { loadCostumComponents } = useFormCostumComponents(null);
-loadCostumComponents();
+import { logicFlowFormPreview } from "@/views/lf/form/components/form-designer/utils/custom";
 
 defineOptions({
   name: "LogicFlowDesigner"
@@ -362,14 +358,6 @@ const formDesign = () => {
   );
 };
 
-/**动态表单创建渲染器 */
-const FormCreateCreator = defineAsyncComponent(
-  () => import("@/views/components/form-create/form-creator/index.vue")
-);
-const FormCreateCreatorRef = ref<InstanceType<typeof FormCreateCreator> | null>(
-  null
-);
-
 /**
  * 动态表单预览
  * @param row 表单
@@ -377,54 +365,7 @@ const FormCreateCreatorRef = ref<InstanceType<typeof FormCreateCreator> | null>(
 const formPreview = async (id: string) => {
   const { data: lfForm } = await LfFormApi.publishDetail(id);
   const { rule, options } = JSON.parse(lfForm.data);
-  addDialog({
-    title: `${lfForm.name}`,
-    props: {
-      isAddForm: false,
-      rule: JSON.parse(rule),
-      options: {
-        ...JSON.parse(options),
-        ...{ submitBtn: false, resetBtn: false }
-      },
-      modelValue: {}
-    },
-    width: "40%",
-    draggable: true,
-    fullscreen: deviceDetection(),
-    fullscreenIcon: true,
-    closeOnClickModal: false,
-    resetForm: () => FormCreateCreatorRef.value.resetForm(),
-    contentRenderer: () =>
-      h(FormCreateCreator, { ref: FormCreateCreatorRef, formData: null }),
-    beforeSure: (done, {}) => {
-      const ApiRef = FormCreateCreatorRef.value.getApiRef();
-      function chores() {
-        message(`操作成功`, {
-          type: "success"
-        });
-        done(); // 关闭弹框
-        //onSearch(); // 刷新表格数据
-      }
-      ApiRef.validate((valid, fail) => {
-        if (valid === true) {
-          // 实际开发先调用新增接口，再进行下面操作
-          const formData = ApiRef.formData();
-          ElMessageBox.alert(formData, "表单提交结果");
-          console.log(formData);
-          chores();
-        } else {
-          console.log("表单验证未通过", fail);
-        }
-      })
-        .then(() => {
-          //推荐
-          console.log("Promise resolved: 表单验证通过");
-        })
-        .catch(() => {
-          console.log("Promise rejected: 表单验证未通过");
-        });
-    }
-  });
+  logicFlowFormPreview(rule, options);
 };
 
 onMounted(() => {
