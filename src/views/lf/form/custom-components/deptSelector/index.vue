@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { nextTick, onMounted, ref } from "vue";
 import { Uuid } from "ts-uuid";
 import { Search } from "@element-plus/icons-vue";
 import {
   type DeptUserTree,
   type LfFormDeptSelector,
+  ApiDeptUserTree,
   ChooseData,
-  DeptUserTreeNodeType,
-  LfFormDeptSelectorModelValue
+  DeptUserTreeNodeType
 } from "./utils/types";
 import type {
   TreeNode,
@@ -20,20 +20,25 @@ defineOptions({
 });
 
 const props = withDefaults(defineProps<LfFormDeptSelector>(), {
-  modelValue: (): LfFormDeptSelectorModelValue => {
-    return {
-      api: {
-        deptUserTree: SystemDeptApi.deptUserTree,
-        deptUserTreeByCondition: SystemDeptApi.deptUserTreeByCondition
-      },
-      chooseData: []
-    };
-  }
+  api: () => ({
+    deptUserTree: SystemDeptApi.deptUserTree,
+    deptUserTreeByCondition: SystemDeptApi.deptUserTreeByCondition
+  }),
+  modelValue: (): ChooseData[] => [
+    {
+      id: "u_1963080001398505474",
+      name: "接警员",
+      checked: true,
+      pid: "d_2",
+      type: DeptUserTreeNodeType.USER,
+      deptId: "2",
+      userId: "1963080001398505474"
+    }
+  ],
+  hteight: "300px"
 });
 
-const api = ref(props.modelValue?.api);
-
-const chooseData = ref<ChooseData[]>(props.modelValue?.chooseData);
+const api = ref(props.api);
 
 const deptUserTreeRef = ref(null);
 /** 共享范围树数据 */
@@ -47,11 +52,24 @@ const deptUserTreeProps = {
 /** 搜索关键字 */
 const deptUserTreeQuery = ref("");
 
+/**
+ * 定义钩子
+ */
+const emit = defineEmits<{
+  (e: "update:modelValue", value: ChooseData[]): void;
+  (e: "change", value: ChooseData[]): void;
+}>();
+
 /** 获取部门树数据 */
 const getDeptUserTreeData = async () => {
-  const { data } = await api.value.deptUserTree(["0"], true);
+  const { data } = await api?.value.deptUserTree(["0"], true);
   addPlaceholder(data);
   deptUserTreeData.value = data;
+  nextTick(() => {
+    setTimeout(() => {
+      fillExistedTree(props.modelValue);
+    }, 10);
+  });
 };
 
 /**
@@ -73,7 +91,7 @@ const onDeptUserTreeQueryChanged = async () => {
     return;
   }
   // 去后端查询数据回来，填回去这个列表，然后才能搜索
-  const { data } = await api.value.deptUserTreeByCondition(
+  const { data } = await api?.value.deptUserTreeByCondition(
     deptUserTreeQuery.value,
     false
   );
@@ -113,7 +131,10 @@ const getDeptUserTreeChildren = async (
     treeNodeData.children[0].type === DeptUserTreeNodeType.PLACEHOLDER
   ) {
     // 如果是占位节点，这里直接清零，然后再去后端查询，查询到了就添加进去
-    const { data } = await api.value.deptUserTree([treeNodeData.deptId], false);
+    const { data } = await api?.value.deptUserTree(
+      [treeNodeData.deptId],
+      false
+    );
     if (
       data &&
       data.length > 0 &&
@@ -233,7 +254,12 @@ const deptUserTreeCheckChange = (
       }
     }
   }
-  deptUserTreeRender();
+  deptUserTreeRender(() => {
+    const data = checkedNodesData();
+    emit("update:modelValue", data);
+    emit("change", data);
+    console.log("data :>> ", data);
+  });
 };
 
 /**
@@ -271,6 +297,83 @@ const deptUserTreeRender = (callback = () => {}) => {
   }, 10);
 };
 
+/**
+ * 获取选中的节点数据
+ */
+const checkedNodesData = (): ChooseData[] => {
+  const checkedNodes = deptUserTreeRef.value!.getCheckedNodes();
+  // TODO 这里可以得到顶层数据
+  // const checkedKeys = checkedNodes.map(i => i.id)
+  // const topNodes: TreeNodeData[] = []
+  // checkedNodes.forEach((i) => {
+  //   if (!checkedKeys.includes(i.parentId)) {
+  //     // 如果找父级不到了就往 tree 里面放在第一级
+  //     topNodes.push(i)
+  //   }
+  // })
+  return checkedNodes
+    .filter(i => i.type !== DeptUserTreeNodeType.PLACEHOLDER)
+    .map(i => {
+      return {
+        id: i.id,
+        name: i.name,
+        checked: i.checked,
+        pid: i.pid,
+        type: i.type,
+        deptId: i.deptId,
+        userId: i.userId
+      };
+    });
+};
+
+const expandNodeUntilTop = (node: TreeNode) => {
+  if (node && node.parent) {
+    setTimeout(() => {
+      if (node.parent) {
+        deptUserTreeRef.value!.expandNode(node.parent);
+      }
+    }, 10);
+    expandNodeUntilTop(node.parent);
+  }
+};
+
+/**
+ * 填充已存在的数据
+ */
+const fillExistedTree = async (loadData: ChooseData[]) => {
+  if (!loadData || loadData.length === 0) {
+    return;
+  }
+  // todo 去后端查询数据回来，填回去这个列表，然后才能搜索
+  const { data } = await api?.value.deptUserTree(
+    [...loadData.map(item => item.deptId)],
+    false
+  );
+  if (
+    data &&
+    data.length > 0 &&
+    deptUserTreeData.value &&
+    deptUserTreeData.value.length > 0
+  ) {
+    mergeQueryDeptUserTree(deptUserTreeData.value, data);
+    deptUserTreeRender(() => {
+      setTimeout(() => {
+        // todo 展开对应的节点
+        // todo 把权限赋值给对应的节点
+        loadData.forEach(item => {
+          const key = item.userId ? `u_${item.userId}` : `d_${item.deptId}`;
+          const node = deptUserTreeRef.value!.getNode(key);
+          if (node) {
+            expandNodeUntilTop(node);
+            deptUserTreeRef.value!.setChecked(key, true);
+            // 展开父级节点
+          }
+        });
+      }, 10);
+    });
+  }
+};
+
 onMounted(() => {
   getDeptUserTreeData();
 });
@@ -289,7 +392,9 @@ onMounted(() => {
         </ElButton>
       </template>
     </ElInput>
-    <el-auto-resizer style="height: 300px">
+    <el-auto-resizer
+      :style="`height: ${props.hteight}; border: 1px solid #eee`"
+    >
       <template #default="{ height, width }">
         <el-tree-v2
           ref="deptUserTreeRef"

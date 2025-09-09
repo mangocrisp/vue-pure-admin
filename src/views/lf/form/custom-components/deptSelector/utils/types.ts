@@ -59,28 +59,26 @@ interface ChooseData {
   /** 父级id */
   pid: string;
   /** 类型，user 或者 dept */
-  type: DeptUserTreeNodeType;
+  type: DeptUserTreeNodeType | string;
   /** 部门id */
   deptId: string;
   /** 用户id */
   userId: string;
 }
 
-interface LfFormDeptSelectorModelValue {
-  api: {
-    deptUserTree: ApiDeptUserTree;
-    deptUserTreeByCondition: ApiConditionDeptUserTree;
-  };
-  chooseData?: ChooseData[];
-}
-
 interface LfFormDeptSelector {
-  modelValue?: LfFormDeptSelectorModelValue;
+  /** 接口 */
+  api?: {
+    deptUserTree?: ApiDeptUserTree;
+    deptUserTreeByCondition?: ApiConditionDeptUserTree;
+  };
+  modelValue?: ChooseData[];
+  /**高度 */
+  hteight?: string;
 }
 export { DeptUserTreeNodeType };
 export type {
   LfFormDeptSelector,
-  LfFormDeptSelectorModelValue,
   DeptUserTree,
   ApiDeptUserTree,
   ApiConditionDeptUserTree,
