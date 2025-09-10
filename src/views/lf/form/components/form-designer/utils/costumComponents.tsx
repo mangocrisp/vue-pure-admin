@@ -36,11 +36,9 @@ export function useFormCostumComponents(FormCreateDesignerRef) {
         componentMap.get(componentName).component
       );
       if (FormCreateDesignerRef && FormCreateDesignerRef.value) {
-        setTimeout(() => {
-          FormCreateDesignerRef.value
-            .getDesignerRef()
-            .addComponent(componentMap.get(componentName).rule);
-        }, 1000);
+        FormCreateDesignerRef.value
+          .getDesignerRef()
+          .addComponent(componentMap.get(componentName).rule);
       }
     });
   };

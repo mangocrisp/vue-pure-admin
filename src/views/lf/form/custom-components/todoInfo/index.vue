@@ -355,7 +355,6 @@ defineExpose({ getConfig });
 <style lang="scss" scoped>
 .lf-form-todo-info {
   width: 100%;
-  margin-bottom: 20px;
 }
 
 .flow-container {

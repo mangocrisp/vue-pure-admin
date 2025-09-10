@@ -24,11 +24,15 @@ const FormCreateCreatorRef = ref<InstanceType<typeof FormCreateCreator> | null>(
  * @param rule 表单规则
  */
 export const logicFlowFormRuleEnhance = (rule: string): any => {
+  if (!rule) {
+    return [];
+  }
   const ruleJSON = formCreate.parseJson(rule);
   if (ruleJSON && ruleJSON.length > 0) {
     ruleJSON.forEach(item => {
       // 针对不同类型的自定义组件，可以在这里做一些自定义的处理，比如这个部门用户选择组件，需要设置 api 接口去获取数据
       if (item.type === "LfFormDeptSelector") {
+        // 用户部门选择器
         item.props["api"] = {
           deptUserTree: SystemDeptApi.deptUserTree,
           deptUserTreeByCondition: SystemDeptApi.deptUserTreeByCondition
@@ -59,19 +63,7 @@ export const logicFlowFormPreview = (rule: string, options: string) => {
         ...optionsJSON,
         ...{ submitBtn: false, resetBtn: false }
       },
-      modelValue: {
-        deptUser: [
-          {
-            id: "u_1963080001398505474",
-            name: "接警员",
-            checked: true,
-            pid: "d_2",
-            type: "user",
-            deptId: "2",
-            userId: "1963080001398505474"
-          }
-        ]
-      }
+      modelValue: {}
     },
     width: "50%",
     draggable: true,

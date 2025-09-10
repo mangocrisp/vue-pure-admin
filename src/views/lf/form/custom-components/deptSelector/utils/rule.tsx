@@ -21,7 +21,7 @@ export const useFormCostumComponentsDeptSelector = () => {
         type: "LfFormDeptSelector",
         field: "deptUser",
         title: "选择部门",
-        info: "可以部门用户一起选，得到的是对应数组，格式为 [{id: '1', name: '张三', type: 'user', deptId: '1', userId: '1'}, {id: '2', name: '部门1', type: 'dept', deptId: '2'}]",
+        info: "可以部门用户一起选，得到的是对应数组",
         props: {
           expandOnClickNode: false,
           checkOnClickNode: false,

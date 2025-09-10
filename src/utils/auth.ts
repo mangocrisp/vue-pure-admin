@@ -25,12 +25,24 @@ export interface DataInfo<T> {
   permissions?: Array<string>;
 }
 
+export interface AuthorizationCookiesType<T> {
+  /** 登录的token */
+  accessToken: string;
+  /** 刷新token */
+  refreshToken: string;
+  /** 过期时间 */
+  expires: T;
+  /** json web token id */
+  jti: string;
+}
+
 export const userKey = "user-info";
 
 /** 顶级角色 code */
 export const ROOTRoleCode = ["ROOT"];
 
-export const TokenKey = "authorized-token";
+export const AuthorizedKeyPrefix = "authorized_";
+
 /**
  * 通过`multiple-tabs`是否在`cookie`中，判断用户是否已经登录系统，
  * 从而支持多标签页打开已经登录的系统后无需再登录。
@@ -40,11 +52,44 @@ export const TokenKey = "authorized-token";
 export const multipleTabsKey = "multiple-tabs";
 
 /** 获取`token` */
-export function getToken(): DataInfo<number> {
-  // 此处与`TokenKey`相同，此写法解决初始化时`Cookies`中不存在`TokenKey`报错
-  return Cookies.get(TokenKey)
-    ? JSON.parse(Cookies.get(TokenKey))
-    : storageLocal().getItem(userKey);
+export function getToken(
+  authorizedData = {
+    jti: "",
+    accessToken: "",
+    expires: 0,
+    refreshToken: ""
+  }
+): DataInfo<number> {
+  Object.keys(authorizedData).forEach(key => {
+    authorizedData[key] = Cookies.get(AuthorizedKeyPrefix + key);
+  });
+  const storageLocalData = storageLocal().getItem(userKey) as any;
+  return { ...authorizedData, ...storageLocalData };
+}
+
+function setAuthorizedCookies(
+  authorizedData: AuthorizationCookiesType<number>
+) {
+  Object.entries(authorizedData).forEach(([key, value]) => {
+    authorizedData.expires > 0
+      ? Cookies.set(AuthorizedKeyPrefix + key, value, {
+          expires: (authorizedData.expires - Date.now()) / 86400000
+        })
+      : Cookies.set(AuthorizedKeyPrefix + key, value);
+  });
+}
+
+function removeAuthorizedCookies(
+  authorizedData = {
+    jti: "",
+    accessToken: "",
+    expires: 0,
+    refreshToken: ""
+  }
+) {
+  Object.keys(authorizedData).forEach(key => {
+    Cookies.remove(AuthorizedKeyPrefix + key);
+  });
 }
 
 /**
@@ -90,18 +135,12 @@ export function setToken(data: DataInfo<Date>) {
   const { accessToken, refreshToken, jti } = data;
   const { isRemembered, loginDay } = useUserStoreHook();
   expires = new Date(data.expires).getTime(); // 如果后端直接设置时间戳，将此处代码改为expires = data.expires，然后把上面的DataInfo<Date>改成DataInfo<number>即可
-  const cookieString = JSON.stringify({
+  setAuthorizedCookies({
     jti,
     accessToken,
     expires,
     refreshToken
   });
-
-  expires > 0
-    ? Cookies.set(TokenKey, cookieString, {
-        expires: (expires - Date.now()) / 86400000
-      })
-    : Cookies.set(TokenKey, cookieString);
 
   Cookies.set(
     multipleTabsKey,
@@ -162,7 +201,7 @@ export function setToken(data: DataInfo<Date>) {
 
 /** 删除`token`以及key值为`user-info`的localStorage信息 */
 export function removeToken() {
-  Cookies.remove(TokenKey);
+  removeAuthorizedCookies();
   Cookies.remove(multipleTabsKey);
   storageLocal().removeItem(userKey);
 }

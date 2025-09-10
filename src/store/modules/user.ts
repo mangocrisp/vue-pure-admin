@@ -211,7 +211,9 @@ export const useUserStore = defineStore("pure-user", {
               jti: data.jti,
               accessToken: data.access_token,
               refreshToken: data.refresh_token,
-              expires: new Date(data.expires_in * 1000 + new Date().getTime())
+              expires: new Date(
+                data.access_token_exp * 1000 + new Date().getTime()
+              )
             });
             this.updateMyInfo();
             resolve({
@@ -219,7 +221,9 @@ export const useUserStore = defineStore("pure-user", {
               data: {
                 accessToken: data.access_token,
                 refreshToken: data.refresh_token,
-                expires: new Date(data.expires_in * 1000 + new Date().getTime())
+                expires: new Date(
+                  data.access_token_exp * 1000 + new Date().getTime()
+                )
               }
             });
           })

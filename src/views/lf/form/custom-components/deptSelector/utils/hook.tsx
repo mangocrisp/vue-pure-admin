@@ -148,6 +148,7 @@ export const useLfFormDeptSelector = (props, emit) => {
           setTimeout(() => {
             const node = deptUserTreeRef.value!.getNode(treeNode.key);
             if (
+              node &&
               node.children &&
               node.children.length === 1 &&
               node.children[0].data.type === DeptUserTreeNodeType.PLACEHOLDER

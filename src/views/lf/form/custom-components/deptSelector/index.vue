@@ -211,6 +211,5 @@ defineExpose({
 <style lang="css" scoped>
 .lf-form-dept-selector {
   width: 100%;
-  margin-bottom: 20px;
 }
 </style>
