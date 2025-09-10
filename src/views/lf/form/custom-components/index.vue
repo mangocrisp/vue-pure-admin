@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, defineAsyncComponent, h, onMounted, shallowRef } from "vue";
+import { ref, h, onMounted, shallowRef } from "vue";
 import LfFormCustomComponentsCard from "./LfFormCustomComponentsCard.vue";
 import "v-contextmenu/dist/themes/default.css";
 import { addDialog } from "@/components/ReDialog";
@@ -7,6 +7,8 @@ import { deviceDetection } from "@pureadmin/utils";
 import { LfFormCustomComponent } from "./utils/types";
 import LfFormTodoInfo from "@/views/lf/form/custom-components/todoInfo/index.vue";
 import LfFormDeptSelector from "@/views/lf/form/custom-components/deptSelector/index.vue";
+import MaterialSymbolsInfo from "~icons/material-symbols/info";
+import TablerSelector from "~icons/tabler/selector";
 
 defineOptions({
   name: "LfProcessInitiate"
@@ -30,7 +32,7 @@ const components = [
   {
     name: "流程待办信息",
     status: 1,
-    icon: "material-symbols:info",
+    icon: MaterialSymbolsInfo,
     type: "component",
     description: "流程待办信息",
     component: lfFormTodoInfoRef
@@ -38,7 +40,7 @@ const components = [
   {
     name: "部门选择器",
     status: 1,
-    icon: "tdesign--component-space",
+    icon: TablerSelector,
     type: "component",
     description:
       "部门选择器（虚拟树版本），可以同时选择到部门下面的用户，当然这个是可选的",
@@ -72,6 +74,8 @@ const showComponent = async (row: LfFormCustomComponent) => {
     closeOnClickModal: false,
     contentRenderer: () => h(CustomComponent, { ref: CustomComponentRef }),
     beforeSure: (done, {}) => {
+      const data = CustomComponentRef.value?.getData?.();
+      console.log(data);
       done();
     }
   });

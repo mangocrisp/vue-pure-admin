@@ -4,7 +4,7 @@ interface LfFormCustomComponent {
   /** 状态 */
   status?: number | string;
   /** 图标 */
-  icon?: string;
+  icon?: any;
   /** 组件类型 */
   type?: string;
   /** 名称 */

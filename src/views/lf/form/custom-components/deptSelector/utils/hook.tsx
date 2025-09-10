@@ -13,6 +13,10 @@ import type {
 export const useLfFormDeptSelector = (props, emit) => {
   const api = ref(props.api);
 
+  const includeUser = ref(props.includeUser);
+
+  const checkStrictly = ref(props.checkStrictly);
+
   const deptUserTreeRef = ref(null);
   /** 共享范围树数据 */
   const deptUserTreeData = ref<DeptUserTree[]>([]);
@@ -27,7 +31,11 @@ export const useLfFormDeptSelector = (props, emit) => {
 
   /** 获取部门树数据 */
   const loadData = async () => {
-    const { data } = await api?.value.deptUserTree(["0"], true);
+    const { data } = await api?.value.deptUserTree(
+      ["0"],
+      true,
+      includeUser.value
+    );
     addPlaceholder(data);
     deptUserTreeData.value = data;
     nextTick(() => {
@@ -40,7 +48,8 @@ export const useLfFormDeptSelector = (props, emit) => {
   /**
    * 搜索数据
    */
-  const onDeptUserTreeQueryChanged = async () => {
+  const handleDeptUserTreeQuery = async () => {
+    toggleExpandStatus(true);
     if (!deptUserTreeQuery.value || deptUserTreeQuery.value.length === 0) {
       deptUserTreeRef.value!.filter(deptUserTreeQuery.value);
       // 如果没有关键字，就折叠所有节点
@@ -58,7 +67,8 @@ export const useLfFormDeptSelector = (props, emit) => {
     // 去后端查询数据回来，填回去这个列表，然后才能搜索
     const { data } = await api?.value.deptUserTreeByCondition(
       deptUserTreeQuery.value,
-      false
+      false,
+      includeUser.value
     );
     if (
       data &&
@@ -72,6 +82,10 @@ export const useLfFormDeptSelector = (props, emit) => {
           deptUserTreeRef.value!.filter(deptUserTreeQuery.value);
         }, 10);
       });
+    } else {
+      setTimeout(() => {
+        deptUserTreeRef.value!.filter(deptUserTreeQuery.value);
+      }, 10);
     }
   };
   /**
@@ -79,16 +93,37 @@ export const useLfFormDeptSelector = (props, emit) => {
    * @param query 关键字
    * @param node 节点数据
    */
-  const deptUserTreeFilterMethod = (query: string, data: TreeNodeData) =>
-    query ? data.name!.includes(query) : true;
+  const deptUserTreeFilterMethod = (query: string, data: TreeNodeData) => {
+    if (!includeUser.value && data.type === DeptUserTreeNodeType.USER) {
+      return false;
+    }
+    if (data.type === DeptUserTreeNodeType.PLACEHOLDER) {
+      // 延时折叠占位节点的父节点
+      setTimeout(() => {
+        const node = deptUserTreeRef.value!.getNode(data.pid);
+        if (node) {
+          deptUserTreeRef.value!.collapseNode(node);
+        }
+      }, 50);
+    }
+    return query ? data.name!.includes(query) : true;
+  };
+
+  const toggleIncludeUser = (value: boolean) => {
+    includeUser.value = value;
+    loadData();
+    setTimeout(() => {
+      handleDeptUserTreeQuery();
+    }, 50);
+  };
 
   /**
    * 根据选择的节点获取他的下级数据
    * @param node 选择的节点
    */
   const getDeptUserTreeChildren = async (
-    treeNodeData: TreeNodeData
-    // ,treeNode: TreeNode
+    treeNodeData: TreeNodeData,
+    treeNode: TreeNode
   ) => {
     if (
       treeNodeData.children &&
@@ -98,7 +133,8 @@ export const useLfFormDeptSelector = (props, emit) => {
       // 如果是占位节点，这里直接清零，然后再去后端查询，查询到了就添加进去
       const { data } = await api?.value.deptUserTree(
         [treeNodeData.deptId],
-        false
+        false,
+        includeUser.value
       );
       if (
         data &&
@@ -107,7 +143,24 @@ export const useLfFormDeptSelector = (props, emit) => {
         deptUserTreeData.value.length > 0
       ) {
         mergeQueryDeptUserTree(deptUserTreeData.value, data);
-        deptUserTreeRender();
+        deptUserTreeRender(() => {
+          // 延时折叠占位节点
+          setTimeout(() => {
+            const node = deptUserTreeRef.value!.getNode(treeNode.key);
+            if (
+              node.children &&
+              node.children.length === 1 &&
+              node.children[0].data.type === DeptUserTreeNodeType.PLACEHOLDER
+            ) {
+              deptUserTreeRef.value!.collapseNode(treeNode);
+            }
+          }, 1000);
+        });
+      } else {
+        // 延时折叠占位节点
+        setTimeout(() => {
+          deptUserTreeRef.value!.collapseNode(treeNode);
+        }, 1000);
       }
     }
   };
@@ -185,7 +238,8 @@ export const useLfFormDeptSelector = (props, emit) => {
             name: "",
             type: DeptUserTreeNodeType.PLACEHOLDER,
             id: Uuid.create().toString().replace(/-/g, ""),
-            pid: item.id
+            pid: item.id,
+            disabled: false
           }
         ];
       } else if (item.type === DeptUserTreeNodeType.DEPT) {
@@ -278,6 +332,9 @@ export const useLfFormDeptSelector = (props, emit) => {
     // })
     return checkedNodes
       .filter(i => i.type !== DeptUserTreeNodeType.PLACEHOLDER)
+      .filter(j =>
+        !includeUser.value ? j.type === DeptUserTreeNodeType.DEPT : true
+      )
       .map(i => {
         return {
           id: i.id,
@@ -315,7 +372,8 @@ export const useLfFormDeptSelector = (props, emit) => {
     // todo 去后端查询数据回来，填回去这个列表，然后才能搜索
     const { data } = await api?.value.deptUserTree(
       [...loadData.map(item => item.deptId)],
-      false
+      false,
+      includeUser.value
     );
     if (
       data &&
@@ -342,6 +400,19 @@ export const useLfFormDeptSelector = (props, emit) => {
     }
   };
 
+  const expandStatus = ref(false);
+
+  const height = ref("0px");
+
+  const toggleExpandStatus = (status: boolean) => {
+    expandStatus.value = status;
+    if (expandStatus.value) {
+      height.value = props.height;
+    } else {
+      height.value = "0px";
+    }
+  };
+
   onMounted(() => {
     loadData();
   });
@@ -349,13 +420,20 @@ export const useLfFormDeptSelector = (props, emit) => {
   return {
     deptUserTreeRef,
     deptUserTreeQuery,
-    onDeptUserTreeQueryChanged,
+    handleDeptUserTreeQuery,
     deptUserTreeData,
     deptUserTreeProps,
     deptUserTreeFilterMethod,
     getDeptUserTreeChildren,
     deptUserTreeCheckChange,
     loadData,
-    checkedNodesData
+    fillExistedTree,
+    checkedNodesData,
+    includeUser,
+    checkStrictly,
+    toggleIncludeUser,
+    expandStatus,
+    toggleExpandStatus,
+    height
   };
 };

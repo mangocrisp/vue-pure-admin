@@ -59,7 +59,7 @@ const showComponent = (data: LfFormCustomComponent) => {
     <div v-contextmenu:contextmenu class="list-card-item_detail bg-bg_color">
       <el-row justify="space-between">
         <div :class="cardLogoClass">
-          <IconifyIconOnline :icon="data?.icon" width="60px" height="60px" />
+          <IconifyIconOffline :icon="data?.icon" width="60px" height="60px" />
         </div>
         <div class="list-card-item_detail--operation">
           <el-tag type="info" class="mt-[10px]">
