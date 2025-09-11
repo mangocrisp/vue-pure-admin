@@ -41,11 +41,15 @@ export default class LfProcessApi {
    * @returns 待办/已办列表
    */
   static todoList = (
-    queryDto: LfProcessType.TodoListQueryDTO
-  ): HttpReturn<LfProcessType.ProcessListVO[]> => {
+    queryDto: LfProcessType.TodoListQueryDTO,
+    pageParams: BaseApi.SqlPageParams
+  ): HttpReturnPage<LfProcessType.ProcessListVO> => {
     return request.post({
       url: `${URL}/todoList`,
-      data: queryDto
+      data: queryDto,
+      params: {
+        ...pageParams
+      }
     });
   };
 
@@ -69,11 +73,15 @@ export default class LfProcessApi {
    * @returns 流程列表
    */
   static userRequestList = (
-    queryDto: LfProcessType.UserRequestListQueryDTO
-  ): HttpReturn<LfProcessType.ProcessListVO[]> => {
+    queryDto: LfProcessType.UserRequestListQueryDTO,
+    pageParams: BaseApi.SqlPageParams
+  ): HttpReturnPage<LfProcessType.ProcessListVO> => {
     return request.post({
       url: `${URL}/userRequestList`,
-      data: queryDto
+      data: queryDto,
+      params: {
+        ...pageParams
+      }
     });
   };
 

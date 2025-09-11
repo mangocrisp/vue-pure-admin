@@ -8,6 +8,7 @@ import {
   ContextmenuSubmenu,
   ContextmenuGroup
 } from "v-contextmenu";
+import { DoneStatusMap, TodoStatusMap } from "../utils/enums";
 export default defineComponent({
   name: "LfProcessInitiateCard",
   components: {
@@ -30,27 +31,27 @@ const useSystemDictParamsStore = useSystemDictParamsStoreHook();
 
 const props = defineProps({
   data: {
-    type: Object as PropType<LfReleaseType.Domain>
+    type: Object as PropType<LfProcessType.ProcessListVO>
   }
 });
 
 const cardClass = computed(() => [
   "list-card-item",
-  { "list-card-item__disabled": !(props.data?.status === 1) }
+  { "list-card-item__disabled": !(props.data?.status === "1") }
 ]);
 
 const cardLogoClass = computed(() => [
   "list-card-item_detail--logo",
-  { "list-card-item_detail--logo__disabled": !(props.data?.status === 1) }
+  { "list-card-item_detail--logo__disabled": !(props.data?.status === "1") }
 ]);
 
 const emit = defineEmits(["initiate-process", "show-design"]);
 
-const handleClickInitiateProcess = (data: LfReleaseType.Domain) => {
+const handleClickInitiateProcess = (data: LfProcessType.ProcessListVO) => {
   emit("initiate-process", data);
 };
 
-const handleClickShowDesign = (data: LfReleaseType.Domain) => {
+const handleClickShowDesign = (data: LfProcessType.ProcessListVO) => {
   emit("show-design", data);
 };
 </script>
@@ -64,13 +65,30 @@ const handleClickShowDesign = (data: LfReleaseType.Domain) => {
         </div>
         <div class="list-card-item_detail--operation">
           <el-tag
-            :color="data?.status === 1 ? '#00a870' : '#eee'"
+            :color="data?.status === '1' ? '#00a870' : '#eee'"
             effect="dark"
+            size="small"
             class="mx-1 list-card-item_detail--operation--tag"
           >
-            {{ data?.status === 1 ? "已启用" : "已停用" }}
+            {{ data?.status === "1" ? "待办" : "已办" }}
           </el-tag>
-          <el-tag type="info" class="mt-[10px]">
+          <el-tag
+            v-if="data?.todoStatus"
+            type="primary"
+            class="mt-[10px]"
+            size="small"
+          >
+            {{ TodoStatusMap[data?.todoStatus] }}
+          </el-tag>
+          <el-tag
+            v-if="data?.doneStatus"
+            type="primary"
+            class="mt-[10px]"
+            size="small"
+          >
+            {{ DoneStatusMap[data?.doneStatus] }}
+          </el-tag>
+          <el-tag type="info" class="mt-[10px]" size="small">
             {{
               useSystemDictParamsStore.dictK2V("lf_process_type", data?.type)
                 .value
@@ -78,14 +96,14 @@ const handleClickShowDesign = (data: LfReleaseType.Domain) => {
           </el-tag>
         </div>
       </el-row>
-      <p class="list-card-item_detail--name text-text_color_primary">
-        {{ data?.name }}
-      </p>
+      <h1 class="list-card-item_detail--name text-text_color_primary">
+        <strong>{{ data?.designName }}</strong>
+      </h1>
       <p class="list-card-item_detail--desc text-text_color_regular">
-        {{ data?.description }}
+        {{ data?.nodeText }}
       </p>
     </div>
-    <v-contextmenu v-if="data?.status === 1" ref="contextmenu">
+    <v-contextmenu v-if="data?.status === '1'" ref="contextmenu">
       <v-contextmenu-item @click="handleClickInitiateProcess(data)"
         >发起申请</v-contextmenu-item
       >

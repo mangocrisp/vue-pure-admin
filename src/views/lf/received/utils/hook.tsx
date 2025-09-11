@@ -1,39 +1,49 @@
-import { ref, onMounted, reactive, defineAsyncComponent, h } from "vue";
+import { ref, onMounted, reactive, defineAsyncComponent } from "vue";
 import { useSystemDictParamsStoreHook } from "@/store/modules/system-dict-params";
-import LfReleaseApi from "@/api/lf/lfRelease";
 import "v-contextmenu/dist/themes/default.css";
 import { useMultiTagsStoreHook } from "@/store/modules/multiTags";
 import { useRouter } from "vue-router";
-import { addDialog } from "@/components/ReDialog";
-import { deviceDetection } from "@pureadmin/utils";
-import LfFormApi from "@/api/lf/lfForm";
-import { ElMessageBox } from "element-plus";
-import { message } from "@/utils/message";
 import { useFormCostumComponents } from "@/views/lf/form/components/form-designer/utils/costumComponents";
-import type { LfFormTodoInfoModelValue } from "@/views/lf/form/custom-components/todoInfo/utils/types";
+import LfProcessApi from "@/api/lf/lfProcess";
 
 // 加载自定义组件
 const { loadCostumComponents } = useFormCostumComponents(null);
 loadCostumComponents();
-export function useReceivedList() {
+export function useReceivedList(props) {
   const router = useRouter();
-  const queryForm = reactive<LfReleaseType.QueryDTO>({
-    /** 发布名称 */
-    name: undefined,
-    /** 状态(0 关闭 1 打开) */
-    status: "1",
-    /** 备注说明 */
-    description: undefined,
-    /** 版本号（yyyyMMddHHmmss） */
-    version: undefined,
+  const status = ref<"1" | "0" | undefined>(undefined);
+  if (props.for === "todo") {
+    status.value = "1";
+  }
+  if (props.for === "done") {
+    status.value = "0";
+  }
+  if (props.for === "cc") {
+    status.value = undefined;
+  }
+  const queryForm = reactive<LfProcessType.TodoListQueryDTO>({
+    /** 流程图 id（可以知道当前流程是基于什么原始设计运行的） */
+    designId: undefined,
+    /** 流程标题 */
+    title: undefined,
+    /** 流程发布 id（可以知道当前流程是基于什么版本的设计在运行的） */
+    releaseId: undefined,
+    /** 运行流程 id */
+    processId: undefined,
+    /** 状态（1、待办、0、已办） */
+    status: status.value,
+    /** 待办状态（1、待处理 2、待阅 3、被退回  4、未读 5、反馈） */
+    todoStatus: undefined,
+    /** 已办状态（1、未归档 2、已归档 3、待回复 4、未读 5、反馈） */
+    doneStatus: undefined,
     /** 流程类型（字典项 lf_process_type） */
     type: undefined,
-    /** 显示最新版本是否只显示最新版本 */
-    showNewVersion: "true"
+    /** 待办类型（1、任务待办 2、抄送待办 ...其他类型自定义） */
+    todoType: props.for === "cc" ? "2" : "1"
   });
 
   /** 列表数据 */
-  const pageList = ref<LfReleaseType.Domain[]>([]);
+  const pageList = ref<LfProcessType.ProcessListVO[]>([]);
   /** 加载中 */
   const loading = ref(true);
 
@@ -46,7 +56,7 @@ export function useReceivedList() {
   const onSearch = async () => {
     try {
       loading.value = true;
-      const { data } = await LfReleaseApi.publishList(queryForm, {
+      const { data } = await LfProcessApi.todoList(queryForm, {
         pageNum: pagination.value.current,
         pageSize: pagination.value.pageSize
       });
@@ -82,190 +92,11 @@ export function useReceivedList() {
     onSearch();
   };
 
-  /**动态表单创建渲染器 */
-  const LfFormRender = defineAsyncComponent(
-    () => import("@/views/lf/received/components/form-render/index.vue")
-  );
-  const LfFormRenderRef = ref<InstanceType<typeof LfFormRender> | null>(null);
-
-  const generateFlowInfo = (
-    row: LfFormType.Domain
-  ): LfFormTodoInfoModelValue => {
-    console.log("row :>> ", row);
-    const infoMap = new Map();
-    infoMap.set("dddd", {
-      title: "相关信息",
-      name: "dddd",
-      basic: {
-        border: true,
-        column: 2,
-        direction: "horizontal",
-        size: "default",
-        title: "",
-        extra: "",
-        labelWidth: 120,
-        children: [
-          {
-            label: "标题",
-            value: "描述"
-          },
-          {
-            label: "标题",
-            value: "描述"
-          },
-          {
-            label: "标题",
-            value: "描述"
-          },
-          {
-            label: "标题",
-            value: "描述"
-          },
-          {
-            label: "标题",
-            value: "描述"
-          }
-        ]
-      }
-    });
-    return {
-      basic: {
-        children: [
-          {
-            label: "姓名",
-            value: "张三"
-          },
-          {
-            label: "手机号",
-            value: "13838380438"
-          },
-          {
-            label: "地址",
-            value: "广州天河"
-          },
-          {
-            label: "理由",
-            value: "有人打架闹事"
-          }
-        ]
-      },
-      records: [
-        {
-          timestamp: "2021-09-01 09:00:00",
-          title: "标题",
-          description: "描述"
-        },
-        {
-          timestamp: "2021-09-01 10:00:00",
-          title: "标题",
-          description: "描述",
-          detail: {
-            title: "标题",
-            name: "名称",
-            basic: {
-              border: true,
-              column: 2,
-              direction: "horizontal",
-              size: "default",
-              title: "",
-              extra: "",
-              labelWidth: 120,
-              children: [
-                {
-                  label: "标题",
-                  value: "描述"
-                },
-                {
-                  label: "标题",
-                  value: "描述"
-                },
-                {
-                  label: "标题",
-                  value: "描述"
-                },
-                {
-                  label: "标题",
-                  value: "描述"
-                },
-                {
-                  label: "标题",
-                  value: "描述"
-                }
-              ]
-            }
-          }
-        }
-      ],
-      infoMap: infoMap
-    };
-  };
-
   /**
    * 开始流程
    * @param row 数据
    */
-  const handleClickInitiateProcess = async () => {
-    const { data: lfForm } = await LfFormApi.publishDetail(
-      "1964966245669912577"
-    );
-    const { rule, options } = JSON.parse(lfForm.data);
-    console.log("row :>> ", JSON.parse(rule));
-
-    const flowInfo = generateFlowInfo(lfForm);
-    addDialog({
-      title: `测试`,
-      props: {
-        isAddForm: false,
-        rule: JSON.parse(rule),
-        options: {
-          ...JSON.parse(options),
-          ...{ submitBtn: false, resetBtn: false }
-        },
-        modelValue: {
-          real: true,
-          flowInfo
-        }
-      },
-      width: "60%",
-      draggable: true,
-      fullscreen: deviceDetection(),
-      fullscreenIcon: true,
-      closeOnClickModal: false,
-      resetForm: () => LfFormRenderRef.value.resetForm(),
-      contentRenderer: () =>
-        h(LfFormRender, { ref: LfFormRenderRef, formData: null }),
-      beforeSure: (done, {}) => {
-        const ApiRef = LfFormRenderRef.value.getApiRef();
-        function chores() {
-          message(`操作成功`, {
-            type: "success"
-          });
-          done(); // 关闭弹框
-          //onSearch(); // 刷新表格数据
-        }
-        ApiRef.validate((valid, fail) => {
-          if (valid === true) {
-            // 实际开发先调用新增接口，再进行下面操作
-            const formData = ApiRef.formData();
-            // 这里清空一下流程信息，因为只是做展示用
-            formData.flowInfo = undefined;
-            ElMessageBox.alert(formData, "表单提交结果");
-            console.log(formData);
-            chores();
-          } else {
-            console.log("表单验证未通过", fail);
-          }
-        })
-          .then(() => {
-            //推荐
-            console.log("Promise resolved: 表单验证通过");
-          })
-          .catch(() => {
-            console.log("Promise rejected: 表单验证未通过");
-          });
-      }
-    });
-  };
+  const handleClickInitiateProcess = async () => {};
 
   /**
    * 设置流程图

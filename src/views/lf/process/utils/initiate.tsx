@@ -104,23 +104,28 @@ export const useLfProcessInitiate = () => {
               source: "processInitiate",
               data: lfRelease
             },
-            onSubmit: () =>
-              new Promise(resolve => {
+            onSubmit: (data: any) => {
+              const { fields } = startNode.properties;
+              fields.forEach(field => {
+                field.value = data[field.name];
+              });
+              const submitData = JSON.stringify(startNode.properties);
+              return new Promise(resolve => {
                 LfProcessApi.newProcess({
                   /** 流程图 id（可以知道当前流程是基于什么原始设计运行的） */
                   designId: lfRelease.designId,
                   /** 流程标题 */
-                  title: title,
+                  title: lfRelease.description,
                   /** 流程发布 id（可以知道当前流程是基于什么版本的设计在运行的） */
                   releaseId: lfRelease.id,
                   /** 备注 */
-                  remark: title,
+                  remark: lfRelease.description,
                   /** 流程类型（字典项 lf_process_type） */
                   type: lfFormRelease.type,
                   /** 开始节点的属性数据，新建流程，是从第一个开始节点开始的，这里一般会传开始节点的属性数据 */
                   startNodes: {
                     /** 节点的属性数据 */
-                    properties: JSON.stringify(startNode.properties),
+                    properties: submitData,
                     /** 节点上的文字 */
                     text: title,
                     /** 节点类型（字典项 lf_node_type） */
@@ -134,7 +139,8 @@ export const useLfProcessInitiate = () => {
                     resolve(false);
                   }
                 });
-              })
+              });
+            }
           });
         });
       } else {

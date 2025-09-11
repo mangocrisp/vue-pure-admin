@@ -60,6 +60,16 @@ declare namespace LfProcessType {
     icon: string;
     /** 最后版本号 */
     lastVersion: string;
+    /** 状态（1、待办、0、已办） */
+    status: string;
+    /** 流程类型（字典项 lf_process_type） */
+    type: string;
+    /** 待办状态（1、待处理 2、待阅 3、被退回  4、未读 5、反馈） */
+    todoStatus: string;
+    /** 已办状态（1、未归档 2、已归档 3、待回复 4、未读 5、反馈） */
+    doneStatus: string;
+    /** 待办类型（1、任务待办 2、抄送待办 ...其他类型自定义） */
+    todoType: string;
   }
 
   /**
@@ -214,6 +224,8 @@ declare namespace LfProcessType {
     doneStatus: string;
     /** 流程类型（字典项 lf_process_type） */
     type: string;
+    /** 待办类型（1、任务待办 2、抄送待办 ...其他类型自定义） */
+    todoType: string;
   }
 
   /**

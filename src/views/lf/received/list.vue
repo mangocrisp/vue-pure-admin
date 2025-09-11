@@ -5,6 +5,7 @@ import "v-contextmenu/dist/themes/default.css";
 import Refresh from "~icons/ep/refresh";
 import { ReceviedListProps } from "./utils/types";
 import { useReceivedList } from "./utils/hook";
+import { DoneStatus, Status, TodoStatus, TodoType } from "./utils/enums";
 
 defineOptions({
   name: "ReceivedList"
@@ -46,7 +47,7 @@ const {
   onCurrentChange,
   handleClickInitiateProcess,
   designD
-} = useReceivedList();
+} = useReceivedList(props);
 </script>
 
 <template>
@@ -57,15 +58,16 @@ const {
       :model="queryForm"
       class="search-form bg-bg_color w-full pl-8 pt-[12px] overflow-auto"
     >
-      <el-form-item label="发布名称" prop="name">
+      <el-form-item label="流程标题" prop="title">
         <el-input
-          v-model="queryForm.name"
-          placeholder="请输入发布名称"
+          v-model="queryForm.title"
+          placeholder="流程标题"
           clearable
           class="w-[180px]!"
         />
       </el-form-item>
-      <el-form-item label="状态" prop="status">
+      <!-- 只有抄送的时候可以选择状态 -->
+      <el-form-item v-if="props.for === 'cc'" label="状态" prop="status">
         <el-select
           v-model="queryForm.status"
           placeholder="请选择"
@@ -73,30 +75,66 @@ const {
           value-key="status"
           clearable
           class="w-[180px]!"
+          @change="
+            queryForm.todoStatus = undefined;
+            queryForm.doneStatus = undefined;
+          "
         >
           <el-option
-            v-for="(item, key) in dictOption('system-status')"
+            v-for="(item, key) in Status"
             :key="key"
             :value="item.value"
             :label="item.label"
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="备注说明" prop="description">
-        <el-input
-          v-model="queryForm.description"
-          placeholder="请输入备注说明"
+      <el-form-item
+        v-if="
+          props.for === 'todo' ||
+          (props.for === 'cc' && queryForm.status === '1')
+        "
+        label="待办状态"
+        prop="todoStatus"
+      >
+        <el-select
+          v-model="queryForm.todoStatus"
+          placeholder="请选择"
+          default-first-option
+          value-key="todoStatus"
           clearable
           class="w-[180px]!"
-        />
+        >
+          <el-option
+            v-for="(item, key) in TodoStatus"
+            :key="key"
+            :value="item.value"
+            :label="item.label"
+          />
+        </el-select>
       </el-form-item>
-      <el-form-item label="版本号" prop="version">
-        <el-input
-          v-model="queryForm.version"
-          placeholder="请输入版本号"
+      <el-form-item
+        v-if="
+          props.for === 'done' ||
+          (props.for === 'cc' && queryForm.status === '0')
+        "
+        label="已办状态"
+        prop="doneStatus"
+      >
+        <el-select
+          v-model="queryForm.doneStatus"
+          placeholder="请选择"
+          default-first-option
+          value-key="doneStatus"
           clearable
           class="w-[180px]!"
-        />
+        >
+          <el-option
+            v-for="(item, key) in DoneStatus"
+            :key="key"
+            :value="item.value"
+            :label="item.label"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item label="流程类型" prop="type">
         <el-select
@@ -114,16 +152,6 @@ const {
             :label="item.label"
           />
         </el-select>
-      </el-form-item>
-      <el-form-item label="是否只显示最新版本" prop="showNewVersion">
-        <el-radio-group v-model="queryForm.showNewVersion">
-          <el-radio
-            v-for="(item, key) in dictOption('system-is')"
-            :key="key"
-            :value="item.value"
-            >{{ item.label }}</el-radio
-          >
-        </el-radio-group>
       </el-form-item>
       <el-form-item>
         <el-button
@@ -162,7 +190,7 @@ const {
           >
             <LfProcessInitiateCard
               :data="data"
-              @click="data.status === 1 ? handleClickInitiateProcess(data) : {}"
+              @click="data.status === '1' ? handleClickInitiateProcess : {}"
               @initiate-process="handleClickInitiateProcess"
               @show-design="designD"
             />

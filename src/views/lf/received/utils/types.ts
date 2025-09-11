@@ -2,4 +2,9 @@ interface ReceviedListProps {
   for: "todo" | "done" | "cc";
 }
 
-export type { ReceviedListProps };
+interface optionsType {
+  label: string;
+  value: string;
+}
+
+export type { ReceviedListProps, optionsType };
