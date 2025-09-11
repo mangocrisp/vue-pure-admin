@@ -3,7 +3,7 @@ declare namespace LogicFlowTypes {
   /**
    * select 选项类型
    */
-  type SelectOptionItem = {
+  export type SelectOptionItem = {
     key: string;
     label: string;
     value: any;
@@ -11,7 +11,7 @@ declare namespace LogicFlowTypes {
   /**
    * 拖拽面板 DndPanel
    */
-  type PatternItem = {
+  export type PatternItem = {
     /**
      * 节点类型
      */
@@ -45,7 +45,7 @@ declare namespace LogicFlowTypes {
   /**
    * 业务字段
    */
-  type BusinessField = {
+  export type BusinessField = {
     /**
      * 字段唯一键
      */
@@ -125,7 +125,7 @@ declare namespace LogicFlowTypes {
   /**
    * 业务属性
    */
-  type BusinessProperties = {
+  export type BusinessProperties = {
     /**
      * 如果节点是 custom-node-end(结束节点) 这里就会判断是否是正常结束的节点,例如,请假成功就是正常,请假被拒绝,就是不正常节点
      */
@@ -195,10 +195,20 @@ declare namespace LogicFlowTypes {
      */
     documentation?: string;
   } & AnyObject;
+
+  /**
+   * 节点/边 的文字
+   */
+  export type elementText = {
+    x: number;
+    y: number;
+    value: string;
+  };
+
   /**
    * 编辑的 节点/边 属性
    */
-  type EditData = {
+  export type EditData = {
     /**
      * 节点或者边的 id,这个,可以自己定义生成规则
      */
@@ -210,7 +220,7 @@ declare namespace LogicFlowTypes {
     /**
      * 节点或者边上面的文字
      */
-    text: string | null;
+    text: string | elementText | null | undefined;
     /**
      * 节点或者边的类型
      */

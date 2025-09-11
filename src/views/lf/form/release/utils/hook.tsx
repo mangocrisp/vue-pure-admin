@@ -5,8 +5,9 @@ import { useMultiTagsStoreHook } from "@/store/modules/multiTags";
 import { useRoute, useRouter } from "vue-router";
 import { useSystemDictParamsStoreHook } from "@/store/modules/system-dict-params";
 import LfFormApi from "@/api/lf/lfForm";
-import { logicFlowFormPreview } from "@/views/lf/form/components/form-designer/utils/custom";
+import { useLfCustomFrom } from "@/views/lf/form/components/form-designer/utils/custom";
 
+const { logicFlowFormPreview } = useLfCustomFrom();
 export function useLfFormRelease() {
   const route = useRoute();
   const router = useRouter();

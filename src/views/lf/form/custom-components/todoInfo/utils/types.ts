@@ -90,10 +90,18 @@ interface LfFormTodoInfoRecord {
   detail?: LfFormTodoInfoRecordDetail;
 }
 
+/**
+ * 流程图
+ */
+interface LfFormTodoInfoFlowChart {
+  id: string;
+  source: string;
+}
+
 /** 待办信息值 */
 interface LfFormTodoInfoModelValue {
   /** 流程实例ID */
-  processId?: string;
+  flowChart?: LfFormTodoInfoFlowChart;
   /** 基础信息 */
   basic?: LfFormTodoInfoBasic;
   records?: LfFormTodoInfoRecord[];
@@ -108,6 +116,7 @@ interface LfFormTodoInfo {
 }
 
 export type {
+  LfFormTodoInfoFlowChart,
   LfFormTodoInfo,
   LfFormTodoInfoModelValue,
   LfFormTodoInfoBasicItem,

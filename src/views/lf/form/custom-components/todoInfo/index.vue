@@ -11,6 +11,7 @@ import { defineAsyncComponent, h, nextTick, ref } from "vue";
 import {
   LfFormTodoInfo,
   LfFormTodoInfoBasic,
+  LfFormTodoInfoFlowChart,
   LfFormTodoInfoModelValue,
   LfFormTodoInfoRecord,
   LfFormTodoInfoRecordDetail
@@ -143,7 +144,7 @@ const props = withDefaults(defineProps<LfFormTodoInfo>(), {
 });
 
 const config = ref<LfFormTodoInfo>(props);
-const processId = ref<string>(props.modelValue.processId);
+const flowChart = ref<LfFormTodoInfoFlowChart>(props.modelValue.flowChart);
 const basic = ref<LfFormTodoInfoBasic>(props.modelValue.basic);
 const records = ref<LfFormTodoInfoRecord[]>(props.modelValue.records);
 const infoMap = ref<Map<string, LfFormTodoInfoRecordDetail>>(
@@ -161,22 +162,22 @@ const showFlowRef = ref(false);
 const handleInfoChange = (val: string) => {
   if (val === "flowChart") {
     nextTick(() => {
-      handleShowFlow(processId.value);
+      handleShowFlow(flowChart.value);
     });
   }
 };
 /**
  * 显示流程
- * @param processId 流程实例 id
+ * @param flowChart 流程实例 id
  */
-const handleShowFlow = (processId: string) => {
-  if (!processId) {
+const handleShowFlow = (flowChart: LfFormTodoInfoFlowChart) => {
+  if (!flowChart || !flowChart.id) {
     return;
   }
   if (showFlowRef.value) {
     return;
   }
-  FormTodoInfoRef.value.reloadData("process", processId);
+  FormTodoInfoRef.value.reloadData(flowChart.source, flowChart.id);
 };
 
 /**
@@ -193,7 +194,7 @@ defineExpose({ getConfig });
 </script>
 <template>
   <el-tabs type="border-card" class="lf-form-todo-info">
-    <el-tab-pane>
+    <el-tab-pane v-if="basic?.children && basic?.children.length > 0">
       <template #label>
         <el-button :icon="InfoFilled" link>基本信息</el-button>
       </template>
@@ -225,7 +226,7 @@ defineExpose({ getConfig });
         </el-descriptions>
       </template>
     </el-tab-pane>
-    <el-tab-pane>
+    <el-tab-pane v-if="records && records.length > 0">
       <template #label>
         <el-button :icon="Guide" link>流转记录</el-button>
       </template>
@@ -358,7 +359,7 @@ defineExpose({ getConfig });
 }
 
 .flow-container {
-  height: 60vh;
+  height: 50vh;
 }
 
 .record-operator {

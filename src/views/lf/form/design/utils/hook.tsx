@@ -11,8 +11,9 @@ import { useSystemDictParamsStoreHook } from "@/store/modules/system-dict-params
 import { ElForm, ElFormItem, ElInput, ElMessageBox } from "element-plus";
 import { useRouter } from "vue-router";
 import { useMultiTagsStoreHook } from "@/store/modules/multiTags";
-import { logicFlowFormPreview } from "@/views/lf/form/components/form-designer/utils/custom";
+import { useLfCustomFrom } from "@/views/lf/form/components/form-designer/utils/custom";
 
+const { logicFlowFormPreview } = useLfCustomFrom();
 export function useLfForm() {
   const router = useRouter();
   const useSystemDictParamsStore = useSystemDictParamsStoreHook();

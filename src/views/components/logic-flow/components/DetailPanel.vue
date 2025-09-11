@@ -354,7 +354,7 @@ const chooseInputType = (type: string) => {
         trigger: 'blur'
       }"
     >
-      <el-input v-model="form.text" type="textarea" />
+      <el-input v-model="form.text as string" type="textarea" />
     </el-form-item>
 
     <el-form-item

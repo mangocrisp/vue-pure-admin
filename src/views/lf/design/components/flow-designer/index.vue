@@ -20,11 +20,13 @@ import SystemUserApi from "@/api/system/user";
 import LfFormApi from "@/api/lf/lfForm";
 import { addDialog } from "@/components/ReDialog";
 import { message } from "@/utils/message";
-import { logicFlowFormPreview } from "@/views/lf/form/components/form-designer/utils/custom";
+import { useLfCustomFrom } from "@/views/lf/form/components/form-designer/utils/custom";
 
 defineOptions({
   name: "LogicFlowDesigner"
 });
+
+const { logicFlowFormPreview } = useLfCustomFrom();
 
 export interface LogicFlowDesignerProps {
   showCloseButton?: boolean;
