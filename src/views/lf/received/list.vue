@@ -90,8 +90,7 @@ const {
       </el-form-item>
       <el-form-item
         v-if="
-          props.for === 'todo' ||
-          (props.for === 'cc' && queryForm.status === '1')
+          props.for === 'todo' || (props.for === 'cc' && queryForm.status === 1)
         "
         label="待办状态"
         prop="todoStatus"
@@ -114,8 +113,7 @@ const {
       </el-form-item>
       <el-form-item
         v-if="
-          props.for === 'done' ||
-          (props.for === 'cc' && queryForm.status === '0')
+          props.for === 'done' || (props.for === 'cc' && queryForm.status === 0)
         "
         label="已办状态"
         prop="doneStatus"
@@ -175,7 +173,7 @@ const {
     >
       <el-empty
         v-show="pagination.total === 0 && !loading"
-        :description="`没有提供可以申请的流程`"
+        :description="`暂无`"
       />
       <template v-if="pagination.total > 0">
         <el-row :gutter="16">
@@ -190,7 +188,7 @@ const {
           >
             <LfProcessInitiateCard
               :data="data"
-              @click="data.status === '1' ? handleClickInitiateProcess : {}"
+              @click="data.status === 1 ? handleClickInitiateProcess : {}"
               @initiate-process="handleClickInitiateProcess"
               @show-design="designD"
             />

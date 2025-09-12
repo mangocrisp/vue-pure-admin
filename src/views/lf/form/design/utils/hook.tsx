@@ -64,7 +64,7 @@ export function useLfForm() {
       minWidth: 90
     },
     {
-      label: "状态(0未发布，1已经发布)",
+      label: "状态",
       prop: "status",
       cellRenderer: scope => {
         return (

@@ -79,6 +79,7 @@ export function useLfDesign() {
     },
     {
       label: "发布/启用",
+      prop: "status",
       cellRenderer: scope => {
         return (
           <span>

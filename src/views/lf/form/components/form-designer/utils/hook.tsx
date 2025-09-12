@@ -11,9 +11,10 @@ import LfFormApi from "@/api/lf/lfForm";
 import { ElMessage } from "element-plus";
 import { useFormCostumComponents } from "./costumComponents";
 import formCreate from "@form-create/element-ui";
-import { logicFlowFormRuleEnhance } from "./custom";
+import { useLfCustomFrom } from "./custom";
 
 export function useLogicFlowFormDesigner() {
+  const { logicFlowFormRuleEnhance } = useLfCustomFrom();
   /**动态表单创建设计器 */
   const FormCreateDesigner = defineAsyncComponent(
     () => import("@/views/components/form-create/form-designer/index.vue")

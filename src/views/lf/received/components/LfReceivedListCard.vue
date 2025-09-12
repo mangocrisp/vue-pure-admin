@@ -37,12 +37,12 @@ const props = defineProps({
 
 const cardClass = computed(() => [
   "list-card-item",
-  { "list-card-item__disabled": !(props.data?.status === "1") }
+  { "list-card-item__disabled": !(props.data?.status === 1) }
 ]);
 
 const cardLogoClass = computed(() => [
   "list-card-item_detail--logo",
-  { "list-card-item_detail--logo__disabled": !(props.data?.status === "1") }
+  { "list-card-item_detail--logo__disabled": !(props.data?.status === 1) }
 ]);
 
 const emit = defineEmits(["initiate-process", "show-design"]);
@@ -65,12 +65,12 @@ const handleClickShowDesign = (data: LfProcessType.ProcessListVO) => {
         </div>
         <div class="list-card-item_detail--operation">
           <el-tag
-            :color="data?.status === '1' ? '#00a870' : '#eee'"
+            :color="data?.status === 1 ? '#00a870' : '#eee'"
             effect="dark"
             size="small"
             class="mx-1 list-card-item_detail--operation--tag"
           >
-            {{ data?.status === "1" ? "待办" : "已办" }}
+            {{ data?.status === 1 ? "待办" : "已办" }}
           </el-tag>
           <el-tag
             v-if="data?.todoStatus"
@@ -103,12 +103,9 @@ const handleClickShowDesign = (data: LfProcessType.ProcessListVO) => {
         {{ data?.nodeText }}
       </p>
     </div>
-    <v-contextmenu v-if="data?.status === '1'" ref="contextmenu">
+    <v-contextmenu v-if="data?.status === 1" ref="contextmenu">
       <v-contextmenu-item @click="handleClickInitiateProcess(data)"
         >发起申请</v-contextmenu-item
-      >
-      <v-contextmenu-item @click="handleClickShowDesign(data)"
-        >查看流程</v-contextmenu-item
       >
       <v-contextmenu-divider />
       <v-contextmenu-item disabled>相关申请</v-contextmenu-item>
