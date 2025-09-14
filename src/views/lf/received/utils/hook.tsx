@@ -4,19 +4,25 @@ import "v-contextmenu/dist/themes/default.css";
 import { useMultiTagsStoreHook } from "@/store/modules/multiTags";
 import { useRouter } from "vue-router";
 import { useFormCostumComponents } from "@/views/lf/form/components/form-designer/utils/costumComponents";
+import { useLfCustomFrom } from "@/views/lf/form/components/form-designer/utils/custom";
 import LfProcessApi from "@/api/lf/lfProcess";
+import { flowInfoDataSource } from "@/views/lf/form/components/form-designer/utils/types";
+import LfFormApi from "@/api/lf/lfForm";
+import { message } from "@/utils/message";
+import LfHistoryApi from "@/api/lf/lfHistory";
 
 // 加载自定义组件
 const { loadCostumComponents } = useFormCostumComponents(null);
 loadCostumComponents();
 export function useReceivedList(props) {
+  const { logicFlowFormEdit } = useLfCustomFrom();
   const router = useRouter();
-  const status = ref<"1" | "0" | undefined>(undefined);
+  const status = ref<1 | 0 | undefined>(undefined);
   if (props.for === "todo") {
-    status.value = "1";
+    status.value = 1;
   }
   if (props.for === "done") {
-    status.value = "0";
+    status.value = 0;
   }
   if (props.for === "cc") {
     status.value = undefined;
@@ -93,10 +99,86 @@ export function useReceivedList(props) {
   };
 
   /**
-   * 开始流程
+   * 处理待办
    * @param row 数据
    */
-  const handleClickInitiateProcess = async () => {};
+  const handleTodo = async (todoInfo: LfProcessType.ProcessListVO) => {
+    // console.log(todoInfo);
+    const { data: lfProcess } = await LfProcessApi.detail(todoInfo.processId);
+    // console.log(lfProcess);
+    if (lfProcess.data) {
+      const flowData = JSON.parse(lfProcess.data);
+      const { nodes, edges } = flowData;
+      const todoNode = nodes.find(node => node.id === todoInfo.nodeId) as
+        | LogicFlowTypes.EditData
+        | undefined;
+      const fromEdge = edges.filter(edge => edge.targetNodeId === todoNode.id);
+      console.log(fromEdge);
+      if (todoNode) {
+        // const title = (todoNode.text as LogicFlowTypes.elementText).value;
+        const { formBind } = todoNode.properties as
+          | LogicFlowTypes.BusinessProperties
+          | undefined;
+        const { data: historyData } = await LfHistoryApi.historyList({
+          processId: todoInfo.processId
+        });
+        LfFormApi.publishDetail(formBind.id).then(res => {
+          const { data: lfFormRelease } = res;
+          const { rule, options } = JSON.parse(lfFormRelease.data);
+          logicFlowFormEdit({
+            title: (todoNode.text as LogicFlowTypes.elementText).value,
+            rule,
+            options,
+            readonly: todoInfo.status !== 1,
+            flowInfoData: {
+              source: flowInfoDataSource.process,
+              data: lfProcess,
+              historyData,
+              flowData
+            },
+            onSubmit: (data: any) => {
+              const { fields } = todoNode.properties;
+              fields.forEach(field => {
+                field.value = data[field.name];
+              });
+              console.log(todoNode);
+              const submitData = JSON.stringify(todoNode.properties);
+              return new Promise(resolve => {
+                LfProcessApi.userSubmit({
+                  /** 主键（节点的id，这里是使用前端生成的 uuid） */
+                  id: todoInfo.nodeId,
+                  /** 流程 id */
+                  processId: todoInfo.processId,
+                  /** 节点的属性数据 */
+                  properties: submitData,
+                  /** 节点上的文字 */
+                  text: (todoNode.text as LogicFlowTypes.elementText).value,
+                  /** 节点类型（字典项 lf_node_type） */
+                  type: todoInfo.type,
+                  /** 待办 id */
+                  todoId: todoInfo.todoId,
+                  /** 上一个节点的 id */
+                  lastNodesId: fromEdge.sourceNodeId
+                }).then(res => {
+                  if (res.code === "200") {
+                    resolve(true);
+                    onCurrentChange(1);
+                  } else {
+                    message(res.message, { type: "error" });
+                    resolve(false);
+                  }
+                });
+              });
+            }
+          });
+        });
+      } else {
+        message("流程数据异常[没有开始节点]", { type: "error" });
+      }
+    } else {
+      message("流程数据异常[数据为空]", { type: "error" });
+    }
+  };
 
   /**
    * 设置流程图
@@ -143,7 +225,7 @@ export function useReceivedList(props) {
     pagination,
     onPageSizeChange,
     onCurrentChange,
-    handleClickInitiateProcess,
+    handleTodo,
     designD
   };
 }

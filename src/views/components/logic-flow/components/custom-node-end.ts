@@ -2,6 +2,7 @@
 import { type BaseNodeModel, type ConnectRule, h } from "@logicflow/core";
 import { EllipseResize } from "@logicflow/extension";
 import { getSequenceShape } from "./custom-commmon";
+import { NodesType } from "@/views/components/logic-flow/types/types";
 class CustomNodeEndModel extends EllipseResize.model {
   initNodeData(data) {
     super.initNodeData(data);
@@ -77,7 +78,7 @@ class CustomNodeEnd extends EllipseResize.view {
   }
 }
 export default {
-  type: "custom-node-end",
+  type: NodesType.end,
   model: CustomNodeEndModel,
   view: CustomNodeEnd
 };

@@ -66,7 +66,7 @@ declare namespace LfProcessType {
     type: string;
     /** 待办状态（1、待处理 2、待阅 3、被退回  4、未读 5、反馈） */
     todoStatus: number;
-    /** 已办状态（1、未归档 2、已归档 3、待回复 4、未读 5、反馈） */
+    /** 已办状态（这个可以行写自动处理 bean 去自定义状态） */
     doneStatus: number;
     /** 待办类型（1、任务待办 2、抄送待办 ...其他类型自定义） */
     todoType: string;
@@ -220,7 +220,7 @@ declare namespace LfProcessType {
     status: number;
     /** 待办状态（1、待处理 2、待阅 3、被退回  4、未读 5、反馈） */
     todoStatus: number;
-    /** 已办状态（1、未归档 2、已归档 3、待回复 4、未读 5、反馈） */
+    /** 已办状态（这个可以行写自动处理 bean 去自定义状态） */
     doneStatus: number;
     /** 流程类型（字典项 lf_process_type） */
     type: string;
@@ -238,7 +238,7 @@ declare namespace LfProcessType {
     title: string;
     /** 流程发布 id（可以知道当前流程是基于什么版本的设计在运行的） */
     releaseId: string;
-    /** 已办状态（1、未归档 2、已归档 3、待回复 4、未读 5、反馈） */
+    /** 已办状态（这个可以行写自动处理 bean 去自定义状态） */
     doneStatus: number;
     /** 流程类型（字典项 lf_process_type） */
     type: string;

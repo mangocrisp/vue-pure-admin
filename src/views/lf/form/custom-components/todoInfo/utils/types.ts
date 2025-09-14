@@ -94,8 +94,8 @@ interface LfFormTodoInfoRecord {
  * 流程图
  */
 interface LfFormTodoInfoFlowChart {
-  id: string;
-  source: string;
+  flowData: any;
+  readonly?: boolean;
 }
 
 /** 待办信息值 */

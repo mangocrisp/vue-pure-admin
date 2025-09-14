@@ -1,4 +1,5 @@
 import { h } from "@logicflow/core";
+import { NodesType } from "@/views/components/logic-flow/types/types";
 
 // 图标，节点图标的原图在 ../assets/icon/ 下面
 const IconSelection =
@@ -54,14 +55,14 @@ export const configDndPanelItems = (lf): LogicFlowTypes.PatternItem[] => [
     }
   },
   {
-    type: "custom-node-start",
+    type: NodesType.start,
     text: "开始",
     label: "开始节点",
     icon: IconNodeStart,
     properties: {}
   },
   {
-    type: "custom-node-user",
+    type: NodesType.user,
     label: "用户任务",
     text: "用户任务",
     icon: IconNodeUser,
@@ -71,21 +72,21 @@ export const configDndPanelItems = (lf): LogicFlowTypes.PatternItem[] => [
     }
   },
   {
-    type: "custom-node-service",
+    type: NodesType.service,
     label: "系统任务",
     text: "系统任务",
     icon: IconNodeService,
     properties: { approved: false, autoExecute: true }
   },
   {
-    type: "custom-node-judgment",
+    type: NodesType.judgment,
     label: "条件判断",
     text: "条件判断",
     icon: IconNodeJudgment,
     properties: { approved: false, autoExecute: false }
   },
   {
-    type: "custom-node-end",
+    type: NodesType.end,
     text: "结束",
     label: "结束节点",
     icon: IconNodeStop,
@@ -93,7 +94,7 @@ export const configDndPanelItems = (lf): LogicFlowTypes.PatternItem[] => [
     properties: { success: false }
   },
   {
-    type: "custom-group",
+    type: NodesType.group,
     label: "分组",
     text: "分组",
     icon: IconGroup

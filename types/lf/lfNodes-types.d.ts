@@ -41,17 +41,17 @@ declare namespace LfNodesType {
   /**
    * 流程节点提交 DTO
    */
-  export interface NodesSubmitDTO extends Domain {
+  export interface NodesSubmitDTO extends UpdateDTO {
     /** 待办 id */
     todoId: string;
     /** 哪个节点连接的当前节点 */
-    edges: string;
+    edges?: string;
     /** 上一个节点的 id */
     lastNodesId: string;
     /** 处理的部门 */
-    deptId: string;
+    deptId?: string;
     /** 处理的岗位 */
-    postId: string;
+    postId?: string;
   }
 
   /** 流程节点 查询条件 */

@@ -155,7 +155,7 @@ const infoMap = ref<Map<string, LfFormTodoInfoRecordDetail>>(
 const LogicFlowDesigner = defineAsyncComponent(
   () => import("@/views/lf/design/components/flow-designer/index.vue")
 );
-const FormTodoInfoRef = ref<InstanceType<typeof LogicFlowDesigner> | null>(
+const LogicFlowDesignerRef = ref<InstanceType<typeof LogicFlowDesigner> | null>(
   null
 );
 const showFlowRef = ref(false);
@@ -171,13 +171,16 @@ const handleInfoChange = (val: string) => {
  * @param flowChart 流程实例 id
  */
 const handleShowFlow = (flowChart: LfFormTodoInfoFlowChart) => {
-  if (!flowChart || !flowChart.id) {
+  if (!flowChart || !flowChart.flowData) {
     return;
   }
   if (showFlowRef.value) {
     return;
   }
-  FormTodoInfoRef.value.reloadData(flowChart.source, flowChart.id);
+  LogicFlowDesignerRef.value.loadData(
+    flowChart.flowData,
+    flowChart.readonly ?? true
+  );
 };
 
 /**
@@ -248,7 +251,13 @@ defineExpose({ getConfig });
             <el-card>
               <h4>{{ record?.title ?? `第${r}步` }}</h4>
               <p>{{ record?.description ?? "" }}</p>
-              <el-collapse v-if="record?.detail">
+              <el-collapse
+                v-if="
+                  record?.detail &&
+                  record?.detail?.basic?.children &&
+                  record?.detail?.basic?.children.length > 0
+                "
+              >
                 <el-collapse-item
                   :title="record?.detail?.title ?? '详细信息'"
                   :name="record?.detail?.name ?? 'record.detail.name'"
@@ -303,7 +312,7 @@ defineExpose({ getConfig });
             <template #default>
               <div class="flow-container">
                 <LogicFlowDesigner
-                  ref="FormTodoInfoRef"
+                  ref="LogicFlowDesignerRef"
                   :show-close-button="false"
                   :autoload-from-route="false"
                 />

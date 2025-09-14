@@ -52,6 +52,7 @@ import {
   configDndPanelReadonlyItems
 } from "./components/custom-commmon";
 import { alignment, nodeAling, beautify } from "./components/formatter";
+import { NodesType } from "@/views/components/logic-flow/types/types";
 
 const props = defineProps({
   hideDemo: {
@@ -417,7 +418,7 @@ const updateEdit = (data: LogicFlowTypes.EditData) => {
     if (data.type?.startsWith("custom-node")) {
       const nodeModel = lf.getNodeModelById(data.id);
       // 更新节点文本
-      nodeModel.updateText(data.text ?? "");
+      nodeModel.updateText((data.text as string) ?? "");
       // 更新图层顺序
       if (data.zIndex) {
         nodeModel.setZIndex(data.zIndex);
@@ -428,7 +429,7 @@ const updateEdit = (data: LogicFlowTypes.EditData) => {
     if (data.type?.startsWith("custom-edge")) {
       const edgeModel = lf.getEdgeModelById(data.id);
       // 更新边文本
-      edgeModel.updateText(data.text ?? "");
+      edgeModel.updateText((data.text as string) ?? "");
       // 更新图层顺序
       if (data.zIndex) {
         edgeModel.setZIndex(data.zIndex);
@@ -683,11 +684,10 @@ const setReadonly = (readonly: boolean) => {
  * 检查开始节点
  */
 const checkStartNode = (data: any) => {
-  if (data.type === "custom-node-start") {
+  if (data.type === NodesType.start) {
     if (
-      lf
-        .getGraphData()
-        ?.nodes?.filter(node => node.type === "custom-node-start").length > 1
+      lf.getGraphData()?.nodes?.filter(node => node.type === NodesType.start)
+        .length > 1
     ) {
       lf.deleteNode(data.id);
     }

@@ -97,6 +97,16 @@ const form = {
 };
 
 /**
+ * 加载数据
+ * @param flowData 数据数据
+ * @param readonly 只读
+ */
+const loadData = (flowData = {}, readonly = true) => {
+  loginFlowRef.value?.iniLogicFlow(false, flowData);
+  loginFlowRef.value?.setReadonly(readonly);
+};
+
+/**
  * 重新加载数据
  */
 const reloadData = async (source: string, id: string) => {
@@ -402,7 +412,7 @@ const saveData = async data => {
   }
 };
 
-defineExpose({ reloadData });
+defineExpose({ reloadData, loadData });
 </script>
 <template>
   <div v-loading="loading" class="flow-container">

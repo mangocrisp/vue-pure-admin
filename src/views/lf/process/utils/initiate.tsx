@@ -7,10 +7,11 @@ import { onMounted, reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useLfCustomFrom } from "@/views/lf/form/components/form-designer/utils/custom";
 import LfProcessApi from "@/api/lf/lfProcess";
-
-const { logicFlowFormEdit } = useLfCustomFrom();
+import { flowInfoDataSource } from "@/views/lf/form/components/form-designer/utils/types";
+import { NodesType } from "@/views/components/logic-flow/types/types";
 
 export const useLfProcessInitiate = () => {
+  const { logicFlowFormEdit } = useLfCustomFrom();
   const router = useRouter();
   const queryForm = reactive<LfReleaseType.QueryDTO>({
     /** 发布名称 */
@@ -84,10 +85,11 @@ export const useLfProcessInitiate = () => {
   const handleClickInitiateProcess = async (row: any) => {
     const { data: lfRelease } = await LfReleaseApi.detail(row.id);
     if (lfRelease.data) {
-      const { nodes } = JSON.parse(lfRelease.data);
-      const startNode = nodes.find(
-        node => node.type === "custom-node-start"
-      ) as LogicFlowTypes.EditData | undefined;
+      const flowData = JSON.parse(lfRelease.data);
+      const { nodes } = flowData;
+      const startNode = nodes.find(node => node.type === NodesType.start) as
+        | LogicFlowTypes.EditData
+        | undefined;
       if (startNode) {
         const title = (startNode.text as LogicFlowTypes.elementText).value;
         const { formBind } = startNode.properties as
@@ -101,8 +103,9 @@ export const useLfProcessInitiate = () => {
             rule,
             options,
             flowInfoData: {
-              source: "processInitiate",
-              data: lfRelease
+              source: flowInfoDataSource.processInitiate,
+              data: lfRelease,
+              flowData
             },
             onSubmit: (data: any) => {
               const { fields } = startNode.properties;

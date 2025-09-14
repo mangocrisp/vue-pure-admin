@@ -5,7 +5,7 @@ import "v-contextmenu/dist/themes/default.css";
 import Refresh from "~icons/ep/refresh";
 import { ReceviedListProps } from "./utils/types";
 import { useReceivedList } from "./utils/hook";
-import { DoneStatus, Status, TodoStatus, TodoType } from "./utils/enums";
+import { DoneStatus, Status, TodoStatus } from "./utils/enums";
 
 defineOptions({
   name: "ReceivedList"
@@ -45,7 +45,7 @@ const {
   pagination,
   onPageSizeChange,
   onCurrentChange,
-  handleClickInitiateProcess,
+  handleTodo,
   designD
 } = useReceivedList(props);
 </script>
@@ -111,7 +111,7 @@ const {
           />
         </el-select>
       </el-form-item>
-      <el-form-item
+      <!-- <el-form-item
         v-if="
           props.for === 'done' || (props.for === 'cc' && queryForm.status === 0)
         "
@@ -133,7 +133,7 @@ const {
             :label="item.label"
           />
         </el-select>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="流程类型" prop="type">
         <el-select
           v-model="queryForm.type"
@@ -188,8 +188,8 @@ const {
           >
             <LfProcessInitiateCard
               :data="data"
-              @click="data.status === 1 ? handleClickInitiateProcess : {}"
-              @initiate-process="handleClickInitiateProcess"
+              @click="handleTodo(data)"
+              @handleTodo="handleTodo"
               @show-design="designD"
             />
           </el-col>

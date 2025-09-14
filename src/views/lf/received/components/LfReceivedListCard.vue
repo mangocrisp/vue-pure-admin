@@ -8,7 +8,7 @@ import {
   ContextmenuSubmenu,
   ContextmenuGroup
 } from "v-contextmenu";
-import { DoneStatusMap, TodoStatusMap } from "../utils/enums";
+import { TodoStatusMap } from "../utils/enums";
 export default defineComponent({
   name: "LfProcessInitiateCard",
   components: {
@@ -45,20 +45,23 @@ const cardLogoClass = computed(() => [
   { "list-card-item_detail--logo__disabled": !(props.data?.status === 1) }
 ]);
 
-const emit = defineEmits(["initiate-process", "show-design"]);
+const emit = defineEmits<{
+  (e: "handleTodo", data: LfProcessType.ProcessListVO): void;
+}>();
 
-const handleClickInitiateProcess = (data: LfProcessType.ProcessListVO) => {
-  emit("initiate-process", data);
-};
-
-const handleClickShowDesign = (data: LfProcessType.ProcessListVO) => {
-  emit("show-design", data);
+/**
+ * 处理待办
+ * @param data 待办信息
+ */
+const handleTodo = (data: LfProcessType.ProcessListVO) => {
+  emit("handleTodo", data);
 };
 </script>
 
 <template>
   <div :class="cardClass">
-    <div v-contextmenu:contextmenu class="list-card-item_detail bg-bg_color">
+    <!-- 添加右键菜单 v-contextmenu:contextmenu -->
+    <div class="list-card-item_detail bg-bg_color">
       <el-row justify="space-between">
         <div :class="cardLogoClass">
           <IconifyIconOnline :icon="data?.icon" width="60px" height="60px" />
@@ -80,14 +83,6 @@ const handleClickShowDesign = (data: LfProcessType.ProcessListVO) => {
           >
             {{ TodoStatusMap[data?.todoStatus] }}
           </el-tag>
-          <el-tag
-            v-if="data?.doneStatus"
-            type="primary"
-            class="mt-[10px]"
-            size="small"
-          >
-            {{ DoneStatusMap[data?.doneStatus] }}
-          </el-tag>
           <el-tag type="info" class="mt-[10px]" size="small">
             {{
               useSystemDictParamsStore.dictK2V("lf_process_type", data?.type)
@@ -102,10 +97,16 @@ const handleClickShowDesign = (data: LfProcessType.ProcessListVO) => {
       <p class="list-card-item_detail--desc text-text_color_regular">
         {{ data?.nodeText }}
       </p>
+      <p class="list-card-item_detail--time text-text_color_regular">
+        {{ data?.createTime }}
+      </p>
+      <p class="list-card-item_detail--username text-text_color_regular">
+        发起人：{{ data?.createUserName }}
+      </p>
     </div>
     <v-contextmenu v-if="data?.status === 1" ref="contextmenu">
-      <v-contextmenu-item @click="handleClickInitiateProcess(data)"
-        >发起申请</v-contextmenu-item
+      <v-contextmenu-item @click="handleTodo(data)"
+        >处理待办</v-contextmenu-item
       >
       <v-contextmenu-divider />
       <v-contextmenu-item disabled>相关申请</v-contextmenu-item>
@@ -170,6 +171,16 @@ const handleClickShowDesign = (data: LfProcessType.ProcessListVO) => {
       font-size: 12px;
       line-height: 20px;
       -webkit-box-orient: vertical;
+    }
+
+    &--time {
+      color: #999;
+      text-align: right;
+    }
+
+    &--username {
+      color: #999;
+      text-align: right;
     }
   }
 

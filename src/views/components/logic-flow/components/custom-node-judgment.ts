@@ -2,6 +2,7 @@
 import { type BaseNodeModel, type ConnectRule, h } from "@logicflow/core";
 import { DiamondResize } from "@logicflow/extension";
 import { getSequenceShape } from "./custom-commmon";
+import { NodesType } from "@/views/components/logic-flow/types/types";
 class CustomNodeJudgmentModel extends DiamondResize.model {
   initNodeData(data) {
     super.initNodeData(data);
@@ -76,7 +77,7 @@ class CustomNodeJudgment extends DiamondResize.view {
   }
 }
 export default {
-  type: "custom-node-judgment",
+  type: NodesType.judgment,
   model: CustomNodeJudgmentModel,
   view: CustomNodeJudgment
 };

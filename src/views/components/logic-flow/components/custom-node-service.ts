@@ -2,6 +2,7 @@
 import { type BaseNodeModel, type ConnectRule, h } from "@logicflow/core";
 import { RectResize } from "@logicflow/extension";
 import { getSequenceShape } from "./custom-commmon";
+import { NodesType } from "@/views/components/logic-flow/types/types";
 class CustomNodServiceModel extends RectResize.model {
   initNodeData(data) {
     super.initNodeData(data);
@@ -95,7 +96,7 @@ class CustomNodService extends RectResize.view {
   }
 }
 export default {
-  type: "custom-node-service",
+  type: NodesType.service,
   model: CustomNodServiceModel,
   view: CustomNodService
 };

@@ -2,6 +2,7 @@
 import { h } from "@logicflow/core";
 import { EllipseResize } from "@logicflow/extension";
 import { getSequenceShape } from "./custom-commmon";
+import { NodesType } from "@/views/components/logic-flow/types/types";
 class CustomNodeStartModel extends EllipseResize.model {
   initNodeData(data) {
     super.initNodeData(data);
@@ -56,7 +57,7 @@ class CustomNodeStart extends EllipseResize.view {
   }
 }
 export default {
-  type: "custom-node-start",
+  type: NodesType.start,
   model: CustomNodeStartModel,
   view: CustomNodeStart
 };

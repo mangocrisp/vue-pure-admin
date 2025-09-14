@@ -7,7 +7,12 @@ import { useFormCostumComponents } from "@/views/lf/form/components/form-designe
 import formCreate from "@form-create/element-ui";
 import SystemDeptApi from "@/api/system/dept";
 import type { LfFormTodoInfoModelValue } from "@/views/lf/form/custom-components/todoInfo/utils/types";
-import type { flowInfoDataType, logicFlowFormEditType } from "./types";
+import {
+  flowInfoDataSource,
+  type flowInfoDataType,
+  type logicFlowFormEditType
+} from "./types";
+import { NodesType } from "@/views/components/logic-flow/types/types";
 
 // 加载自定义组件
 const { loadCostumComponents } = useFormCostumComponents(null);
@@ -18,11 +23,16 @@ export const useLfCustomFrom = () => {
    * 因为定义了一些自定义的表单组件，这些组件里面的规则需要动态的修改，比如一些调用后端数据的方法，需要动态的设置进去
    * @param rule 表单规则
    */
-  const logicFlowFormRuleEnhance = (rule: string): any => {
+  const logicFlowFormRuleEnhance = (rule: string, readonly = false): any => {
     if (!rule) {
       return [];
     }
     const ruleJSON = formCreate.parseJson(rule);
+    if (readonly) {
+      return ruleJSON.filter(item => {
+        return item.type === "LfFormTodoInfo";
+      });
+    }
     if (ruleJSON && ruleJSON.length > 0) {
       ruleJSON.forEach(item => {
         // 针对不同类型的自定义组件，可以在这里做一些自定义的处理，比如这个部门用户选择组件，需要设置 api 接口去获取数据
@@ -61,17 +71,67 @@ export const useLfCustomFrom = () => {
         infoMap: flowInfoData.infoMap ?? new Map()
       };
     }
-    if (flowInfoData.source === "processInitiate") {
+    if (flowInfoData.source === flowInfoDataSource.processInitiate) {
       // 如果是开始流程的，流程信息因为还没填写，这里只返回流程图设计给填写的人看，让他知道流程的走向
-      const sourceData = flowInfoData.data as LfReleaseType.Domain;
       // 流程开始
       return {
         flowChart: {
-          id: sourceData.id,
-          source: flowInfoData.source
+          flowData: flowInfoData.flowData
         },
         basic: {},
         records: [],
+        infoMap: flowInfoData.infoMap ?? new Map()
+      };
+    }
+    if (flowInfoData.source === flowInfoDataSource.process) {
+      // 运行中的流程
+      const basic = { children: [] };
+      const records = [];
+      flowInfoData.historyData.forEach(history => {
+        const { data, nodeType, action, time, id, userName } = history;
+        if (
+          nodeType === NodesType.judgment ||
+          nodeType === NodesType.group ||
+          nodeType === NodesType.service
+        ) {
+          // 如果是判断节点、分组、和服务节点，则不显示历史记录，因为它没有数据
+          return;
+        }
+        if (data) {
+          const { fields } = JSON.parse(data);
+          const record = {
+            timestamp: time,
+            title: action,
+            description: "",
+            operator: userName ?? "",
+            detail: {
+              title: "节点信息",
+              name: id,
+              basic: {
+                children: []
+              }
+            }
+          };
+          if (fields && fields.length > 0) {
+            const children = fields.map(field => ({
+              label: field.title,
+              value: field.value
+            }));
+            if (nodeType === NodesType.start) {
+              // 找到开始节点，可以得到这个节点的信息
+              basic.children = children;
+            }
+            record.detail.basic.children = children;
+          }
+          records.push(record);
+        }
+      });
+      return {
+        flowChart: {
+          flowData: flowInfoData.flowData
+        },
+        basic,
+        records,
         infoMap: flowInfoData.infoMap ?? new Map()
       };
     }
@@ -90,28 +150,36 @@ export const useLfCustomFrom = () => {
    * @param config 配置
    */
   const logicFlowFormEdit = (config: logicFlowFormEditType) => {
-    const ruleJSON = logicFlowFormRuleEnhance(config.rule);
+    const ruleJSON = logicFlowFormRuleEnhance(config.rule, config.readonly);
     const optionsJSON = formCreate.parseJson(config.options);
-    const flowInfo = config.generateFlowInfo
-      ? config.flowInfoData
-      : generateFlowInfoDf(config.flowInfoData);
+    const flowInfo =
+      config.generateFlowInfo?.(config.flowInfoData) ??
+      generateFlowInfoDf(config.flowInfoData);
+    const modelValue = config.readonly
+      ? { flowInfo: flowInfo }
+      : {
+          ...(config.formData ?? {}),
+          ...{ flowInfo: flowInfo }
+        };
     addDialog({
       title: config.title ?? "流程表单编辑",
       props: {
-        config: config.isAddForm ?? true,
+        isAddForm: config.isAddForm ?? true,
         rule: ruleJSON,
         options: {
           ...optionsJSON,
           ...{ submitBtn: false, resetBtn: false }
         },
-        modelValue: { ...(config.formData ?? {}), ...{ flowInfo: flowInfo } }
+        modelValue
       },
       width: "60%",
       draggable: true,
       fullscreen: deviceDetection(),
       fullscreenIcon: true,
       closeOnClickModal: false,
-      resetForm: () => LfFormRenderRef.value.resetForm(),
+      resetForm: config.readonly
+        ? undefined
+        : () => LfFormRenderRef.value.resetForm(),
       contentRenderer: () =>
         h(LfFormRender, { ref: LfFormRenderRef, formData: null }),
       beforeSure: (done, {}) => {

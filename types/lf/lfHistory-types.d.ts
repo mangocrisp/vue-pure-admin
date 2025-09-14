@@ -124,9 +124,9 @@ declare namespace LfHistoryType {
     /** 运行流程 id */
     processId: string;
     /** 当前节点类型（字典项 lf_node_type） */
-    nodeType: string;
+    nodeType?: string;
     /** 与我相关 */
-    relatedToMe: string;
+    relatedToMe?: 1 | 0;
   }
 
   /** 流程历史 查询体 */
