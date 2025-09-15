@@ -189,7 +189,7 @@ const {
             <LfProcessInitiateCard
               :data="data"
               @click="handleTodo(data)"
-              @handleTodo="handleTodo"
+              @todo="handleTodo"
               @show-design="designD"
             />
           </el-col>

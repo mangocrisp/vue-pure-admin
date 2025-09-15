@@ -8,9 +8,8 @@ import {
   ContextmenuSubmenu,
   ContextmenuGroup
 } from "v-contextmenu";
-import { TodoStatusMap } from "../utils/enums";
 export default defineComponent({
-  name: "LfReceivedListCard",
+  name: "LfProcessListCard",
   components: {
     [Contextmenu.name]: Contextmenu,
     [ContextmenuItem.name]: ContextmenuItem,
@@ -46,22 +45,27 @@ const cardLogoClass = computed(() => [
 ]);
 
 const emit = defineEmits<{
-  (e: "todo", data: LfProcessType.ProcessListVO): void;
+  (e: "show-detail", data: LfProcessType.ProcessListVO): void;
+  (e: "show-design", data: LfProcessType.ProcessListVO): void;
 }>();
 
 /**
- * 处理待办
- * @param data 待办信息
+ * 查看详情
+ * @param data 流程信息
  */
-const handleTodo = (data: LfProcessType.ProcessListVO) => {
-  emit("todo", data);
+const handleShowDetail = (data: LfProcessType.ProcessListVO) => {
+  emit("show-detail", data);
+};
+
+/** 查看流程图 */
+const handleClickShowDesign = (data: LfProcessType.ProcessListVO) => {
+  emit("show-design", data);
 };
 </script>
 
 <template>
   <div :class="cardClass">
-    <!-- 添加右键菜单 v-contextmenu:contextmenu -->
-    <div class="list-card-item_detail bg-bg_color">
+    <div v-contextmenu:contextmenu class="list-card-item_detail bg-bg_color">
       <el-row justify="space-between">
         <div :class="cardLogoClass">
           <IconifyIconOnline :icon="data?.icon" width="60px" height="60px" />
@@ -76,12 +80,12 @@ const handleTodo = (data: LfProcessType.ProcessListVO) => {
             {{ data?.status === 1 ? "待办" : "已办" }}
           </el-tag>
           <el-tag
-            v-if="data?.todoStatus"
+            v-if="data?.lastVersion"
             type="primary"
             class="mt-[10px]"
             size="small"
           >
-            {{ TodoStatusMap[data?.todoStatus] }}
+            {{ data?.lastVersion }}
           </el-tag>
           <el-tag type="info" class="mt-[10px]" size="small">
             {{
@@ -104,12 +108,15 @@ const handleTodo = (data: LfProcessType.ProcessListVO) => {
         发起人：{{ data?.createUserName }}
       </p>
     </div>
-    <v-contextmenu v-if="data?.status === 1" ref="contextmenu">
-      <v-contextmenu-item @click="handleTodo(data)"
-        >处理待办</v-contextmenu-item
+    <v-contextmenu ref="contextmenu">
+      <v-contextmenu-item @click="handleShowDetail(data)"
+        >流程详情</v-contextmenu-item
+      >
+      <v-contextmenu-item @click="handleClickShowDesign(data)"
+        >查看流程</v-contextmenu-item
       >
       <v-contextmenu-divider />
-      <v-contextmenu-item disabled>相关申请</v-contextmenu-item>
+      <v-contextmenu-item disabled>相关操作</v-contextmenu-item>
     </v-contextmenu>
   </div>
 </template>

@@ -155,8 +155,8 @@ export const useLfProcessInitiate = () => {
   };
 
   /**
-   * 设置流程图
-   * @param row 当前行数据
+   * 查看流程图
+   * @param row 当前流程发布数据
    */
   const designD = (row: LfReleaseType.Domain) => {
     useMultiTagsStoreHook().handleTags("push", {

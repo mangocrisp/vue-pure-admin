@@ -183,6 +183,10 @@ export const useLfCustomFrom = () => {
       contentRenderer: () =>
         h(LfFormRender, { ref: LfFormRenderRef, formData: null }),
       beforeSure: (done, {}) => {
+        if (config.readonly) {
+          done();
+          return;
+        }
         const ApiRef = LfFormRenderRef.value.getApiRef();
         function chores() {
           message(`操作成功`, {

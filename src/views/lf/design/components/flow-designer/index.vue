@@ -122,12 +122,10 @@ const reloadData = async (source: string, id: string) => {
       break;
     case "release":
     case "processInitiate":
+    case "process":
       // 发布预览阶段
       sourceReleaseData.value = (await LfReleaseApi.detail(id)).data;
       designData.value = sourceReleaseData.value.data ?? "{}";
-      break;
-    case "process":
-      // 流程进行中
       break;
   }
   Object.assign(form, {

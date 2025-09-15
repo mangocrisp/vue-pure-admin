@@ -122,58 +122,70 @@ export function useReceivedList(props) {
         const { data: historyData } = await LfHistoryApi.historyList({
           processId: todoInfo.processId
         });
-        LfFormApi.publishDetail(formBind.id).then(res => {
-          const { data: lfFormRelease } = res;
+
+        // 如果没有绑定表单，也就是说没有可以处理的表单提交，只需要查看流程信息就好了，下面的默认是查看流程信息动态表单的配置
+        const formCreateConfig = {
+          rule: `[{\"type\":\"LfFormTodoInfo\",\"field\":\"flowInfo\",\"title\":\"\",\"info\":\"请不要修改字段 ID (flowInfo)，仅展示流程信息\",\"_fc_id\":\"id_F81hmfjjyd86abc\",\"name\":\"ref_F31fmfjjyd86acc\",\"display\":true,\"hidden\":false,\"_fc_drag_tag\":\"LfFormTodoInfo\"}]`,
+          options: `{\"form\":{\"inline\":false,\"hideRequiredAsterisk\":false,\"labelPosition\":\"right\",\"size\":\"default\",\"labelWidth\":\"125px\"},\"resetBtn\":{\"show\":false,\"innerText\":\"重置\"},\"submitBtn\":{\"show\":true,\"innerText\":\"提交\"}}`
+        };
+
+        if (formBind && formBind.id) {
+          const { data: lfFormRelease } = await LfFormApi.publishDetail(
+            formBind.id
+          );
           const { rule, options } = JSON.parse(lfFormRelease.data);
-          logicFlowFormEdit({
-            title: (todoNode.text as LogicFlowTypes.elementText).value,
-            rule,
-            options,
-            readonly: todoInfo.status !== 1,
-            flowInfoData: {
-              source: flowInfoDataSource.process,
-              data: lfProcess,
-              historyData,
-              flowData
-            },
-            onSubmit: (data: any) => {
-              const { fields } = todoNode.properties;
-              fields.forEach(field => {
-                field.value = data[field.name];
+          formCreateConfig.rule = rule;
+          formCreateConfig.options = options;
+        }
+
+        logicFlowFormEdit({
+          title: (todoNode.text as LogicFlowTypes.elementText).value,
+          rule: formCreateConfig.rule,
+          options: formCreateConfig.options,
+          readonly: todoInfo.status !== 1,
+          flowInfoData: {
+            source: flowInfoDataSource.process,
+            data: lfProcess,
+            historyData,
+            flowData
+          },
+          onSubmit: (data: any) => {
+            const { fields } = todoNode.properties;
+            fields.forEach(field => {
+              field.value = data[field.name];
+            });
+            console.log(todoNode);
+            const submitData = JSON.stringify(todoNode.properties);
+            return new Promise(resolve => {
+              LfProcessApi.userSubmit({
+                /** 主键（节点的id，这里是使用前端生成的 uuid） */
+                id: todoInfo.nodeId,
+                /** 流程 id */
+                processId: todoInfo.processId,
+                /** 节点的属性数据 */
+                properties: submitData,
+                /** 节点上的文字 */
+                text: (todoNode.text as LogicFlowTypes.elementText).value,
+                /** 节点类型（字典项 lf_node_type） */
+                type: todoInfo.type,
+                /** 待办 id */
+                todoId: todoInfo.todoId,
+                /** 上一个节点的 id */
+                lastNodesId: fromEdge.sourceNodeId
+              }).then(res => {
+                if (res.code === "200") {
+                  resolve(true);
+                  onCurrentChange(1);
+                } else {
+                  message(res.message, { type: "error" });
+                  resolve(false);
+                }
               });
-              console.log(todoNode);
-              const submitData = JSON.stringify(todoNode.properties);
-              return new Promise(resolve => {
-                LfProcessApi.userSubmit({
-                  /** 主键（节点的id，这里是使用前端生成的 uuid） */
-                  id: todoInfo.nodeId,
-                  /** 流程 id */
-                  processId: todoInfo.processId,
-                  /** 节点的属性数据 */
-                  properties: submitData,
-                  /** 节点上的文字 */
-                  text: (todoNode.text as LogicFlowTypes.elementText).value,
-                  /** 节点类型（字典项 lf_node_type） */
-                  type: todoInfo.type,
-                  /** 待办 id */
-                  todoId: todoInfo.todoId,
-                  /** 上一个节点的 id */
-                  lastNodesId: fromEdge.sourceNodeId
-                }).then(res => {
-                  if (res.code === "200") {
-                    resolve(true);
-                    onCurrentChange(1);
-                  } else {
-                    message(res.message, { type: "error" });
-                    resolve(false);
-                  }
-                });
-              });
-            }
-          });
+            });
+          }
         });
       } else {
-        message("流程数据异常[没有开始节点]", { type: "error" });
+        message("流程数据异常[没有节点信息]", { type: "error" });
       }
     } else {
       message("流程数据异常[数据为空]", { type: "error" });

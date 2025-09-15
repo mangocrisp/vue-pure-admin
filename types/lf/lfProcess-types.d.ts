@@ -211,21 +211,21 @@ declare namespace LfProcessType {
     /** 流程图 id（可以知道当前流程是基于什么原始设计运行的） */
     designId?: string;
     /** 流程标题 */
-    title: string;
+    title?: string;
     /** 流程发布 id（可以知道当前流程是基于什么版本的设计在运行的） */
-    releaseId: string;
+    releaseId?: string;
     /** 运行流程 id */
-    processId: string;
+    processId?: string;
     /** 状态（1、待办、0、已办） */
-    status: number;
+    status?: number;
     /** 待办状态（1、待处理 2、待阅 3、被退回  4、未读 5、反馈） */
-    todoStatus: number;
+    todoStatus?: number;
     /** 已办状态（这个可以行写自动处理 bean 去自定义状态） */
-    doneStatus: number;
+    doneStatus?: number;
     /** 流程类型（字典项 lf_process_type） */
-    type: string;
+    type?: string;
     /** 待办类型（1、任务待办 2、抄送待办 ...其他类型自定义） */
-    todoType: string;
+    todoType?: string;
   }
 
   /**
@@ -233,15 +233,17 @@ declare namespace LfProcessType {
    */
   export interface UserRequestListQueryDTO {
     /** 流程图 id（可以知道当前流程是基于什么原始设计运行的） */
-    designId: string;
+    designId?: string;
     /** 流程标题 */
-    title: string;
+    title?: string;
     /** 流程发布 id（可以知道当前流程是基于什么版本的设计在运行的） */
-    releaseId: string;
-    /** 已办状态（这个可以行写自动处理 bean 去自定义状态） */
-    doneStatus: number;
+    releaseId?: string;
+    /** 流程状态（1、流程进行中 0、流程已经完成 2、流程已归档 -1、流程中止） */
+    processStatus?: number;
     /** 流程类型（字典项 lf_process_type） */
-    type: string;
+    type?: string;
+    /** 是否是我提交的请求 */
+    isMe?: boolean;
   }
 
   /** 流程管理 查询体 */

@@ -263,6 +263,7 @@ function convert(data: SystemMenuType.Router[]): any[] {
           component: item.component,
           redirect: item.redirect, // 路由重定向
           isBlank: item.isBlank, // 是否打开新页面
+          params: {}, // 路由参数，参数的值类型为字符串和数字不能为其他类型
           meta: {
             title: item.title, // 菜单名称（兼容国际化、非国际化，如何用国际化的写法就必须在根目录的`locales`文件夹下对应添加）
             icon: item.icon, // 菜单图标
@@ -286,7 +287,11 @@ function convert(data: SystemMenuType.Router[]): any[] {
         }
         // 自定义路由参数
         if (item.props) {
-          node.meta = { ...node.meta, ...JSON.parse(item.props) };
+          const props = JSON.parse(item.props);
+          if (props.params) {
+            node.params = props.params; // 路由参数
+          }
+          node.meta = { ...node.meta, ...props };
         }
         const children = item.children ? convert(item.children) : [];
         if (children.length > 0) {
