@@ -5,7 +5,12 @@ import { getToken } from "@/utils/auth";
 
 const useUserStore = useUserStoreHook();
 
-const websocketHost = import.meta.env.VITE_WEBSOCKET_HOST;
+// const websocketHost = import.meta.env.VITE_WEBSOCKET_HOST;
+
+const websocketHost =
+  (location.href.startsWith("https://") ? "wss://" : "ws://") +
+  location.host +
+  "/api";
 
 export const useWebSocketStore = defineStore("system-websocket", {
   state: () => {
