@@ -39,7 +39,7 @@ export default class LfReleaseApi {
       data: queryDto,
       params: {
         ...pageParams,
-        pageOrder: "update_time desc"
+        pageOrder: "lf_release.update_time desc"
       }
     });
   };

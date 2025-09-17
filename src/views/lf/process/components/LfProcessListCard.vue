@@ -25,6 +25,7 @@ export default defineComponent({
 <script setup lang="ts">
 import { computed, PropType } from "vue";
 import { useSystemDictParamsStoreHook } from "@/store/modules/system-dict-params";
+import { ProcessStatusMap } from "@/views/lf/process/utils/enums";
 
 const useSystemDictParamsStore = useSystemDictParamsStoreHook();
 
@@ -36,12 +37,14 @@ const props = defineProps({
 
 const cardClass = computed(() => [
   "list-card-item",
-  { "list-card-item__disabled": !(props.data?.status === 1) }
+  { "list-card-item__disabled": !(props.data?.processStatus === 1) }
 ]);
 
 const cardLogoClass = computed(() => [
   "list-card-item_detail--logo",
-  { "list-card-item_detail--logo__disabled": !(props.data?.status === 1) }
+  {
+    "list-card-item_detail--logo__disabled": !(props.data?.processStatus === 1)
+  }
 ]);
 
 const emit = defineEmits<{
@@ -72,12 +75,12 @@ const handleClickShowDesign = (data: LfProcessType.ProcessListVO) => {
         </div>
         <div class="list-card-item_detail--operation">
           <el-tag
-            :color="data?.status === 1 ? '#00a870' : '#eee'"
+            :color="data?.processStatus === 1 ? '#00a870' : '#eee'"
             effect="dark"
             size="small"
             class="mx-1 list-card-item_detail--operation--tag"
           >
-            {{ data?.status === 1 ? "待办" : "已办" }}
+            {{ ProcessStatusMap[data?.processStatus] ?? "..." }}
           </el-tag>
           <el-tag
             v-if="data?.lastVersion"

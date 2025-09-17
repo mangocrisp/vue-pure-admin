@@ -60,6 +60,8 @@ declare namespace LfProcessType {
     icon: string;
     /** 最后版本号 */
     lastVersion: string;
+    /** 流程状态（1、流程进行中 0、流程已经完成 2、流程已归档 -1、流程中止） */
+    processStatus?: number;
     /** 状态（1、待办、0、已办） */
     status: number;
     /** 流程类型（字典项 lf_process_type） */
