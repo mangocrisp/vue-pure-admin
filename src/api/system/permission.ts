@@ -26,7 +26,7 @@ export default class SystemPermissionApi {
     });
   };
 
-  /** 添加与菜单关联字段的权限列表 */
+  /** 带菜单信息的权限列表 */
   static listWithMenu = (
     params?: any
   ): HttpReturn<SystemPermissionType.Permission[]> => {

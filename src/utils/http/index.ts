@@ -209,11 +209,13 @@ class PureHttp {
         if (code === resultCode) {
           return response;
         } else {
-          ElNotification({
-            title: code ? `业务状态码: ${String(code)}` : "未知业务状态码",
-            message: message || "接口异常",
-            type: "error"
-          });
+          if (!$config.cancelErrorTip) {
+            ElNotification({
+              title: code ? `业务状态码: ${String(code)}` : "未知业务状态码",
+              message: message || "接口异常",
+              type: "error"
+            });
+          }
           return Promise.reject(response);
         }
       },
@@ -269,7 +271,7 @@ class PureHttp {
               return PureHttp.axiosInstance($error.config);
             } catch (e) {
               console.error(e);
-              if (e.response?.status === 401) {
+              if (e.response?.status !== 200) {
                 useUserStoreHook().clearLoginStatus();
               }
               // 所有的响应异常 区分来源为取消请求/非取消请求
@@ -281,26 +283,38 @@ class PureHttp {
           } else {
             return PureHttp.retryUnauthorizedRequest($error.config).catch(e => {
               console.error(e);
-              if (e.response?.status === 401) {
+              if (e.response?.status !== 200) {
                 useUserStoreHook().clearLoginStatus();
               }
               return Promise.reject($error);
             });
           }
         } else if ($error.response?.status === 500) {
-          ElNotification({
-            title: "服务出错",
-            message: $error.response?.data?.message ?? "请稍后重试!",
-            type: "error"
-          });
+          if (
+            !($error.response.config as PureHttpRequestConfig)?.cancelErrorTip
+          ) {
+            ElNotification({
+              title: "服务出错",
+              message: $error.response?.data?.message ?? "请稍后重试!",
+              type: "error"
+            });
+          }
         } else if ($error.response?.status === 503) {
-          ElNotification({
-            title: "服务离线",
-            message: $error.response?.data?.message ?? "请稍后重试!",
-            type: "error"
-          });
+          if (
+            !($error.response.config as PureHttpRequestConfig)?.cancelErrorTip
+          ) {
+            ElNotification({
+              title: "服务离线",
+              message: $error.response?.data?.message ?? "请稍后重试!",
+              type: "error"
+            });
+          }
         } else {
-          ElMessage.error($error.response?.data?.message ?? "请求出错");
+          if (
+            !($error.response.config as PureHttpRequestConfig)?.cancelErrorTip
+          ) {
+            ElMessage.error($error.response?.data?.message ?? "请求出错");
+          }
         }
         $error.isCancelRequest = Axios.isCancel($error);
         // 关闭进度条动画

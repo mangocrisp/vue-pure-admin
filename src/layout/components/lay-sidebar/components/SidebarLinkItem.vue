@@ -7,11 +7,17 @@ const props = defineProps<{
   to: menuType;
 }>();
 
-const isExternalLink = computed(() => isUrl(props.to.name));
+const isExternalLink = computed(() => {
+  if (props.to.meta?.menuType === 2) {
+    // 如果是外部链接
+    return isUrl(props.to.meta?.frameSrc);
+  }
+  return false;
+});
 const getLinkProps = (item: menuType) => {
   if (isExternalLink.value) {
     return {
-      href: item.name,
+      href: props.to.meta?.frameSrc,
       // target: "_blank",
       target: (item.isBlank ?? 1 === 1) ? "_blank" : "_self",
       rel: "noopener"

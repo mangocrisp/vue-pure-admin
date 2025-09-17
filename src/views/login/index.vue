@@ -314,7 +314,7 @@ watch(loginDay, value => {
               <el-form-item v-if="hasCaptcha" prop="captcha_code">
                 <el-input
                   v-model="ruleForm.captcha_code"
-                  autocomplete="false"
+                  autocomplete="off"
                   clearable
                   :prefix-icon="useRenderIcon(Keyhole)"
                   placeholder="请输入验证码"

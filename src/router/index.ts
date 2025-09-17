@@ -49,19 +49,19 @@ import {
 //     eager: true
 //   }
 // );
-// const modules: Record<string, any> = import.meta.env.DEV
-//   ? import.meta.glob(["./modules/**/*.ts", "!./modules/**/remaining.ts"], {
-//       eager: true
-//     })
-//   : import.meta.glob(["./modules/home.ts"], {
-//       eager: true
-//     });
-const modules: Record<string, any> = import.meta.glob(
-  ["./modules/**/*.ts", "!./modules/**/remaining.ts"],
-  {
-    eager: true
-  }
-);
+const modules: Record<string, any> = import.meta.env.DEV
+  ? import.meta.glob(["./modules/**/*.ts", "!./modules/**/remaining.ts"], {
+      eager: true
+    })
+  : import.meta.glob(["./modules/home.ts"], {
+      eager: true
+    });
+// const modules: Record<string, any> = import.meta.glob(
+//   ["./modules/**/*.ts", "!./modules/**/remaining.ts"],
+//   {
+//     eager: true
+//   }
+// );
 
 /** 原始静态路由（未做任何处理） */
 const routes = [];

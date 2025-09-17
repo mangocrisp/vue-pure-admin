@@ -28,6 +28,7 @@ const props = withDefaults(defineProps<FormProps>(), {
       frameLoading: true,
       hiddenTag: false,
       fixedTag: false,
+      menuType: 0,
       transition: {}
     },
     menuData: {
@@ -65,6 +66,11 @@ function getRef() {
   return ruleFormRef.value;
 }
 
+const changeMenuType = (val: number) => {
+  newFormInline.value.menuType = val;
+  newFormInline.value.meta.menuType = val;
+};
+
 defineExpose({ getRef });
 </script>
 
@@ -79,8 +85,9 @@ defineExpose({ getRef });
       <re-col>
         <el-form-item label="菜单类型">
           <Segmented
-            v-model="newFormInline.menuType"
+            :model-value="newFormInline.menuType"
             :options="menuTypeOptions"
+            @update:model-value="changeMenuType"
           />
         </el-form-item>
       </re-col>
@@ -133,7 +140,7 @@ defineExpose({ getRef });
         </el-form-item>
       </re-col>
       <re-col
-        v-if="[0, 1].indexOf(newFormInline.menuType) >= 0"
+        v-if="[0, 1, 2].indexOf(newFormInline.menuType) >= 0"
         :value="12"
         :xs="24"
         :sm="24"
@@ -143,21 +150,6 @@ defineExpose({ getRef });
             v-model="newFormInline.menuData.routeName"
             clearable
             placeholder="请输入路由名称"
-          />
-        </el-form-item>
-      </re-col>
-
-      <re-col v-if="newFormInline.menuType === 2" :value="12" :xs="24" :sm="24">
-        <el-form-item
-          label="链接地址"
-          prop="menuData.routeName"
-          :rules="[{ required: true, message: '链接地址不能为空' }]"
-        >
-          <el-input
-            v-model="newFormInline.menuData.routeName"
-            clearable
-            placeholder="请输入链接地址"
-            @change="newFormInline.menuData.component = ''"
           />
         </el-form-item>
       </re-col>
@@ -193,6 +185,17 @@ defineExpose({ getRef });
             v-model="newFormInline.menuData.component"
             clearable
             placeholder="请输入 iframe 链接地址（https://）"
+          />
+        </el-form-item>
+      </re-col>
+
+      <re-col v-if="newFormInline.menuType === 2" :value="12" :xs="24" :sm="24">
+        <!-- iframe -->
+        <el-form-item label="链接地址" prop="menuData.component">
+          <el-input
+            v-model="newFormInline.menuData.component"
+            clearable
+            placeholder="请输入外部链接地址（https://）"
           />
         </el-form-item>
       </re-col>
@@ -271,7 +274,7 @@ defineExpose({ getRef });
           <el-input-number
             v-model="newFormInline.menuData.sort"
             class="w-full!"
-            :min="1"
+            :min="0"
             :max="9999"
             controls-position="right"
           />

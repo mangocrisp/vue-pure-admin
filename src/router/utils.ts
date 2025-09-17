@@ -238,20 +238,20 @@ function initRouter() {
       MenuApi.loadRouter().then(({ data }) => {
         const menuData = convert(data);
         handleAsyncRoutes(
-          // import.meta.env.DEV
-          //   ? menuData.concat([
-          //       systemMonitorRouter,
-          //       permissionRouter,
-          //       frameRouter,
-          //       tabsRouter
-          //     ])
-          //   : menuData
-          menuData.concat([
-            systemMonitorRouter,
-            permissionRouter,
-            frameRouter,
-            tabsRouter
-          ])
+          import.meta.env.DEV
+            ? menuData.concat([
+                systemMonitorRouter,
+                permissionRouter,
+                frameRouter,
+                tabsRouter
+              ])
+            : menuData
+          // menuData.concat([
+          //   systemMonitorRouter,
+          //   permissionRouter,
+          //   frameRouter,
+          //   tabsRouter
+          // ])
         );
         resolve(router);
       });
@@ -264,7 +264,9 @@ function convert(data: SystemMenuType.Router[]): any[] {
   return data
     ? data.map(item => {
         const node = {
-          path: item.path?.startsWith("/") ? item.path : "/" + item.path,
+          path: item.path?.startsWith("/")
+            ? item.path
+            : "/" + (item.path ?? item.name),
           name: item.name,
           component: item.component,
           redirect: item.redirect, // 路由重定向

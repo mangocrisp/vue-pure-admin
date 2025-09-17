@@ -1,6 +1,7 @@
 interface Meta extends CustomizeRouteMeta {
   icon?: string;
   extraIcon?: string;
+  menuType?: number;
 }
 
 interface FormPropsItem {

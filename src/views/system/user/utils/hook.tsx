@@ -295,6 +295,8 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         if (userAvatarMap.has(user.id)) {
           return (user.avatar = userAvatarMap.get(user.id));
         }
+        user.avatar = userAvatar;
+        userAvatarMap.set(user.id, userAvatar);
         const taskId = setTimeout(() => {
           // 下载文件
           getFile(user.avatar).then(dataURI => {

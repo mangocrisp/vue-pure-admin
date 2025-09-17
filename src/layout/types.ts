@@ -75,6 +75,8 @@ export type menuType = {
     rank?: number;
     showParent?: boolean;
     extraIcon?: string;
+    frameSrc?: string;
+    menuType?: number;
   };
   showTooltip?: boolean;
   parentId?: number;

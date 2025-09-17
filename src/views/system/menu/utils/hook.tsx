@@ -34,32 +34,6 @@ export function useMenu() {
     }
   };
 
-  /**
-   * 系统菜单类型
-   * @param menu 系统菜单
-   * @returns pure 菜单类型
-   */
-  const getMenuDataType = (menu: SystemMenuType.Menu): number => {
-    if (menu.menuType === "M") {
-      return 0;
-    }
-    if (
-      menu.component?.startsWith("http://") ||
-      menu.component?.startsWith("https://")
-    ) {
-      // iframe
-      return 1;
-    }
-    if (
-      menu.routeName?.startsWith("http://") ||
-      menu.routeName?.startsWith("https://")
-    ) {
-      // outlink
-      return 2;
-    }
-    return 0;
-  };
-
   const columns: TableColumnList = [
     {
       label: "菜单名称",
@@ -150,7 +124,7 @@ export function useMenu() {
     loading.value = true;
     // const { data } = await getMenuList(); // 这里是返回一维数组结构，前端自行处理成树结构，返回格式要求：唯一id加父节点parentId，parentId取父节点id
     const { data: menuData } = await SystemMenuApi.list({ name: form.name });
-    const { data: permData } = await SystemPermissionApi.list({
+    const { data: permData } = await SystemPermissionApi.listWithMenu({
       name: form.name
     });
     dataList.value = handleTree(mixMenuPermData(menuData, permData)); // 处理成树结构
@@ -174,24 +148,27 @@ export function useMenu() {
         ? menuData
             .filter(item => item.parentId)
             .map(item => {
+              const propsJSON = item.props ? JSON.parse(item.props) : {};
               return {
                 higherMenuOptions: [],
                 id: item.id,
                 parentId: item.parentId,
-                menuType: getMenuDataType(item),
+                menuType: propsJSON.menuType ?? 0,
                 meta: item.props
                   ? {
                       ...{
                         frameLoading: true,
                         hiddenTag: false,
-                        fixedTag: false
+                        fixedTag: false,
+                        menuType: 0
                       },
-                      ...JSON.parse(item.props)
+                      ...propsJSON
                     }
                   : {
                       frameLoading: true,
                       hiddenTag: false,
                       fixedTag: false,
+                      menuType: 0,
                       transition: {}
                     },
                 menuData: {
@@ -224,45 +201,50 @@ export function useMenu() {
         : []
     ).concat(
       permData
-        ? permData.map(item => {
-            return {
-              higherMenuOptions: [],
-              id: item.id,
-              parentId: item.menuId,
-              menuType: 3,
-              meta: {
-                frameLoading: true,
-                hiddenTag: false,
-                fixedTag: false,
-                transition: {}
-              },
-              menuData: {
-                id: undefined,
-                name: undefined,
-                parentId: "0",
-                alwaysShow: 1,
-                props: undefined,
-                sort: 0,
-                routeName: undefined,
-                routePath: undefined,
-                component: undefined,
-                redirect: undefined,
-                isCache: 1,
-                menuType: undefined,
-                hidden: 0,
-                status: 1,
-                icon: undefined,
-                isBlank: 1
-              },
-              permData: {
+        ? permData
+            .filter(
+              perm => perm.menuId && perm.menuId !== "0" && perm.menuId !== "-1"
+            )
+            .map(item => {
+              return {
+                higherMenuOptions: [],
                 id: item.id,
-                menuId: item.menuId,
-                name: item.name,
-                urlPerm: item.urlPerm,
-                btnPerm: item.btnPerm
-              }
-            };
-          })
+                parentId: item.menuId,
+                menuType: 3,
+                meta: {
+                  frameLoading: true,
+                  hiddenTag: false,
+                  fixedTag: false,
+                  menuType: 3,
+                  transition: {}
+                },
+                menuData: {
+                  id: undefined,
+                  name: undefined,
+                  parentId: "0",
+                  alwaysShow: 1,
+                  props: undefined,
+                  sort: 0,
+                  routeName: undefined,
+                  routePath: undefined,
+                  component: undefined,
+                  redirect: undefined,
+                  isCache: 1,
+                  menuType: undefined,
+                  hidden: 0,
+                  status: 1,
+                  icon: undefined,
+                  isBlank: 1
+                },
+                permData: {
+                  id: item.id,
+                  menuId: item.menuId,
+                  name: item.name,
+                  urlPerm: item.urlPerm,
+                  btnPerm: item.btnPerm
+                }
+              };
+            })
         : []
     );
   }
@@ -293,7 +275,8 @@ export function useMenu() {
             frameLoading: true,
             hiddenTag: false,
             fixedTag: false,
-            transition: {}
+            transition: {},
+            menuType: 0
           },
           menuData: row?.menuData ?? {
             id: undefined,
@@ -347,15 +330,33 @@ export function useMenu() {
               menuType === 3
                 ? formInlineData.permData.name
                 : formInlineData.menuData.name;
+
+            const { props } = formInlineData.menuData;
+            let propsJSON = {
+              frameLoading: true,
+              hiddenTag: false,
+              fixedTag: false,
+              transition: {},
+              menuType: menuType
+            };
+            if (props) {
+              try {
+                propsJSON = JSON.parse(props);
+              } catch (error) {
+                message(`自定义路由参数失败，必须是 JSON 类型配置${error}`, {
+                  type: "error"
+                });
+              }
+            }
+            // 菜单管理的菜单类型，默认是目录，如果有父级就是菜单
+            let menuDataType = "C";
             if (!formInlineData.parentId) {
               // 如果没有指定父级，则默认是根目录
               formInlineData.parentId = "0";
-              formInlineData.menuData.component = "Layout";
-            }
-            // 菜单管理的菜单类型，默认是目录，如果有父级就是菜单
-            let menuDataType = "M";
-            if (formInlineData.parentId !== "0") {
-              menuDataType = "C";
+              if (menuType === 0) {
+                menuDataType = "M";
+                formInlineData.menuData.component = "Layout";
+              }
             }
             // if (
             //   formInlineData.menuData.component?.startsWith("http://") ||
@@ -371,17 +372,6 @@ export function useMenu() {
               // 上级菜单也就是权限绑定的菜单
               ...{ menuId: formInlineData.parentId }
             };
-            const { props } = formInlineData.menuData;
-            let propsJSON = {};
-            if (props) {
-              try {
-                propsJSON = JSON.parse(props);
-              } catch (error) {
-                message(`自定义路由参数失败，必须是 JSON 类型配置${error}`, {
-                  type: "error"
-                });
-              }
-            }
             // 菜单数据
             const menuData = {
               ...formInlineData.menuData,

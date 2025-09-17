@@ -8,20 +8,23 @@ const request = <T>(options: PureHttpRequestConfig): AxiosPromise<T> => {
 
 const requestReturn = async <T = any>(
   method: Method,
-  options: PureHttpRequestConfig
+  options: PureHttpRequestConfig,
+  cancelErrorTip?: boolean
 ) => {
   const res = await request<T>({
     method,
     // 接口地址
     baseURL: import.meta.env.VITE_SERVER_PROXY,
+    // 是否 取消 错误提示
+    cancelErrorTip,
     ...options
   });
   return res.data;
 };
 
-function createRequestFn(type: Method) {
+function createRequestFn(type: Method, cancelErrorTip?: boolean) {
   return function <T = any>(options: PureHttpRequestConfig) {
-    return requestReturn<T>(type, options);
+    return requestReturn<T>(type, options, cancelErrorTip);
   };
 }
 

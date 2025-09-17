@@ -1,4 +1,3 @@
-import { message } from "@/utils/message";
 import useAxios from "../../hooks/core/useAxios";
 
 const request = useAxios();
@@ -23,11 +22,12 @@ export default class AdminFileApi {
         params: {
           path,
           d: true
-        }
+        },
+        cancelErrorTip: true
       })
       .then((res: Blob) => res)
       .catch(error => {
-        message("下载文件失败!", { type: "error" });
+        // message("下载文件失败!", { type: "error" });
         return Promise.reject(error);
       });
 }

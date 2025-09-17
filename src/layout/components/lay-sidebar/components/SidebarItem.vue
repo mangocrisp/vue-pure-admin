@@ -86,6 +86,7 @@ const expandCloseIcon = computed(() => {
   };
 });
 
+/** 唯一的子集 */
 const onlyOneChild: menuType = ref(null);
 
 function hasOneShowingChild(children: menuType[] = [], parent: menuType) {
@@ -94,19 +95,27 @@ function hasOneShowingChild(children: menuType[] = [], parent: menuType) {
     return true;
   });
 
+  // 如果有子集的是需要显示父级，如果要显示父级就不能直接显示 link
   if (showingChildren[0]?.meta?.showParent) {
     return false;
   }
 
+  // 如果只有一个子集，把父级的 routename 也设置成 子集的 name，并且返回true
   if (showingChildren.length === 1) {
     parent.name = showingChildren[0].name;
     return true;
   }
-
+  // 如果没有子集，则返回true，显示 Link
   if (showingChildren.length === 0) {
     onlyOneChild.value = { ...parent, path: "", noShowingChildren: true };
     return true;
   }
+
+  /*总结：
+  1、只要有一个子集需要显示父级就不能显示 link
+  2、如果没有子集要显示父级，并且只有一个子集，那就直接显示 link，这里要加个条件，并且这里的这一个子集不能有子集
+  3、如果没有子集，就直接用父级（自身）的属性，然后显示 link
+  */
   return false;
 }
 
