@@ -165,45 +165,86 @@ const getRoleList = async () => {
 };
 
 /**
+ * 部门列表缓存（每次查询回来的数据按用户 id 为 key 进行缓存，避免重复查询）, 用于下拉框选择
+ */
+const deptChoseListCache = new Map<string, LogicFlowTypes.SelectOptionItem>();
+/**
  * 获取部门列表, 用于下拉框选择
  * @param keyword 搜索关键字
  */
 const getDeptPage = async (keyword: string) => {
   try {
+    if (keyword && typeof keyword !== "string") {
+      deptChoseListRef.value = Array.from(deptChoseListCache.values());
+      return;
+    }
+    const searchKeywword =
+      typeof keyword === "string" ? keyword.trim() : undefined;
     const { data } = await SystemDeptApi.loadDeptList({
       page: 1,
       size: 50,
-      name: keyword
+      name: searchKeywword
     });
-    deptChoseListRef.value = data.map(d =>
+    const searchResult = data.map(d =>
       Object.assign({
         key: d.id,
         value: { id: d.id, name: d.name },
         label: d.name
       })
     );
+    searchResult.forEach(item => deptChoseListCache.set(item.key, item));
+    if (searchResult.length === 0) {
+      deptChoseListRef.value = [];
+    } else {
+      if (searchKeywword && searchKeywword.trim() !== "") {
+        deptChoseListRef.value = searchResult;
+      } else {
+        deptChoseListRef.value = Array.from(deptChoseListCache.values());
+      }
+    }
   } catch (error) {
     console.error("error =>", error);
   }
 };
+
+/**
+ * 用户列表缓存（每次查询回来的数据按用户 id 为 key 进行缓存，避免重复查询）, 用于下拉框选择
+ */
+const userChoseListCache = new Map<string, LogicFlowTypes.SelectOptionItem>();
 /**
  * 获取用户分页列表
  * @param keyword 搜索关键字
  */
 const getUserPage = async (keyword: string) => {
   try {
+    if (keyword && typeof keyword !== "string") {
+      userChoseListRef.value = Array.from(userChoseListCache.values());
+      return;
+    }
+    const searchKeywword =
+      typeof keyword === "string" ? keyword.trim() : undefined;
     const { data } = await SystemUserApi.page({
       page: 1,
       size: 50,
-      nickname: keyword
+      nickname: searchKeywword
     });
-    userChoseListRef.value = data.records.map(d =>
+    const searchResult = data.records.map(d =>
       Object.assign({
         key: d.id,
         value: { id: d.id, name: d.nickname },
         label: d.nickname
       })
     );
+    searchResult.forEach(item => userChoseListCache.set(item.key, item));
+    if (searchResult.length === 0) {
+      userChoseListRef.value = [];
+    } else {
+      if (searchKeywword && searchKeywword.trim() !== "") {
+        userChoseListRef.value = searchResult;
+      } else {
+        userChoseListRef.value = Array.from(userChoseListCache.values());
+      }
+    }
   } catch (error) {
     console.error("error =>", error);
   }
@@ -387,6 +428,8 @@ onMounted(() => {
     reloadData(route.params.source as string, route.params.id as string);
   }
   getRoleList();
+  getDeptPage(undefined);
+  getUserPage(undefined);
   getComponentsList();
   userChoseListRef.value = [];
 });

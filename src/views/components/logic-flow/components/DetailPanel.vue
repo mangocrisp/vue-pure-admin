@@ -429,7 +429,7 @@ const chooseInputType = (type: string) => {
         :remote-method="remoteRole"
         clearable
         :options="roleChoseList"
-        value-key="value"
+        value-key="id"
       />
     </el-form-item>
     <el-form-item
@@ -451,7 +451,8 @@ const chooseInputType = (type: string) => {
         :remote-method="remoteDept"
         clearable
         :options="deptChoseList"
-        value-key="value"
+        value-key="id"
+        @blur="remoteDept"
       />
     </el-form-item>
     <el-form-item
@@ -474,7 +475,8 @@ const chooseInputType = (type: string) => {
         :remote-method="remoteUser"
         clearable
         :options="userChoseList"
-        value-key="value"
+        value-key="id"
+        @blur="remoteUser"
       />
     </el-form-item>
     <el-form-item
@@ -623,7 +625,7 @@ const chooseInputType = (type: string) => {
         :remote-method="remoteForm"
         clearable
         :options="formBindChoseList"
-        value-key="value"
+        value-key="id"
       />
 
       <el-button
