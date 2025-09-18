@@ -1,5 +1,14 @@
 <script setup lang="ts">
-import { ref, onMounted, provide, Ref, defineAsyncComponent, h } from "vue";
+import {
+  ref,
+  onMounted,
+  provide,
+  Ref,
+  defineAsyncComponent,
+  h,
+  defineEmits,
+  nextTick
+} from "vue";
 import LfDesignApi from "@/api/lf/lfDesign";
 import {
   type RouteParamsGeneric,
@@ -31,16 +40,32 @@ const { logicFlowFormPreview } = useLfCustomFrom();
 export interface LogicFlowDesignerProps {
   showCloseButton?: boolean;
   autoloadFromRoute?: boolean;
+  data?: any;
+  readonly?: boolean;
 }
 
 const props = withDefaults(defineProps<LogicFlowDesignerProps>(), {
   showCloseButton: true,
-  autoloadFromRoute: true
+  autoloadFromRoute: true,
+  data: null,
+  readonly: true
 });
+
+/**
+ * 定义钩子
+ */
+const emit = defineEmits<{
+  /**当加载完成时 */
+  (e: "mounted"): void;
+}>();
 
 const showCloseButtonRef = ref<boolean>(props.showCloseButton);
 
 const autoloadFromRouteRef = ref<boolean>(props.autoloadFromRoute);
+
+const dataRef = ref<any>(props.data);
+
+const readonlyRef = ref<boolean>(props.readonly);
 
 const route = useRoute();
 
@@ -102,8 +127,10 @@ const form = {
  * @param readonly 只读
  */
 const loadData = (flowData = {}, readonly = true) => {
+  loading.value = true;
   loginFlowRef.value?.iniLogicFlow(false, flowData);
   loginFlowRef.value?.setReadonly(readonly);
+  loading.value = false;
 };
 
 /**
@@ -420,12 +447,19 @@ const formPreview = async (id: string) => {
 };
 
 onMounted(() => {
+  emit("mounted");
   // 如果只读
   loginFlowRef.value?.setReadonly(true);
   routeParams.value = route.params;
   routeQuery.value = route.query;
   if (autoloadFromRouteRef.value && route.name === "FlowDesignD") {
     reloadData(route.params.source as string, route.params.id as string);
+  } else {
+    nextTick(() => {
+      setTimeout(() => {
+        loadData(dataRef.value, readonlyRef.value);
+      }, 100);
+    });
   }
   getRoleList();
   getDeptPage(undefined);

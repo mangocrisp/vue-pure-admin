@@ -7,10 +7,11 @@ const useUserStore = useUserStoreHook();
 
 // const websocketHost = import.meta.env.VITE_WEBSOCKET_HOST;
 
-const websocketHost =
-  (location.href.startsWith("https://") ? "wss://" : "ws://") +
-  location.host +
-  "/api";
+const websocketHost = import.meta.env.DEV
+  ? import.meta.env.VITE_WEBSOCKET_HOST
+  : (location.href.startsWith("https://") ? "wss://" : "ws://") +
+    location.host +
+    "/api";
 
 export const useWebSocketStore = defineStore("system-websocket", {
   state: () => {

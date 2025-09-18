@@ -7,15 +7,8 @@ import {
   DataLine,
   Bell
 } from "@element-plus/icons-vue";
-import { defineAsyncComponent, h, nextTick, ref } from "vue";
-import {
-  LfFormTodoInfo,
-  LfFormTodoInfoBasic,
-  LfFormTodoInfoFlowChart,
-  LfFormTodoInfoModelValue,
-  LfFormTodoInfoRecord,
-  LfFormTodoInfoRecordDetail
-} from "./utils/types";
+import { LfFormTodoInfo, LfFormTodoInfoModelValue } from "./utils/types";
+import { useTodoInfo } from "./utils/hook";
 
 defineOptions({
   name: "LfFormTodoInfo"
@@ -143,53 +136,20 @@ const props = withDefaults(defineProps<LfFormTodoInfo>(), {
   }
 });
 
-const config = ref<LfFormTodoInfo>(props);
-const flowChart = ref<LfFormTodoInfoFlowChart>(props.modelValue.flowChart);
-const basic = ref<LfFormTodoInfoBasic>(props.modelValue.basic);
-const records = ref<LfFormTodoInfoRecord[]>(props.modelValue.records);
-const infoMap = ref<Map<string, LfFormTodoInfoRecordDetail>>(
-  props.modelValue.infoMap
-);
-
-/**流程图设计器 */
-const LogicFlowDesigner = defineAsyncComponent(
-  () => import("@/views/lf/design/components/flow-designer/index.vue")
-);
-const LogicFlowDesignerRef = ref<InstanceType<typeof LogicFlowDesigner> | null>(
-  null
-);
-const showFlowRef = ref(false);
-const handleInfoChange = (val: string) => {
-  if (val === "flowChart") {
-    nextTick(() => {
-      handleShowFlow(flowChart.value);
-    });
-  }
-};
-/**
- * 显示流程
- * @param flowChart 流程实例 id
- */
-const handleShowFlow = (flowChart: LfFormTodoInfoFlowChart) => {
-  if (!flowChart || !flowChart.flowData) {
-    return;
-  }
-  if (showFlowRef.value) {
-    return;
-  }
-  LogicFlowDesignerRef.value.loadData(
-    flowChart.flowData,
-    flowChart.readonly ?? true
-  );
-};
-
-/**
- * 定义钩子
- */
-const emit = defineEmits<{
-  /**保存数据 */
-  (e: "update:modelValue", value: LfFormTodoInfoModelValue): void;
-}>();
+const {
+  config,
+  basic,
+  records,
+  infoMap,
+  LogicFlowDesigner,
+  LogicFlowDesignerRef,
+  infoElCollapseRef,
+  infoPannelLoading,
+  handleInfoChange,
+  showFlowRef,
+  flowChart,
+  avatarComputed
+} = useTodoInfo(props);
 
 const getConfig = () => config.value;
 
@@ -248,6 +208,15 @@ defineExpose({ getConfig });
             :icon="record?.icon ?? ''"
             :hollow="record?.hollow ?? false"
           >
+            <div class="record-operator">
+              <el-avatar
+                v-if="record?.avatar"
+                class="record-operator-avatar"
+                :size="30"
+                :src="avatarComputed(record?.avatar)"
+              />
+              <span>{{ record?.operator ?? "未知操作者信息" }}</span>
+            </div>
             <el-card>
               <h4>{{ record?.title ?? `第${r}步` }}</h4>
               <p>{{ record?.description ?? "" }}</p>
@@ -292,9 +261,6 @@ defineExpose({ getConfig });
                 </el-collapse-item>
               </el-collapse>
             </el-card>
-            <div class="record-operator">
-              {{ record?.operator ?? "未知操作者信息" }}
-            </div>
           </el-timeline-item>
         </el-timeline>
       </template>
@@ -304,17 +270,28 @@ defineExpose({ getConfig });
         <el-button :icon="TrendCharts" link>流程信息</el-button>
       </template>
       <template #default>
-        <el-collapse accordion @change="handleInfoChange">
+        <el-collapse
+          ref="infoElCollapseRef"
+          accordion
+          @change="handleInfoChange"
+        >
           <el-collapse-item name="flowChart">
             <template #title>
               <el-button :icon="DataLine" type="primary" link>流程图</el-button>
             </template>
             <template #default>
-              <div class="flow-container">
+              <div v-loading="infoPannelLoading" class="flow-container">
                 <LogicFlowDesigner
                   ref="LogicFlowDesignerRef"
                   :show-close-button="false"
                   :autoload-from-route="false"
+                  :data="flowChart.flowData ?? null"
+                  :readonly="flowChart.readonly ?? true"
+                  @mounted="
+                    () => {
+                      infoPannelLoading = false;
+                    }
+                  "
                 />
               </div>
             </template>
@@ -378,5 +355,9 @@ defineExpose({ getConfig });
   font-size: var(--el-font-size-small);
   line-height: 1;
   color: var(--el-text-color-secondary);
+
+  &-avatar {
+    vertical-align: sub;
+  }
 }
 </style>

@@ -149,6 +149,10 @@ const onSubmit = async (formEl: FormInstance) => {
 async function loadMyInfo() {
   const { data: myInfo } = await SystemUserApi.myInfo();
   setTimeout(async () => {
+    if (!myInfo.avatar) {
+      userInfos.avatar = staticAvatar;
+      return;
+    }
     AdminFileApi.fileDownload(myInfo.avatar)
       .then((res: Blob) => {
         blobToDataURI(res)

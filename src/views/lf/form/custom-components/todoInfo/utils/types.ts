@@ -86,6 +86,8 @@ interface LfFormTodoInfoRecord {
   description?: string;
   /** 操作者 */
   operator?: string;
+  /** 操作者头像 */
+  avatar?: string;
   /** 节点详情 */
   detail?: LfFormTodoInfoRecordDetail;
 }

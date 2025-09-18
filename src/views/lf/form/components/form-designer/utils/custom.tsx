@@ -88,7 +88,7 @@ export const useLfCustomFrom = () => {
       const basic = { children: [] };
       const records = [];
       flowInfoData.historyData.forEach(history => {
-        const { data, nodeType, action, time, id, userName } = history;
+        const { data, nodeType, action, time, id, userName, avatar } = history;
         if (
           nodeType === NodesType.judgment ||
           nodeType === NodesType.group ||
@@ -104,6 +104,7 @@ export const useLfCustomFrom = () => {
             title: action,
             description: "",
             operator: userName ?? "",
+            avatar,
             detail: {
               title: "节点信息",
               name: id,
