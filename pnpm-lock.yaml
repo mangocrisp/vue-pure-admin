@@ -29,6 +29,9 @@ importers:
       '@logicflow/extension':
         specifier: ^1.2.28
         version: 1.2.28
+      '@onlyoffice/document-editor-vue':
+        specifier: ^1.6.1
+        version: 1.6.1(vue@3.5.21(typescript@5.9.2))
       '@pureadmin/descriptions':
         specifier: ^1.2.1
         version: 1.2.1(echarts@5.6.0)(element-plus@2.11.2(vue@3.5.21(typescript@5.9.2)))(typescript@5.9.2)
@@ -1446,6 +1449,11 @@ packages:
 
   '@one-ini/wasm@0.1.1':
     resolution: {integrity: sha512-XuySG1E38YScSJoMlqovLru4KTUNSjgVTIjyh7qMX6aNN5HY5Ct5LhRJdxO79JtTzKfzV/bnWpz+zquYrISsvw==}
+
+  '@onlyoffice/document-editor-vue@1.6.1':
+    resolution: {integrity: sha512-sdU7h684ESSdXvGNDcMf73UmToiZGMVO5QRIazTmGfm+bKOnT5ildomeagYFdnQaHQH0J28EJqc4jqXOcQbicA==}
+    peerDependencies:
+      vue: ^3.0.0
 
   '@parcel/watcher-android-arm64@2.5.1':
     resolution: {integrity: sha512-KF8+j9nNbUN8vzOFDpRMsaKBHZ/mcjEjMToVMJOhTozkDonQFFrRcfdLWn6yWKCmJKmdVxSgHiYvTCef4/qcBA==}
@@ -6989,6 +6997,11 @@ snapshots:
     optional: true
 
   '@one-ini/wasm@0.1.1': {}
+
+  '@onlyoffice/document-editor-vue@1.6.1(vue@3.5.21(typescript@5.9.2))':
+    dependencies:
+      lodash: 4.17.21
+      vue: 3.5.21(typescript@5.9.2)
 
   '@parcel/watcher-android-arm64@2.5.1':
     optional: true

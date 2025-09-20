@@ -56,6 +56,7 @@ export type userType = {
   currentPage?: number;
   isRemembered?: boolean;
   loginDay?: number;
+  deptIds?: string[];
 };
 /**
  * 系统字典和参数

@@ -23,6 +23,8 @@ export interface DataInfo<T> {
   roles?: Array<string>;
   /** 当前登录用户的按钮级别权限 */
   permissions?: Array<string>;
+  /** 部门ids */
+  deptIds?: string[];
 }
 
 export interface AuthorizationCookiesType<T> {
@@ -102,7 +104,8 @@ export function updateTokenInfo({
   username,
   nickname,
   roles,
-  permissions
+  permissions,
+  deptIds
 }) {
   useUserStoreHook().SET_ID(id);
   useUserStoreHook().SET_AVATAR(avatar);
@@ -110,6 +113,7 @@ export function updateTokenInfo({
   useUserStoreHook().SET_NICKNAME(nickname);
   useUserStoreHook().SET_ROLES(roles);
   useUserStoreHook().SET_PERMS(permissions);
+  useUserStoreHook().SET_DEPT_IDS(deptIds);
   const cache = storageLocal().getItem(userKey) as object;
   storageLocal().setItem(userKey, {
     ...cache,
@@ -119,7 +123,8 @@ export function updateTokenInfo({
       username,
       nickname,
       roles,
-      permissions
+      permissions,
+      deptIds
     }
   });
 }
@@ -152,12 +157,20 @@ export function setToken(data: DataInfo<Date>) {
       : {}
   );
 
-  function setUserKey({ avatar, username, nickname, roles, permissions }) {
+  function setUserKey({
+    avatar,
+    username,
+    nickname,
+    roles,
+    permissions,
+    deptIds
+  }) {
     useUserStoreHook().SET_AVATAR(avatar);
     useUserStoreHook().SET_USERNAME(username);
     useUserStoreHook().SET_NICKNAME(nickname);
     useUserStoreHook().SET_ROLES(roles);
     useUserStoreHook().SET_PERMS(permissions);
+    useUserStoreHook().SET_DEPT_IDS(deptIds);
     storageLocal().setItem(userKey, {
       refreshToken,
       expires,
@@ -165,7 +178,8 @@ export function setToken(data: DataInfo<Date>) {
       username,
       nickname,
       roles,
-      permissions
+      permissions,
+      deptIds
     });
   }
 
@@ -176,7 +190,8 @@ export function setToken(data: DataInfo<Date>) {
       username,
       nickname: data?.nickname ?? "",
       roles,
-      permissions: data?.permissions ?? []
+      permissions: data?.permissions ?? [],
+      deptIds: data?.deptIds ?? []
     });
   } else {
     const avatar =
@@ -189,12 +204,15 @@ export function setToken(data: DataInfo<Date>) {
       storageLocal().getItem<DataInfo<number>>(userKey)?.roles ?? [];
     const permissions =
       storageLocal().getItem<DataInfo<number>>(userKey)?.permissions ?? [];
+    const deptIds =
+      storageLocal().getItem<DataInfo<number>>(userKey)?.deptIds ?? [];
     setUserKey({
       avatar,
       username,
       nickname,
       roles,
-      permissions
+      permissions,
+      deptIds
     });
   }
 }

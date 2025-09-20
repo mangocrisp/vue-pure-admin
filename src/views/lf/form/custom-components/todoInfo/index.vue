@@ -285,8 +285,8 @@ defineExpose({ getConfig });
                   ref="LogicFlowDesignerRef"
                   :show-close-button="false"
                   :autoload-from-route="false"
-                  :data="flowChart.flowData ?? null"
-                  :readonly="flowChart.readonly ?? true"
+                  :data="flowChart?.flowData ?? null"
+                  :readonly="flowChart?.readonly ?? true"
                   @mounted="
                     () => {
                       infoPannelLoading = false;

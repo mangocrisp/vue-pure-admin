@@ -46,7 +46,9 @@ export const useUserStore = defineStore("pure-user", {
     // 是否勾选了登录页的免登录
     isRemembered: false,
     // 登录页的免登录存储几天，默认7天
-    loginDay: 7
+    loginDay: 7,
+    // 部门id
+    deptIds: []
   }),
   actions: {
     /** 存储id */
@@ -89,6 +91,10 @@ export const useUserStore = defineStore("pure-user", {
     SET_LOGINDAY(value: number) {
       this.loginDay = Number(value);
     },
+    /** 设置用户关联的部门 */
+    SET_DEPT_IDS(value: string[]) {
+      this.deptIds = value;
+    },
     /** 登入 */
     async loginByUsername(params) {
       return new Promise<UserResult>(async (resolve, reject) => {
@@ -119,7 +125,8 @@ export const useUserStore = defineStore("pure-user", {
               permissions: undefined,
               accessToken: loginResult.access_token,
               refreshToken: loginResult.refresh_token,
-              expires
+              expires,
+              deptIds: myInfo.deptIds
             };
             updateTokenInfo(token);
             this.SET_AVATAR(token.avatar);
@@ -143,7 +150,8 @@ export const useUserStore = defineStore("pure-user", {
         username: myInfo.username,
         nickname: myInfo.nickname,
         roles: myInfo.roles,
-        permissions: undefined
+        permissions: undefined,
+        deptIds: myInfo.deptIds
       };
       updateTokenInfo(token);
       this.SET_AVATAR(token.avatar);

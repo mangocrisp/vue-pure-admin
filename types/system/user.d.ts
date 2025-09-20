@@ -70,6 +70,7 @@ declare namespace SystemUserType {
     status?: number;
     userType?: string;
     username?: string;
+    deptIds?: string[];
   }
 
   export interface UserRole {
