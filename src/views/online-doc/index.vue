@@ -216,8 +216,8 @@ onlyOfficeResourceUrl.value = import.meta.env.VITE_ONLY_OFFICE_RESOURCE_URL;
 onlyOfficeServerUrl.value = import.meta.env.VITE_ONLY_OFFICE_SERVER_URL;
 
 /** 文件静态资源地址 */
-const adminFileStatics = "/statics";
-// const adminFileStatics = "/online-doc/v1/onlineDoc/statics?d=true&path=";
+// const adminFileStatics = "/statics";
+const adminFileStatics = "/online-doc/v1/onlineDoc/statics?path=";
 
 /** 固定配置 */
 const constConfig = {
