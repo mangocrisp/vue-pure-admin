@@ -138,7 +138,7 @@ declare namespace OnlineDocType {
   /** 在线文档修改更新 DTO */
   export interface OnlineDocUpdateDTO extends AnyObject {
     /** 主键 */
-    id: string;
+    id?: string;
     /** 文档名称 */
     name?: string;
     /** 文档是否共享 */
@@ -146,11 +146,11 @@ declare namespace OnlineDocType {
     /** 所属部门名称 */
     deptName?: string;
     /** 创建人id */
-    createUser: string;
+    createUser?: string;
     /** 创建时间 */
-    createTime: string;
+    createTime?: string;
     /** 最后修改时间 */
-    updateTime: string;
+    updateTime?: string;
     /** 创建人姓名 */
     createUserName?: string;
     /** 最后修改人姓名 */
@@ -159,5 +159,7 @@ declare namespace OnlineDocType {
     onlineDocPermitSet?: OnlineDocPermit[];
     /** 数据 */
     data?: string;
+    /** 文件 */
+    file?: any;
   }
 }

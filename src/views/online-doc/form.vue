@@ -56,7 +56,7 @@ const visible = computed({
  */
 const actionType = ref<"add" | "update">("add");
 /**
- * 表单的 Ref 对象
+ * 文档的 Ref 对象
  */
 const formRef = ref<FormInstance | null>();
 
@@ -72,21 +72,21 @@ interface UploadFileType {
 const addDTO = {
   /** 主键 */
   id: undefined,
-  /** 表单名称 */
+  /** 文档名称 */
   name: undefined,
-  /** 表单是否共享 */
+  /** 文档是否共享 */
   share: 1,
-  /** 表单属性设置（字段等） */
+  /** 文档属性设置（字段等） */
   properties: undefined,
-  /** 表单共享范围 */
+  /** 文档共享范围 */
   onlineDocPermitSet: [],
   /** excel 文件 */
   file: undefined,
-  /** 表单属性设置（字段等） */
+  /** 文档属性设置（字段等） */
   onlineDocProperties: undefined
 };
 
-/** 表单数据 Ref */
+/** 文档数据 Ref */
 const form = ref<
   (OnlineDocType.OnlineDocAddDTO | OnlineDocType.OnlineDocUpdateDTO) &
     UploadFileType
@@ -97,10 +97,10 @@ const defaultConfigForm = ref<
   OnlineDocType.OnlineDocAddDTO | OnlineDocType.OnlineDocUpdateDTO
 >();
 
-/** 重置表单方法 Ref */
+/** 重置文档方法 Ref */
 const restFormFnRef = ref<any>(null);
 
-/** 初始化新增表单 */
+/** 初始化新增文档 */
 const iniAddForm = () => {
   form.value = JSON.parse(JSON.stringify(addDTO));
   restFormFnRef.value = () => {
@@ -109,7 +109,7 @@ const iniAddForm = () => {
   defaultConfigForm.value = JSON.parse(JSON.stringify(addDTO));
 };
 /**
- * 初始化编辑修改表单
+ * 初始化编辑修改文档
  * @param data 需要被编辑的数据
  */
 const iniUpdateForm = (data: OnlineDocType.OnlineDocUpdateDTO) => {
@@ -121,7 +121,7 @@ const iniUpdateForm = (data: OnlineDocType.OnlineDocUpdateDTO) => {
 };
 
 const rules = reactive<FormRules>({
-  name: [{ required: true, message: "请输入表单名称", trigger: "blur" }],
+  name: [{ required: true, message: "请输入文档名称", trigger: "blur" }],
   share: [{ required: true, message: "请选择是否需要共享", trigger: "blur" }],
   file: [{ required: true, message: "请上传文件", trigger: "blur" }]
 });
@@ -187,7 +187,7 @@ const close = () => {
 };
 
 /**
- * 加载更新表单
+ * 加载更新文档
  * @param data 更新数据
  */
 const initUpdateForm = (data: OnlineDocType.OnlineDocVO) => {
@@ -245,6 +245,7 @@ const fillExistedTree = async (
     const convertData = onlineDocPermitSet.map(item => {
       return {
         key: item.userId ? `u_${item.userId}` : `d_${item.deptId}`,
+        id: item.userId ? `u_${item.userId}` : `d_${item.deptId}`,
         permissions: item.permissions
           ? JSON.parse(item.permissions as string)
           : undefined,
@@ -303,8 +304,8 @@ const expandNodeUntilTop = (node: TreeNode) => {
 };
 
 /**
- * 重置表单
- * @param formEl 表单引用
+ * 重置文档
+ * @param formEl 文档引用
  */
 const rest = (formEl: FormInstance | undefined | null) => {
   if (!formEl) return;
@@ -316,13 +317,13 @@ const rest = (formEl: FormInstance | undefined | null) => {
 };
 
 /**
- * 表单选项
+ * 文档选项
  */
 const formOptions = ref<OnlineDocType.OnlineDoc[]>([]);
 
 /**
- * 远程查询表单
- * @param formName 表单名称
+ * 远程查询文档
+ * @param formName 文档名称
  * @param andThen 查询成功后回调
  */
 const searchFormName = async (formName: string, andThen?: () => void) => {
@@ -364,8 +365,8 @@ const beforeUpload = async file => {
 };
 
 /**
- * 选择表单改变选中
- * @param formName 选中的表单名称
+ * 选择文档改变选中
+ * @param formName 选中的文档名称
  */
 const searchFormNameChangeHandle = async (formName: string) => {
   if (actionType.value === "add") {
@@ -402,9 +403,9 @@ const searchFormNameChangeHandle = async (formName: string) => {
       if (form.value.id) {
         /** 主键 */
         form.value.id = undefined;
-        /** 表单是否共享 */
+        /** 文档是否共享 */
         form.value.share = 0;
-        /** 表单属性设置（字段等） */
+        /** 文档属性设置（字段等） */
         (form.value as OnlineDocType.OnlineDocUpdateDTO).deptName = undefined;
         /** 所属部门id */
         form.value.onlineDocPermitSet = [];
@@ -416,8 +417,8 @@ const searchFormNameChangeHandle = async (formName: string) => {
 };
 
 /**
- * 设置选中当前表单
- * @param formName 表单名称
+ * 设置选中当前文档
+ * @param formName 文档名称
  */
 const setChooseCurrentForm = (formName: string) => {
   form.value.name = formName;
@@ -427,7 +428,7 @@ const setChooseCurrentForm = (formName: string) => {
 
 /** 配置选项 */
 const deptUserTreeProps = {
-  value: "key",
+  value: "id",
   label: "name",
   children: "children"
 };
@@ -457,13 +458,14 @@ const addPlaceholder = (data: OnlineDocType.DeptUserTree[]) => {
       item.type === DeptUserTreeNodeType.DEPT &&
       (!item.children || item.children.length === 0)
     ) {
+      const key = Uuid.create().toString().replace(/-/g, "");
       item.children = [
         {
-          key: Uuid.create().toString().replace(/-/g, ""),
+          key: key,
           name: "",
           type: DeptUserTreeNodeType.PLACEHOLDER,
           disabled: false,
-          id: Uuid.create().toString().replace(/-/g, ""),
+          id: key,
           pid: item.id,
           isAdmin: 0
         }
@@ -541,6 +543,7 @@ const onDeptUserTreeQueryChanged = async () => {
       const convertData = form.value.onlineDocPermitSet.map(item => {
         return {
           key: item.userId ? `u_${item.userId}` : `d_${item.deptId}`,
+          id: item.userId ? `u_${item.userId}` : `d_${item.deptId}`,
           permissions: item.permissions
             ? JSON.parse(item.permissions as string)
             : undefined,
@@ -862,8 +865,8 @@ getDeptUserTreeData();
     >
       <ElRow :gutter="20">
         <ElCol :span="24">
-          <ElTooltip content="表单名称">
-            <ElFormItem class="edit-form-item" label="表单名称" prop="name">
+          <ElTooltip content="文档名称">
+            <ElFormItem class="edit-form-item" label="文档名称" prop="name">
               <el-select
                 v-model="form.name"
                 filterable
@@ -871,7 +874,7 @@ getDeptUserTreeData();
                 :reserve-keyword="false"
                 default-first-option
                 allow-create
-                placeholder="搜索表单名或者新建表单名"
+                placeholder="搜索文档名或者新建文档名"
                 value-key="name"
                 remote-show-suffix
                 :remote-method="searchFormName"
@@ -891,7 +894,7 @@ getDeptUserTreeData();
         </ElCol>
         <el-alert title="注意" show-icon type="error" :closable="false">
           <template #default>
-            选择已经创建的同表单名的文件会覆盖且会更新操作记录（无法还原），请谨慎操作！
+            选择已经创建的同文档名的文件会覆盖且会更新操作记录（无法还原），请谨慎操作！
           </template>
         </el-alert>
         <ElCol
@@ -969,10 +972,10 @@ getDeptUserTreeData();
           </ElTooltip>
         </ElCol>
         <ElCol :span="24">
-          <ElTooltip content="表单是否共享">
+          <ElTooltip content="文档是否共享">
             <ElFormItem
               class="edit-form-item"
-              label="表单是否共享"
+              label="文档是否共享"
               prop="share"
             >
               <el-radio-group v-model="form.share">
@@ -987,6 +990,7 @@ getDeptUserTreeData();
             v-model="deptUserTreeQuery"
             placeholder="关键字搜索部门或者用户"
             clearable
+            @keyup.enter="onDeptUserTreeQueryChanged"
           >
             <template #append>
               <ElButton type="primary" @click="onDeptUserTreeQueryChanged">
@@ -996,179 +1000,203 @@ getDeptUserTreeData();
           </ElInput>
         </ElCol>
         <ElCol v-if="form.share === 1" :span="24">
-          <ElTreeV2
-            ref="deptUserTreeRef"
-            style="max-width: 100%"
-            :data="deptUserTreeData"
-            :props="deptUserTreeProps"
-            show-checkbox
-            highlight-current
-            :expand-on-click-node="false"
-            :filter-method="deptUserTreeFilterMethod"
-            :indent="10"
-            :item-size="30"
-            @node-expand="getDeptUserTreeChildren"
-            @check-change="deptUserTreeCheckChange"
-          >
-            <template #default="{ node, data }">
-              <el-tag
-                v-if="data.type === DeptUserTreeNodeType.DEPT"
-                type="primary"
+          <el-auto-resizer :style="`height: 300px; border: 1px solid #eee`">
+            <template #default="{ height, width }">
+              <ElTreeV2
+                ref="deptUserTreeRef"
+                :width="width"
+                :height="height"
+                :data="deptUserTreeData"
+                :props="deptUserTreeProps"
+                show-checkbox
+                highlight-current
+                :expand-on-click-node="false"
+                :filter-method="deptUserTreeFilterMethod"
+                :indent="10"
+                :item-size="30"
+                @node-expand="getDeptUserTreeChildren"
+                @check-change="deptUserTreeCheckChange"
               >
-                部门
-              </el-tag>
-              <el-tag
-                v-if="data.type === DeptUserTreeNodeType.USER"
-                type="success"
-              >
-                用户
-              </el-tag>
-              <el-tag
-                v-if="data.type === DeptUserTreeNodeType.PLACEHOLDER"
-                type="info"
-              >
-                ...
-              </el-tag>
-              <ElTooltip :content="node.label">
-                <span
-                  class="dept-user-tree-label ellipsis"
-                  style="width: 40vw"
-                  >{{ node.label }}</span
-                >
-              </ElTooltip>
-              <ElButton
-                v-if="
-                  data.isAdmin &&
-                  (form as OnlineDocType.OnlineDocUpdateDTO).createUser &&
-                  (form as OnlineDocType.OnlineDocUpdateDTO).createUser !==
-                    userStore.id
-                "
-                disabled
-                type="warning"
-                size="small"
-                plain
-              >
-                无权操作管理员
-              </ElButton>
-              <ElButton
-                v-show="data.hasChildren"
-                type="danger"
-                plain
-                size="small"
-                @click="deleteAllPermissions(node, data)"
-              >
-                删除全部权限
-              </ElButton>
-              <ElButton
-                v-show="
-                  data.type !== DeptUserTreeNodeType.PLACEHOLDER &&
-                  !data.permissions
-                "
-                type="warning"
-                plain
-                size="small"
-                @click="addPermissions(node, data)"
-              >
-                添加权限
-              </ElButton>
-              <ElButton
-                v-show="
-                  data.type !== DeptUserTreeNodeType.PLACEHOLDER &&
-                  data.permissions &&
-                  (!data.isAdmin ||
-                    data.isAdmin === 0 ||
-                    !(form as OnlineDocType.OnlineDocUpdateDTO).createUser ||
-                    (form as OnlineDocType.OnlineDocUpdateDTO).createUser ===
-                      userStore.id)
-                "
-                type="danger"
-                plain
-                size="small"
-                @click="deletePermissions(node, data)"
-              >
-                删除权限
-              </ElButton>
-              <label
-                v-show="
-                  data.type === DeptUserTreeNodeType.USER &&
-                  data.permissions &&
-                  (data.isAdmin === 1 ||
-                    !(form as OnlineDocType.OnlineDocUpdateDTO).createUser ||
-                    (form as OnlineDocType.OnlineDocUpdateDTO).createUser ===
-                      userStore.id)
-                "
-                class="dept-user-tree-permissions-label"
-                ><span>管理员</span>
-                <ElSwitch
-                  v-if="(form as OnlineDocType.OnlineDocUpdateDTO).createUser"
-                  v-model="data.isAdmin"
-                  size="small"
-                  :disabled="
-                    (form as OnlineDocType.OnlineDocUpdateDTO).createUser !==
-                    userStore.id
-                  "
-                  :active-value="1"
-                  :inactive-value="0"
-                />
-                <ElSwitch
-                  v-else
-                  v-model="data.isAdmin"
-                  size="small"
-                  :active-value="1"
-                  :inactive-value="0"
-                />
-              </label>
-              <el-popover
-                v-if="
-                  data.type !== DeptUserTreeNodeType.PLACEHOLDER &&
-                  data.permissions &&
-                  (!data.isAdmin || data.isAdmin === 0)
-                "
-                title="文档操作权限"
-                placement="right"
-                trigger="hover"
-              >
-                <template #reference>
-                  <el-tag class="dept-user-tree-label" type="warning">
-                    权限
+                <template #default="{ node, data }">
+                  <el-tag
+                    v-if="data.type === DeptUserTreeNodeType.DEPT"
+                    type="primary"
+                  >
+                    部门
                   </el-tag>
-                </template>
-                <template #default>
-                  <label class="dept-user-tree-permissions-label"
-                    ><span>聊天</span>
-                    <ElSwitch v-model="data.permissions.chat" size="small" />
-                  </label>
-                  <label class="dept-user-tree-permissions-label"
-                    ><span>下载</span>
+                  <el-tag
+                    v-if="data.type === DeptUserTreeNodeType.USER"
+                    type="success"
+                  >
+                    用户
+                  </el-tag>
+                  <el-tag
+                    v-if="data.type === DeptUserTreeNodeType.PLACEHOLDER"
+                    type="info"
+                  >
+                    ...
+                  </el-tag>
+                  <ElTooltip :content="node.label">
+                    <span
+                      class="dept-user-tree-label ellipsis"
+                      style="width: 40vw"
+                      >{{ node.label }}</span
+                    >
+                  </ElTooltip>
+                  <ElButton
+                    v-if="
+                      data.isAdmin &&
+                      (form as OnlineDocType.OnlineDocUpdateDTO).createUser &&
+                      (form as OnlineDocType.OnlineDocUpdateDTO).createUser !==
+                        userStore.id
+                    "
+                    disabled
+                    type="warning"
+                    size="small"
+                    plain
+                  >
+                    无权操作管理员
+                  </ElButton>
+                  <ElButton
+                    v-show="data.hasChildren"
+                    type="danger"
+                    plain
+                    size="small"
+                    @click="deleteAllPermissions(node, data)"
+                  >
+                    删除全部权限
+                  </ElButton>
+                  <ElButton
+                    v-show="
+                      data.type !== DeptUserTreeNodeType.PLACEHOLDER &&
+                      !data.permissions
+                    "
+                    type="warning"
+                    plain
+                    size="small"
+                    @click="addPermissions(node, data)"
+                  >
+                    添加权限
+                  </ElButton>
+                  <ElButton
+                    v-show="
+                      data.type !== DeptUserTreeNodeType.PLACEHOLDER &&
+                      data.permissions &&
+                      (!data.isAdmin ||
+                        data.isAdmin === 0 ||
+                        !(form as OnlineDocType.OnlineDocUpdateDTO)
+                          .createUser ||
+                        (form as OnlineDocType.OnlineDocUpdateDTO)
+                          .createUser === userStore.id)
+                    "
+                    type="danger"
+                    plain
+                    size="small"
+                    @click="deletePermissions(node, data)"
+                  >
+                    删除权限
+                  </ElButton>
+                  <label
+                    v-show="
+                      data.type === DeptUserTreeNodeType.USER &&
+                      data.permissions &&
+                      (data.isAdmin === 1 ||
+                        !(form as OnlineDocType.OnlineDocUpdateDTO)
+                          .createUser ||
+                        (form as OnlineDocType.OnlineDocUpdateDTO)
+                          .createUser === userStore.id)
+                    "
+                    class="dept-user-tree-permissions-label"
+                    ><span>管理员</span>
                     <ElSwitch
-                      v-model="data.permissions.download"
+                      v-if="
+                        (form as OnlineDocType.OnlineDocUpdateDTO).createUser
+                      "
+                      v-model="data.isAdmin"
                       size="small"
+                      :disabled="
+                        (form as OnlineDocType.OnlineDocUpdateDTO)
+                          .createUser !== userStore.id
+                      "
+                      :active-value="1"
+                      :inactive-value="0"
+                    />
+                    <ElSwitch
+                      v-else
+                      v-model="data.isAdmin"
+                      size="small"
+                      :active-value="1"
+                      :inactive-value="0"
                     />
                   </label>
-                  <label class="dept-user-tree-permissions-label"
-                    ><span>复制</span>
-                    <ElSwitch v-model="data.permissions.copy" size="small" />
-                  </label>
-                  <label class="dept-user-tree-permissions-label"
-                    ><span>评论</span>
-                    <ElSwitch v-model="data.permissions.comment" size="small" />
-                  </label>
-                  <label class="dept-user-tree-permissions-label"
-                    ><span>编辑</span>
-                    <ElSwitch v-model="data.permissions.edit" size="small" />
-                  </label>
-                  <label class="dept-user-tree-permissions-label"
-                    ><span>打印</span>
-                    <ElSwitch v-model="data.permissions.print" size="small" />
-                  </label>
+                  <el-popover
+                    v-if="
+                      data.type !== DeptUserTreeNodeType.PLACEHOLDER &&
+                      data.permissions &&
+                      (!data.isAdmin || data.isAdmin === 0)
+                    "
+                    title="文档操作权限"
+                    placement="right"
+                    trigger="hover"
+                  >
+                    <template #reference>
+                      <el-tag class="dept-user-tree-label" type="warning">
+                        权限
+                      </el-tag>
+                    </template>
+                    <template #default>
+                      <label class="dept-user-tree-permissions-label"
+                        ><span>聊天</span>
+                        <ElSwitch
+                          v-model="data.permissions.chat"
+                          size="small"
+                        />
+                      </label>
+                      <label class="dept-user-tree-permissions-label"
+                        ><span>下载</span>
+                        <ElSwitch
+                          v-model="data.permissions.download"
+                          size="small"
+                        />
+                      </label>
+                      <label class="dept-user-tree-permissions-label"
+                        ><span>复制</span>
+                        <ElSwitch
+                          v-model="data.permissions.copy"
+                          size="small"
+                        />
+                      </label>
+                      <label class="dept-user-tree-permissions-label"
+                        ><span>评论</span>
+                        <ElSwitch
+                          v-model="data.permissions.comment"
+                          size="small"
+                        />
+                      </label>
+                      <label class="dept-user-tree-permissions-label"
+                        ><span>编辑</span>
+                        <ElSwitch
+                          v-model="data.permissions.edit"
+                          size="small"
+                        />
+                      </label>
+                      <label class="dept-user-tree-permissions-label"
+                        ><span>打印</span>
+                        <ElSwitch
+                          v-model="data.permissions.print"
+                          size="small"
+                        />
+                      </label>
+                    </template>
+                  </el-popover>
                 </template>
-              </el-popover>
+              </ElTreeV2>
             </template>
-          </ElTreeV2>
+          </el-auto-resizer>
         </ElCol>
         <ElCol v-if="actionType === 'add'" :span="24">
-          <ElTooltip content="表单文件">
-            <ElFormItem class="edit-form-item" label="表单文件" prop="file">
+          <ElTooltip content="文档文件">
+            <ElFormItem class="edit-form-item" label="文档文件" prop="file">
               <ElUpload
                 action="#"
                 :http-request="requestUpload"

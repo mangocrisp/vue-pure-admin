@@ -14,8 +14,12 @@ import {
   OfficeBuilding,
   CirclePlusFilled,
   Position,
-  FullScreen
+  FullScreen,
+  Document
 } from "@element-plus/icons-vue";
+import splitpane, { ContextProps } from "@/components/ReSplitPane";
+import { useRenderIcon } from "@/components/ReIcon/src/hooks";
+import FontistoMoreVA from "~icons/fontisto/more-v-a";
 
 defineOptions({
   name: "OnlineDocList"
@@ -86,10 +90,22 @@ const resetParams = () => {
 
 type resetFnType = ((...args: any) => any) | ((...args: any) => any)[];
 
-// 重置分页后查询(注意这里没有重置form表单参数)
+const settingLR: ContextProps = reactive({
+  minPercent: 20,
+  defaultPercent: 20,
+  split: "vertical"
+});
+
+const settingTB: ContextProps = reactive({
+  minPercent: 20,
+  defaultPercent: 40,
+  split: "horizontal"
+});
+
+// 重置分页后查询(注意这里没有重置form文档参数)
 const reloadList = (resetFn?: resetFnType) => {
-  // 重置form表单参数
-  // 由外部传入方法, 可用于重置表单或者列表勾选项
+  // 重置form文档参数
+  // 由外部传入方法, 可用于重置文档或者列表勾选项
   // 例子 reloadList(resetForm) 或多方法 reloadList([resetForm, clearSelectionRows])
   if (resetFn) {
     if (isArray(resetFn)) resetFn.forEach(fn => fn());
@@ -162,8 +178,8 @@ const formChoosedRowDataRef = ref<AnyObject>();
 const formTableRef = ref(null);
 
 /**
- * 表单点击
- * @param row 表单数据
+ * 文档点击
+ * @param row 文档数据
  */
 const chooseFormData = async (row: OnlineDocType.OnlineDoc) => {
   formChoosedRowRef.value = row;
@@ -176,7 +192,7 @@ const chooseFormData = async (row: OnlineDocType.OnlineDoc) => {
 };
 
 /**
- * 导入当前表单
+ * 导入当前文档
  */
 const importCurrentForm = () => {
   dialogVisible.value = true;
@@ -236,7 +252,7 @@ const constConfig = {
       print: true // 开启打印
     },
     fileType: "docx", // 文件类型
-    // onlyoffice用key做文件缓存索引，推荐每次都随机生成一下，不然总是读取缓存，后面应该是改成关联的文件的数据，例如表单的 id
+    // onlyoffice用key做文件缓存索引，推荐每次都随机生成一下，不然总是读取缓存，后面应该是改成关联的文件的数据，例如文档的 id
     key: Uuid.create().toString().replace(/-/g, "")
   },
   editorConfig: {
@@ -345,7 +361,7 @@ const openInEditor = (detail?: OnlineDocType.OnlineDocVO) => {
   if (workbookDataStr) {
     const item = JSON.parse(workbookDataStr);
     const config = { ...constConfig };
-    // onlyoffice用key做文件缓存索引，推荐每次都随机生成一下，不然总是读取缓存，后面应该是改成关联的文件的数据，例如表单的 id
+    // onlyoffice用key做文件缓存索引，推荐每次都随机生成一下，不然总是读取缓存，后面应该是改成关联的文件的数据，例如文档的 id
     config.documentType = item.documentType;
     config.document.title = item.title;
     config.document.url = `${onlyOfficeResourceUrl.value}${adminFileStatics}${item.url}`;
@@ -523,328 +539,309 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="main-view">
-    <ElRow :gutter="20">
-      <ElCol :span="4">
-        <div class="search">
-          <div class="import-plus">
-            <span class="import-plus-title">表单列表</span>
-            <ElButton type="primary" size="small" @click="dialogVisible = true">
-              <el-icon><Plus /></el-icon>
-            </ElButton>
-          </div>
-
-          <ElForm
-            ref="queryFormRef"
-            :model="form"
-            class="query-form"
-            inline
-            @submit.prevent
-          >
-            <ElTooltip content="按关键字搜索: 文件名/创建人/部门">
-              <ElFormItem class="query-form-item search-gtoup-item">
-                <ElInput
-                  v-model="form.keyWords"
-                  placeholder="文件名/创建人/部门"
-                  clearable
+  <el-card shadow="never">
+    <div class="split-pane">
+      <splitpane :splitSet="settingLR">
+        <!-- #paneL 表示指定该组件为左侧面板 -->
+        <template #paneL>
+          <!-- 自定义左侧面板的内容 -->
+          <el-scrollbar>
+            <div class="list-pane">
+              <div class="list-pane-operate">
+                <span class="list-pane-operate-title">文档列表</span>
+                <ElButton
+                  type="primary"
+                  size="small"
+                  @click="dialogVisible = true"
                 >
-                  <template #append>
-                    <ElButton
-                      type="primary"
-                      native-type="submit"
-                      @click="
-                        reloadList();
-                        totalFn();
-                      "
+                  <el-icon><Plus /></el-icon>
+                </ElButton>
+              </div>
+              <div class="list-pane-search">
+                <ElForm
+                  ref="queryFormRef"
+                  :model="form"
+                  class="query-form"
+                  inline
+                  @submit.prevent
+                >
+                  <ElFormItem style="width: 100%">
+                    <ElInput
+                      v-model="form.keyWords"
+                      placeholder="文件名/创建人/部门"
+                      clearable
                     >
-                      <el-icon><Search /></el-icon>
-                    </ElButton>
-                  </template>
-                </ElInput>
-              </ElFormItem>
-            </ElTooltip>
-          </ElForm>
-        </div>
+                      <template #append>
+                        <ElButton
+                          type="primary"
+                          native-type="submit"
+                          @click="
+                            reloadList();
+                            totalFn();
+                          "
+                        >
+                          <el-icon><Search /></el-icon>
+                        </ElButton>
+                      </template>
+                    </ElInput>
+                  </ElFormItem>
+                </ElForm>
+              </div>
 
-        <div class="main">
-          <ElTable
-            ref="formTableRef"
-            v-loading="loading"
-            highlight-current-row
-            row-key="id"
-            :data="list"
-            :show-header="false"
-            max-height="75vh"
-            cell-class-name="no-padding-table-cell"
-            @row-click="chooseFormData"
-          >
-            <!-- 显示列 -->
-            <el-table-column prop="name" label="表单名称">
-              <template #default="{ row }">
-                <ElTooltip :content="row.name" placement="right" :offset="25">
-                  <template #content>
-                    <p>
-                      <el-icon><User /></el-icon>{{ row.createUserName }}
-                    </p>
-                    <p>
-                      <el-icon><OfficeBuilding /></el-icon>{{ row.deptName }}
-                    </p>
+              <ElTable
+                ref="formTableRef"
+                v-loading="loading"
+                class="list-pane-table"
+                highlight-current-row
+                row-key="id"
+                :data="list"
+                :show-header="false"
+                max-height="75vh"
+                stripe
+                @row-click="chooseFormData"
+              >
+                <!-- 显示列 -->
+                <el-table-column prop="name" label="文档名称">
+                  <template #default="{ row }">
+                    <ElTooltip placement="right" :offset="80">
+                      <template #content>
+                        <p>
+                          <el-icon><Document /></el-icon>{{ row.name }}
+                        </p>
+                        <p>
+                          <el-icon><User /></el-icon>{{ row.createUserName }}
+                        </p>
+                        <p>
+                          <el-icon><OfficeBuilding /></el-icon
+                          >{{ row.deptName }}
+                        </p>
+                      </template>
+                      <div class="list-pane-table-doc-name">
+                        <div class="list-pane-table-doc-name-tag">
+                          <ElTag
+                            v-if="row.share === 1"
+                            type="success"
+                            class="mr-[5px]"
+                            size="small"
+                          >
+                            共享
+                          </ElTag>
+                          <ElTag
+                            v-else
+                            type="warning"
+                            class="mr-[5px]"
+                            size="small"
+                          >
+                            不共享
+                          </ElTag>
+                          <ElTag
+                            v-show="row.createUser === userStore.id"
+                            type="danger"
+                            class="mr-[5px]"
+                            size="small"
+                          >
+                            拥有者
+                          </ElTag>
+                          <ElTag
+                            v-show="
+                              row.createUser !== userStore.id &&
+                              row.isAdmin === 1
+                            "
+                            type="primary"
+                            class="mr-[5px]"
+                            size="small"
+                          >
+                            管理员
+                          </ElTag>
+                        </div>
+                        <span class="ellipsis">{{ row.name }}</span>
+                      </div>
+                    </ElTooltip>
                   </template>
-                  <div style="padding-top: 12px">
-                    <ElTag
-                      v-if="row.share === 1"
-                      type="success"
-                      class="share-tag-position"
-                    >
-                      共享
-                    </ElTag>
-                    <ElTag v-else type="warning" class="share-tag-position">
-                      不共享
-                    </ElTag>
-                    <ElTag
-                      v-show="row.createUser === userStore.id"
-                      type="danger"
-                      class="permissions-tag-position"
-                    >
-                      拥有者
-                    </ElTag>
-                    <ElTag
-                      v-show="
-                        row.createUser !== userStore.id && row.isAdmin === 1
-                      "
-                      type="primary"
-                      class="permissions-tag-position"
-                    >
-                      管理员
-                    </ElTag>
-                    <span class="list-table-column-value ellipsis">{{
-                      row.name
+                </el-table-column>
+                <!-- 操作按钮 -->
+                <el-table-column
+                  prop="sort"
+                  label="操作"
+                  fixed="right"
+                  align="center"
+                  width="60px"
+                >
+                  <template #default="{ row }">
+                    <el-dropdown placement="bottom">
+                      <el-button
+                        v-show="
+                          row.createUser === userStore.id || row.isAdmin === 1
+                        "
+                        class="ml-3! mt-[2px]!"
+                        link
+                        type="primary"
+                        size="small"
+                        :icon="useRenderIcon(FontistoMoreVA)"
+                      />
+                      <template #dropdown>
+                        <el-dropdown-menu>
+                          <el-dropdown-item @click="handleUpdate(row)">
+                            编辑
+                          </el-dropdown-item>
+                          <el-dropdown-item
+                            v-if="row.createUser === userStore.id"
+                            @click="handleDel(row)"
+                          >
+                            删除
+                          </el-dropdown-item>
+                        </el-dropdown-menu>
+                      </template>
+                    </el-dropdown>
+                  </template>
+                </el-table-column>
+              </ElTable>
+              <el-pagination
+                v-model:currentPage="pageParam.pageNum"
+                class="justify-center"
+                :page-size="pageParam.pageSize"
+                :total="totalRef"
+                :page-sizes="[12, 24, 36]"
+                :background="true"
+                layout="total, prev, pager, next"
+                @size-change="onPageSizeChange"
+                @current-change="onCurrentChange"
+              />
+            </div>
+          </el-scrollbar>
+        </template>
+        <!-- #paneR 表示指定该组件为右侧面板 -->
+        <template #paneR>
+          <el-scrollbar>
+            <div class="doc-pane">
+              <div class="doc-pane-info">
+                <ElTooltip placement="bottom">
+                  <template #content>
+                    <div v-if="formChoosedRowRef">
+                      <p>文档名称：{{ formChoosedRowRef.name }}</p>
+                      <p>
+                        创建人：{{ formChoosedRowRef.createUserName }}({{
+                          formChoosedRowRef.deptName
+                        }})
+                      </p>
+                      <p>创建时间：{{ formChoosedRowRef.createTime }}</p>
+                      <p>最后修改人：{{ formChoosedRowRef.updateUserName }}</p>
+                      <p>最后修改时间：{{ formChoosedRowRef.updateTime }}</p>
+                    </div>
+                    <div v-else>请选择左侧文档</div>
+                  </template>
+                  <div class="doc-pane-info-title ellipsis mr-[10px]">
+                    <el-icon class="doc-pane-info-title-icon"
+                      ><Document /></el-icon
+                    ><span>{{
+                      formChoosedRowRef?.name ?? "请选择左侧文档"
                     }}</span>
                   </div>
                 </ElTooltip>
-              </template>
-            </el-table-column>
-            <!-- 操作按钮 -->
-            <el-table-column
-              prop="sort"
-              label="操作"
-              fixed="right"
-              align="center"
-              width="20"
-            >
-              <template #default="{ row }">
-                <el-dropdown placement="bottom">
-                  <button
-                    v-show="
-                      row.createUser === userStore.id || row.isAdmin === 1
-                    "
-                    class="form-operat-button-group"
+                <div class="doc-pane-info-btns">
+                  <ElButton
+                    v-show="canImportThatDoc"
+                    type="primary"
+                    @click="importCurrentForm"
                   >
-                    ...
-                  </button>
-                  <template #dropdown>
-                    <el-dropdown-menu>
-                      <el-dropdown-item @click="handleUpdate(row)">
-                        编辑
-                      </el-dropdown-item>
-                      <el-dropdown-item
-                        v-if="row.createUser === userStore.id"
-                        @click="handleDel(row)"
-                      >
-                        删除
-                      </el-dropdown-item>
-                    </el-dropdown-menu>
-                  </template>
-                </el-dropdown>
-              </template>
-            </el-table-column>
-          </ElTable>
-          <el-pagination
-            v-model:currentPage="pageParam.pageNum"
-            class="justify-center"
-            :page-size="pageParam.pageSize"
-            :total="totalRef"
-            :page-sizes="[12, 24, 36]"
-            :background="true"
-            layout="total, prev, pager, next"
-            @size-change="onPageSizeChange"
-            @current-change="onCurrentChange"
-          />
-        </div>
-      </ElCol>
-      <ElCol :span="20">
-        <div class="main">
-          <div class="search" style="padding-left: 0">
-            <div class="form-data-list-action-bar">
-              <ElTooltip v-if="formChoosedRowRef">
-                <template #content>
-                  <p>
-                    创建人：{{ formChoosedRowRef.createUserName }}({{
-                      formChoosedRowRef.deptName
-                    }})
-                  </p>
-                  <p>创建时间：{{ formChoosedRowRef.createTime }}</p>
-                  <p>最后修改人：{{ formChoosedRowRef.updateUserName }}</p>
-                  <p>最后修改时间：{{ formChoosedRowRef.updateTime }}</p>
-                </template>
-                <span class="form-data-title">{{
-                  formChoosedRowRef.name ?? "请选择左侧表单"
-                }}</span>
-              </ElTooltip>
-              <ElButton
-                v-show="canImportThatDoc"
-                type="primary"
-                @click="importCurrentForm"
-              >
-                <el-icon><CirclePlusFilled /></el-icon> 导入
-              </ElButton>
-              <ElTooltip
-                content="内网环境的 ssl 证书一般是自定义的，所以需要先让浏览器信任该证书，信任证书之后重新打开这个菜单即可"
-              >
-                <ElButton
-                  v-show="!isCertificateTrusted"
-                  type="warning"
-                  @click="trustCertificate"
-                >
-                  <el-icon><Position /></el-icon> 点击信任插件
-                </ElButton>
-              </ElTooltip>
-              <ElButton
-                v-show="isCertificateTrusted"
-                type="primary"
-                @click="fullScreenEditor"
-              >
-                <el-icon><FullScreen /></el-icon> 全屏显示
-              </ElButton>
+                    <el-icon><CirclePlusFilled /></el-icon> 导入
+                  </ElButton>
+                  <ElTooltip
+                    content="内网环境的 ssl 证书一般是自定义的，所以需要先让浏览器信任该证书，信任证书之后重新打开这个菜单即可"
+                  >
+                    <ElButton
+                      v-show="!isCertificateTrusted"
+                      type="warning"
+                      @click="trustCertificate"
+                    >
+                      <el-icon><Position /></el-icon> 点击信任插件
+                    </ElButton>
+                  </ElTooltip>
+                  <ElButton
+                    v-show="isCertificateTrusted"
+                    type="primary"
+                    @click="fullScreenEditor"
+                  >
+                    <el-icon><FullScreen /></el-icon> 全屏显示
+                  </ElButton>
+                </div>
+              </div>
+              <div class="onlyofficeView">
+                <div id="onlyOfficeEditor" />
+              </div>
             </div>
-          </div>
-          <div class="onlyofficeView">
-            <div id="onlyOfficeEditor" />
-          </div>
-        </div>
-      </ElCol>
-    </ElRow>
+          </el-scrollbar>
+        </template>
+      </splitpane>
+    </div>
+
     <OnlineDocEdit
       ref="OnlineDocEditRef"
       v-model="dialogVisible"
       @reset-table="editReload"
     />
-  </div>
+  </el-card>
 </template>
 
 <style lang="scss" scoped>
-.el-col {
-  border: 1px #aaa solid;
-}
-
-.text-success {
-  color: #70b603;
-  background-color: rgb(202 249 130 / 50.2%);
-}
-
-.text-warning {
-  color: #f59a23;
-  background-color: rgb(250 205 145 / 50.2%);
-}
-
-.share-tag-position {
-  position: absolute;
-  top: 5px;
-  width: 40px;
-  font-size: 11px;
-  text-align: center;
-}
-
-.permissions-tag-position {
-  position: absolute;
-  top: 5px;
-  left: 45px;
-  width: 40px;
-  font-size: 11px;
-  text-align: center;
-}
-
-.main-view .search {
-  margin-bottom: 0;
-}
-
-.main-view .main {
-  padding: 0 20px 20px;
-  border-radius: 4px;
-}
-
-.form-operat-button-group {
-  font-size: 20px;
-  font-weight: 800;
-  color: rgb(64 158 255);
-  writing-mode: vertical-rl;
-}
-
-.search-gtoup-item {
+.split-pane {
   width: 100%;
-}
+  height: calc(100vh - 200px);
+  border: 1px solid #e5e6eb;
 
-.import-plus {
-  margin-bottom: 10px;
-  border-left: 8px rgb(64 158 255) solid;
+  .list-pane {
+    padding: 10px;
 
-  .import-plus-title {
-    margin-left: 5px;
-    font-weight: 800;
+    &-operate {
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+
+      &-title {
+        font-size: 16px;
+        font-weight: 600;
+      }
+    }
   }
 
-  button {
-    float: right;
-    padding: 5px !important;
+  .doc-pane {
+    height: calc(100vh - 250px);
+
+    &-info {
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+
+      &-title {
+        display: inline-block;
+        align-self: center;
+        max-width: 300px;
+        font-size: 20px;
+        font-weight: 600;
+
+        &-icon {
+          font-size: 20px;
+          vertical-align: text-bottom;
+          color: var(--el-color-primary);
+        }
+      }
+    }
+
+    .onlyofficeView {
+      height: calc(100% - 40px);
+    }
   }
 }
 
-.form-data-list-action-bar {
-  margin-bottom: 10px;
-  border-left: 8px rgb(64 158 255) solid;
-
-  .form-data-title {
-    margin-right: 10px;
-    margin-left: 5px;
-    font-weight: 800;
-  }
-}
-
-.onlyofficeView {
-  height: 70vh;
-}
-</style>
-
-<style lang="scss">
-// 文字显示省略号
-.query-form-item > label,
 .ellipsis {
   display: inline-block;
+  width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #000;
   white-space: nowrap;
-}
-
-.no-padding-table-cell {
-  border: 1px #eee solid;
-  border-right: 0;
-  border-left: 0;
-}
-
-.no-padding-table-cell .cell {
-  padding: 0 !important;
-}
-
-// 表格的文字详情
-.list-table-column-value {
-  width: 100%;
-  margin-top: 10px;
-  margin-bottom: -10px;
-}
-
-// 查询列表的标题文字详情
-.query-form-item > label {
-  width: 120px;
 }
 </style>
