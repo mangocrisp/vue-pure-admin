@@ -783,6 +783,11 @@ onMounted(async () => {
   </el-card>
 </template>
 
+<style lang="scss">
+.el-scrollbar__view {
+  width: calc(100% - 25px);
+}
+</style>
 <style lang="scss" scoped>
 .split-pane {
   width: 100%;
@@ -790,7 +795,7 @@ onMounted(async () => {
   border: 1px solid #e5e6eb;
 
   .list-pane {
-    padding: 10px;
+    padding: 10px 10px 10px 25px;
 
     &-operate {
       display: flex;
@@ -807,7 +812,7 @@ onMounted(async () => {
   }
 
   .doc-pane {
-    height: calc(100vh - 250px);
+    height: calc(100vh - 220px);
 
     &-info {
       display: flex;

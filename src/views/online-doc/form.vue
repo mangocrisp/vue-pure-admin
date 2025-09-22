@@ -13,7 +13,6 @@ import type {
   TreeNode,
   TreeNodeData
 } from "element-plus/es/components/tree-v2/src/types";
-import GlobalDialog from "@base-lib/components/GlobalDialog/index.vue";
 import { useUserStoreHook } from "@/store/modules/user";
 import OnlineDocApi from "@/api/online-doc/online-doc";
 import { DeptUserTreeNodeType } from "./utils/types";
@@ -75,7 +74,7 @@ const addDTO = {
   /** 文档名称 */
   name: undefined,
   /** 文档是否共享 */
-  share: 1,
+  share: 0,
   /** 文档属性设置（字段等） */
   properties: undefined,
   /** 文档共享范围 */
@@ -103,9 +102,7 @@ const restFormFnRef = ref<any>(null);
 /** 初始化新增文档 */
 const iniAddForm = () => {
   form.value = JSON.parse(JSON.stringify(addDTO));
-  restFormFnRef.value = () => {
-    form.value = JSON.parse(JSON.stringify(addDTO));
-  };
+  restFormFnRef.value = () => JSON.parse(JSON.stringify(addDTO));
   defaultConfigForm.value = JSON.parse(JSON.stringify(addDTO));
 };
 /**
@@ -114,9 +111,7 @@ const iniAddForm = () => {
  */
 const iniUpdateForm = (data: OnlineDocType.OnlineDocUpdateDTO) => {
   form.value = JSON.parse(JSON.stringify(data));
-  restFormFnRef.value = () => {
-    form.value = JSON.parse(JSON.stringify(data));
-  };
+  restFormFnRef.value = () => JSON.parse(JSON.stringify(data));
   defaultConfigForm.value = JSON.parse(JSON.stringify(data));
 };
 
@@ -184,6 +179,8 @@ const submitData = async () => {
 const close = () => {
   actionType.value = "add";
   iniAddForm();
+  getDeptUserTreeData();
+  clearPermissions(deptUserTreeData.value);
 };
 
 /**
@@ -253,7 +250,7 @@ const fillExistedTree = async (
       };
     });
     data.forEach(i => {
-      const same = convertData.filter(j => j.key === i.key);
+      const same = convertData.filter(j => j.id === i.id);
       if (same && same.length > 0) {
         if (same[0].permissions && typeof same[0].permissions !== "string") {
           i.permissions = same[0]
@@ -311,8 +308,14 @@ const rest = (formEl: FormInstance | undefined | null) => {
   if (!formEl) return;
   if (actionType.value === "add") {
     formEl.resetFields();
+    getDeptUserTreeData();
+    clearPermissions(deptUserTreeData.value);
   } else {
-    form.value = restFormFnRef.value();
+    form.value.share = 0;
+    setTimeout(() => {
+      form.value = restFormFnRef.value();
+      initUpdateForm(form.value as any);
+    }, 50);
   }
 };
 
@@ -518,7 +521,7 @@ const onDeptUserTreeQueryChanged = async () => {
     deptUserTreeRef.value!.filter(deptUserTreeQuery.value);
     // 如果没有关键字，就折叠所有节点
     // if (deptUserTreeData.value && deptUserTreeData.value.length > 0) {
-    //   deptUserTreeData.value.map(item => item.key)
+    //   deptUserTreeData.value.map(item => item.id)
     //     .map(key => deptUserTreeRef.value!.getNode(key))
     //     .forEach((node) => {
     //       if (node) {
@@ -530,7 +533,8 @@ const onDeptUserTreeQueryChanged = async () => {
   }
   // todo 去后端查询数据回来，填回去这个列表，然后才能搜索
   const { data } = await SystemDeptApi.deptUserTreeByCondition(
-    deptUserTreeQuery.value
+    deptUserTreeQuery.value,
+    false
   );
   if (
     data &&
@@ -551,7 +555,7 @@ const onDeptUserTreeQueryChanged = async () => {
         };
       });
       data.forEach(i => {
-        const same = convertData.filter(j => j.key === i.key);
+        const same = convertData.filter(j => j.id === i.id);
         if (same && same.length > 0) {
           if (same[0].permissions && typeof same[0].permissions !== "string") {
             i.permissions = same[0]
@@ -849,7 +853,7 @@ getDeptUserTreeData();
     v-model="visible"
     width="75vw"
     :title="`${form.name || '新建文件'} `"
-    @closed="close"
+    @close="close"
   >
     <template #header>
       <el-tag type="primary">
