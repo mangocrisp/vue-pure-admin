@@ -1,0 +1,60 @@
+.split-pane {
+  width: 100%;
+  height: calc(100vh - 200px);
+  border: 1px solid #e5e6eb;
+
+  .list-pane {
+    padding: 10px 10px 10px 25px;
+
+    &-operate {
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+
+      &-title {
+        font-size: 16px;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .doc-pane {
+    height: calc(100vh - 220px);
+
+    &-info {
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+
+      &-title {
+        display: inline-block;
+        align-self: center;
+        max-width: 300px;
+        font-size: 20px;
+        font-weight: 600;
+
+        &-icon {
+          font-size: 20px;
+          vertical-align: text-bottom;
+          color: var(--el-color-primary);
+        }
+      }
+    }
+
+    .onlyofficeView {
+      height: calc(100% - 40px);
+    }
+  }
+}
+
+.ellipsis {
+  display: inline-block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
