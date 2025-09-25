@@ -1,0 +1,36 @@
+export const KeyName = {
+  /*主键 */
+  id: "主键",
+  /*业务类型 */
+  type: "业务类型",
+  /*模块 */
+  module: "模块",
+  /*模块标题 */
+  title: "接口标题",
+  /*接口描述 */
+  description: "接口描述",
+  /*请求方式 */
+  method: "请求方式",
+  /*请求URL */
+  url: "请求URL",
+  /*状态码 */
+  code: "状态码",
+  /*操作人员 */
+  username: "操作人员",
+  /*客户端 */
+  client: "客户端",
+  /*主机地址 */
+  ip: "主机地址",
+  /*请求参数 */
+  params: "请求参数",
+  /*返回参数 */
+  result: "返回参数",
+  /*创建人 */
+  createUser: "创建人",
+  /*创建时间 */
+  createTime: "创建时间",
+  /*更新人 */
+  updateUser: "更新人",
+  /*更新时间 */
+  updateTime: "更新时间"
+};

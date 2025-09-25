@@ -24,7 +24,7 @@ export function useRole() {
     {
       label: "jti",
       prop: "jti",
-      minWidth: 60
+      minWidth: 150
     },
     {
       label: "用户名",
@@ -74,11 +74,13 @@ export function useRole() {
   ];
 
   function handleSizeChange(val: number) {
-    console.log(`${val} items per page`);
+    pagination.pageSize = val;
+    onSearch();
   }
 
   function handleCurrentChange(val: number) {
-    console.log(`current page: ${val}`);
+    pagination.currentPage = val;
+    onSearch();
   }
 
   function handleSelectionChange(val) {
@@ -94,7 +96,10 @@ export function useRole() {
 
   async function onSearch() {
     loading.value = true;
-    const { data } = await SystemUserApi.online(toRaw(form));
+    const { data } = await SystemUserApi.online({
+      ...toRaw(form),
+      ...{ pageSize: pagination.pageSize, pageNum: pagination.currentPage }
+    });
     dataList.value = data.records;
     pagination.total = data.total;
     pagination.pageSize = data.size;
@@ -108,6 +113,7 @@ export function useRole() {
   const resetForm = formEl => {
     if (!formEl) return;
     formEl.resetFields();
+    pagination.currentPage = 1;
     onSearch();
   };
 

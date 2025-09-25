@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { useRole } from "./hook";
+import { useRole } from "./utils/log";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 
-import Plane from "~icons/ri/plane-line";
+import BxDetail from "~icons/bx/detail";
 import Refresh from "~icons/ep/refresh";
 
 defineOptions({
-  name: "OnlineUser"
+  name: "ScheduledLog"
 });
 
 const formRef = ref();
@@ -20,10 +20,10 @@ const {
   pagination,
   onSearch,
   resetForm,
-  handleOffline,
   handleSizeChange,
   handleCurrentChange,
-  handleSelectionChange
+  handleSelectionChange,
+  showDetail
 } = useRole();
 </script>
 
@@ -35,10 +35,10 @@ const {
       :model="form"
       class="search-form bg-bg_color w-full pl-8 pt-[12px] overflow-auto"
     >
-      <el-form-item label="用户名" prop="username">
+      <el-form-item label="任务键" prop="taskKey">
         <el-input
-          v-model="form.username"
-          placeholder="请输入用户名"
+          v-model="form.taskKey"
+          placeholder="业务类型"
           clearable
           class="w-[180px]!"
         />
@@ -61,7 +61,7 @@ const {
       </el-form-item>
     </el-form>
 
-    <PureTableBar title="在线用户" :columns="columns" @refresh="onSearch">
+    <PureTableBar title="任务调度日志" :columns="columns" @refresh="onSearch">
       <template v-slot="{ size, dynamicColumns }">
         <pure-table
           align-whole="center"
@@ -83,22 +83,16 @@ const {
           @page-current-change="handleCurrentChange"
         >
           <template #operation="{ row }">
-            <el-popconfirm
-              :title="`是否强制下线${row.userName}`"
-              @confirm="handleOffline(row)"
+            <el-button
+              class="reset-margin"
+              link
+              type="primary"
+              :size="size"
+              :icon="useRenderIcon(BxDetail)"
+              @click="showDetail(row)"
             >
-              <template #reference>
-                <el-button
-                  class="reset-margin"
-                  link
-                  type="primary"
-                  :size="size"
-                  :icon="useRenderIcon(Plane)"
-                >
-                  强退
-                </el-button>
-              </template>
-            </el-popconfirm>
+              详情
+            </el-button>
           </template>
         </pure-table>
       </template>

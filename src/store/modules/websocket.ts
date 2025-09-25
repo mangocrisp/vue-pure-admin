@@ -20,7 +20,7 @@ export const useWebSocketStore = defineStore("system-websocket", {
       isConnected: false,
       isConnecting: false,
       error: undefined,
-      wsUrl: websocketHost + "/system/websocket/{userId}?jti={jti}" // TODO 这个地址可能由于单体架构和微服务架构不同，需要根据实际情况修改
+      wsUrl: websocketHost + "/websocket/{userId}?jti={jti}" // TODO 这个地址可能由于单体架构和微服务架构不同，需要根据实际情况修改
     };
   },
   getters: {
