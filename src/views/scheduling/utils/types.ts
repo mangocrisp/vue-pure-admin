@@ -18,3 +18,10 @@ export const KeyName = {
   /** 更新时间 */
   updateTime: "更新时间"
 };
+
+interface EditFormDTO {
+  isAddForm?: boolean;
+  formInline: SchedulingType.AddDTO | SchedulingType.UpdateDTO;
+}
+
+export type { EditFormDTO };
