@@ -212,6 +212,9 @@ importers:
       vue-waterfall-plugin-next:
         specifier: ^2.6.7
         version: 2.6.9
+      vue3-cron-plus-picker:
+        specifier: ^1.0.2
+        version: 1.0.2
       vue3-danmaku:
         specifier: ^1.6.6
         version: 1.6.6(vue@3.5.21(typescript@5.9.2))
@@ -5633,6 +5636,9 @@ packages:
 
   vue-waterfall-plugin-next@2.6.9:
     resolution: {integrity: sha512-b6DGrH39RHPebRIVvj3kxBxJABbQx288YXrhBTpdzeA4aHQmHtqpvH8xwOHO+mkmz4WoXrTA5TapzMXjkVZKfQ==}
+
+  vue3-cron-plus-picker@1.0.2:
+    resolution: {integrity: sha512-SUVmAb2qSPMuAm5GIU0wQZyUawiiL3OKEy1HAZs94eZz+neKF+wEPNP4wICWMU78u4LzeCNni2Njnhf8bsqkcw==}
 
   vue3-danmaku@1.6.6:
     resolution: {integrity: sha512-6igzSqFxxVzu0IIqQdRrRQHltQiRT8oOleCIoxBwsjCJBvAe4oKjUnNQxFxhwhp+HwXiaCdgK8V73iUUk920zA==}
@@ -11529,6 +11535,8 @@ snapshots:
       vue-resize: 2.0.0-alpha.1(vue@3.5.21(typescript@5.9.2))
 
   vue-waterfall-plugin-next@2.6.9: {}
+
+  vue3-cron-plus-picker@1.0.2: {}
 
   vue3-danmaku@1.6.6(vue@3.5.21(typescript@5.9.2)):
     dependencies:

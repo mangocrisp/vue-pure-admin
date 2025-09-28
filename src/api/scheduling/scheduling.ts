@@ -1,10 +1,56 @@
 import useAxios from "@/hooks/core/useAxios";
+import { groupBatchIds } from "@/utils";
 
 const request = useAxios();
 
 const URL = "/scheduling/v1/scheduling";
 
 export default class SchedulingApi {
+  /**
+   * 重启任务
+   * @param keySet 重启任务键
+   * @returns 重启任务结果
+   */
+  static restart = (keySet: string[]): HttpReturn<any> => {
+    return request.put({
+      url: `${URL}/restart?${groupBatchIds(keySet, "keySet")}`
+    });
+  };
+
+  /**
+   * 停止任务
+   * @param keySet 停止的任务键
+   * @returns 停止结果
+   */
+  static stop = (keySet: string[]): HttpReturn<any> => {
+    return request.put({
+      url: `${URL}/stop?${groupBatchIds(keySet, "keySet")}`
+    });
+  };
+
+  /**
+   * 尝试执行一次
+   * @param key 尝试执行的任务键
+   * @returns 任务执行结果
+   */
+  static tryOnce = (key: string, params = "{}"): HttpReturn<any> => {
+    return request.post({
+      url: `${URL}/tryOnce/${key}`,
+      data: JSON.parse(params)
+    });
+  };
+
+  /**
+   * 启动任务
+   * @param keySet 任务键
+   * @returns 任务启动结果
+   */
+  static start = (keySet: string[]): HttpReturn<any> => {
+    return request.put({
+      url: `${URL}/start?${groupBatchIds(keySet, "keySet")}`
+    });
+  };
+
   /**
    * 日志分页查询
    * @param params 查询参数
@@ -33,7 +79,7 @@ export default class SchedulingApi {
       url: `${URL}/task/page`,
       params: {
         ...pageParams,
-        pageOrder: "update_time desc"
+        pageOrder: "sort asc"
       }
     });
   };
@@ -107,8 +153,7 @@ export default class SchedulingApi {
    */
   static batchRemove = (ids: string[]): HttpReturn<any> => {
     return request.delete({
-      url: `${URL}/batch`,
-      data: ids
+      url: `${URL}/batch?${groupBatchIds(ids)}`
     });
   };
 }

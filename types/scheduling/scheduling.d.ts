@@ -28,6 +28,8 @@ declare namespace SchedulingType {
     sort: number;
     /*任务启动参数 */
     params?: string;
+    /** 当前是否已启动 1 已启动 0 未启动 */
+    startFlag?: number;
   }
   /**调度日志 */
   export interface Log {

@@ -9,10 +9,10 @@ import Delete from "~icons/ep/delete";
 import EditPen from "~icons/ep/edit-pen";
 import Refresh from "~icons/ep/refresh";
 import AddFill from "~icons/ri/add-circle-line";
-import FileIconsMicrosoftExcel from "~icons/file-icons/microsoft-excel";
-import LucideBookTemplate from "~icons/lucide/book-template";
-import EpUploadFilled from "~icons/ep/upload-filled";
-import MaterialSymbolsCloudDownload from "~icons/material-symbols/cloud-download";
+import CodiconDebugStart from "~icons/codicon/debug-start";
+import SolarStopBold from "~icons/solar/stop-bold";
+import CodiconDebugRestart from "~icons/codicon/debug-restart";
+import More from "~icons/ep/more-filled";
 
 defineOptions({
   name: "permission"
@@ -36,7 +36,11 @@ const {
   handleDeleteBatch,
   handleSizeChange,
   handleCurrentChange,
-  handleSelectionChange
+  handleSelectionChange,
+  start,
+  stop,
+  tryOnce,
+  restart
 } = useScheduledTask();
 
 /**覆盖默认的上传行为 */
@@ -112,6 +116,27 @@ const requestUpload = () => Promise.resolve();
       >
         <template #buttons>
           <el-button
+            type="success"
+            :icon="useRenderIcon(CodiconDebugStart)"
+            @click="start()"
+          >
+            启动
+          </el-button>
+          <el-button
+            type="danger"
+            :icon="useRenderIcon(SolarStopBold)"
+            @click="stop()"
+          >
+            停止
+          </el-button>
+          <el-button
+            type="warning"
+            :icon="useRenderIcon(CodiconDebugRestart)"
+            @click="restart()"
+          >
+            重启
+          </el-button>
+          <el-button
             type="primary"
             :icon="useRenderIcon(AddFill)"
             @click="openDialog()"
@@ -183,6 +208,64 @@ const requestUpload = () => Promise.resolve();
                   </el-button>
                 </template>
               </el-popconfirm>
+              <el-dropdown>
+                <el-button
+                  class="ml-3! mt-[2px]!"
+                  link
+                  type="primary"
+                  :size="size"
+                  :icon="useRenderIcon(More)"
+                />
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item>
+                      <el-button
+                        class="reset-margin"
+                        link
+                        type="primary"
+                        :size="size"
+                        :icon="useRenderIcon(CodiconDebugStart)"
+                        @click="tryOnce(row)"
+                      >
+                        执行一次
+                      </el-button>
+                    </el-dropdown-item>
+                    <el-dropdown-item>
+                      <el-button
+                        link
+                        type="success"
+                        :size="size"
+                        :icon="useRenderIcon(CodiconDebugStart)"
+                        @click="start([row.taskKey])"
+                      >
+                        启动
+                      </el-button>
+                    </el-dropdown-item>
+                    <el-dropdown-item>
+                      <el-button
+                        type="danger"
+                        link
+                        :size="size"
+                        :icon="useRenderIcon(SolarStopBold)"
+                        @click="stop([row.taskKey])"
+                      >
+                        停止
+                      </el-button>
+                    </el-dropdown-item>
+                    <el-dropdown-item>
+                      <el-button
+                        type="warning"
+                        link
+                        :size="size"
+                        :icon="useRenderIcon(CodiconDebugRestart)"
+                        @click="restart([row.taskKey])"
+                      >
+                        重启
+                      </el-button>
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
             </template>
           </pure-table>
         </template>

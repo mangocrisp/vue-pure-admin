@@ -7,6 +7,7 @@ import { deviceDetection } from "@pureadmin/utils";
 import { reactive, ref, onMounted, h, toRaw } from "vue";
 import SchedulingApi from "@/api/scheduling/scheduling";
 import type { EditFormDTO } from "./types";
+import { ElMessageBox } from "element-plus";
 
 export function useScheduledTask() {
   /**操作名 */
@@ -35,46 +36,32 @@ export function useScheduledTask() {
     currentPage: 1,
     background: true
   });
+  const switchLoadMap = ref({});
   /** 列名 */
   const columns: TableColumnList = [
     {
       label: "主键",
       prop: "id",
-      fixed: "left"
-    },
-    {
-      label: "创建人",
-      prop: "createUser"
+      fixed: "left",
+      width: 190
     },
     {
       label: "创建时间",
       prop: "createTime",
       minWidth: 160,
-      formatter: ({ dateTime }) =>
-        dateTime ? dayjs(dateTime).format("YYYY-MM-DD HH:mm:ss") : "-"
-    },
-    {
-      label: "修改人",
-      prop: "updateUser"
+      formatter: ({ createTime }) =>
+        createTime ? dayjs(createTime).format("YYYY-MM-DD HH:mm:ss") : "-"
     },
     {
       label: "修改时间",
       prop: "updateTime",
       minWidth: 160,
-      formatter: ({ dateTime }) =>
-        dateTime ? dayjs(dateTime).format("YYYY-MM-DD HH:mm:ss") : "-"
+      formatter: ({ updateTime }) =>
+        updateTime ? dayjs(updateTime).format("YYYY-MM-DD HH:mm:ss") : "-"
     },
     {
       label: "是否已删除",
       prop: "isDeleted"
-    },
-    {
-      label: "租户id",
-      prop: "tenantId"
-    },
-    {
-      label: "逻辑唯一键",
-      prop: "uniqueKey"
     },
     {
       label: "任务键",
@@ -89,26 +76,104 @@ export function useScheduledTask() {
       prop: "cron"
     },
     {
-      label: "是否自动启动(1 是 0 否)",
-      prop: "autoStart"
+      label: "状态",
+      prop: "startFlag",
+      minWidth: 100,
+      cellRenderer: scope => (
+        <>
+          <el-tag type={scope.row.startFlag === 1 ? "success" : "danger"}>
+            {scope.row.startFlag === 1 ? "已启动" : "未启动"}
+          </el-tag>
+        </>
+      )
+    },
+    {
+      label: "是否自动启动",
+      cellRenderer: scope => (
+        <el-switch
+          size={scope.props.size === "small" ? "small" : "default"}
+          loading={switchLoadMap.value[scope.index]?.loading}
+          v-model={scope.row.autoStart}
+          active-value={1}
+          inactive-value={0}
+          active-text="已启用"
+          inactive-text="已停用"
+          inline-prompt
+          onChange={() => toggleAutoStart(scope as any)}
+        />
+      ),
+      minWidth: 90
     },
     {
       label: "排序",
       prop: "sort"
-    },
-    {
-      label: "任务启动参数",
-      prop: "params"
     },
     /** 如果是 JSON 类型，需要转换才能正常显示：formatter: ({ jsonType }) => (jsonType ? JSON.stringify(jsonType) : "-")*/
     { type: "selection", fixed: "right", reserveSelection: true },
     {
       label: "操作",
       fixed: "right",
-      width: 210,
+      width: 250,
       slot: "operation"
     }
   ];
+
+  /**
+   * 状态修改
+   * @param row 当前行
+   */
+  function toggleAutoStart({ row, index }) {
+    ElMessageBox.confirm(
+      `确认要<strong>${
+        row.autoStart === 0 ? "停用" : "启用"
+      }</strong><strong style='color:var(--el-color-primary)'>${
+        row.taskKey
+      }</strong>自动启动任务吗?`,
+      "系统提示",
+      {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+        dangerouslyUseHTMLString: true,
+        draggable: true
+      }
+    )
+      .then(async () => {
+        switchLoadMap.value[index] = Object.assign(
+          {},
+          switchLoadMap.value[index],
+          {
+            loading: true
+          }
+        );
+        await SchedulingApi.update({
+          id: row.id,
+          /** 任务键 */
+          taskKey: row.taskKey,
+          /** 任务描述 */
+          description: row.description,
+          /** cron 表达式 */
+          cron: row.cron,
+          /** 是否自动启动(1 是 0 否) */
+          autoStart: row.autoStart,
+          /** 排序 */
+          sort: row.sort
+        });
+        switchLoadMap.value[index] = Object.assign(
+          {},
+          switchLoadMap.value[index],
+          {
+            loading: false
+          }
+        );
+        message(`已${row.autoStart === 0 ? "停用" : "启用"}${row.taskKey}`, {
+          type: "success"
+        });
+      })
+      .catch(() => {
+        row.autoStart === 0 ? (row.autoStart = 1) : (row.autoStart = 0);
+      });
+  }
 
   /** 选中的行 */
   const selectedRows: SchedulingType.Domain[] = [];
@@ -118,7 +183,11 @@ export function useScheduledTask() {
    * @param row 当前行
    */
   async function handleDelete(row) {
-    message(`您删除了${operateName}名称为${row.name}的这条数据`, {
+    if (row.startFlag === 1) {
+      message(`当前任务正在执行中，请先停止！`, { type: "warning" });
+      return;
+    }
+    message(`您删除了${operateName}名称为${row.taskKey}的这条数据`, {
       type: "success"
     });
     await SchedulingApi.remove(row.id);
@@ -129,6 +198,10 @@ export function useScheduledTask() {
   async function handleDeleteBatch() {
     if (selectedRows.length === 0) {
       message(`请至少勾选一条数据`, { type: "warning" });
+      return;
+    }
+    if (selectedRows.some(item => item.startFlag === 1)) {
+      message(`当前任务正在执行中，请先停止！`, { type: "warning" });
       return;
     }
     loading.value = true;
@@ -201,6 +274,7 @@ export function useScheduledTask() {
       props: {
         isAddForm: title === "新增",
         formInline: {
+          id: row?.id,
           /** 任务键 */
           taskKey: row?.taskKey,
           /** 任务描述 */
@@ -258,6 +332,94 @@ export function useScheduledTask() {
     });
   }
 
+  const start = async (keySet = []) => {
+    if (selectedRows.length === 0) {
+      if (keySet.length === 0) {
+        message(`请至少勾选一条数据`, { type: "warning" });
+        return;
+      }
+    } else {
+      if (keySet.length === 0) {
+        keySet = selectedRows.map(item => item.taskKey);
+      }
+    }
+    loading.value = true;
+    try {
+      const { message: msg } = await SchedulingApi.start(keySet);
+      message(msg, { type: "success" });
+      selectedRows.length = 0;
+      onSearch();
+    } catch (error) {
+      console.error("error =>", error);
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const stop = async (keySet = []) => {
+    if (selectedRows.length === 0) {
+      if (keySet.length === 0) {
+        message(`请至少勾选一条数据`, { type: "warning" });
+        return;
+      }
+    } else {
+      if (keySet.length === 0) {
+        keySet = selectedRows.map(item => item.taskKey);
+      }
+    }
+    loading.value = true;
+    try {
+      const { message: msg } = await SchedulingApi.stop(keySet);
+      message(msg, { type: "success" });
+      selectedRows.length = 0;
+      onSearch();
+    } catch (error) {
+      console.error("error =>", error);
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const restart = async (keySet = []) => {
+    if (selectedRows.length === 0) {
+      if (keySet.length === 0) {
+        message(`请至少勾选一条数据`, { type: "warning" });
+        return;
+      }
+    } else {
+      if (keySet.length === 0) {
+        keySet = selectedRows.map(item => item.taskKey);
+      }
+    }
+    loading.value = true;
+    try {
+      const { message: msg } = await SchedulingApi.restart(keySet);
+      message(msg, { type: "success" });
+      selectedRows.length = 0;
+      onSearch();
+    } catch (error) {
+      console.error("error =>", error);
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const tryOnce = async (row: SchedulingType.Domain) => {
+    try {
+      const { message: msg } = await SchedulingApi.tryOnce(
+        row.taskKey,
+        row.params
+      );
+      message(msg, { type: "success" });
+      selectedRows.length = 0;
+      onSearch();
+    } catch (error) {
+      console.error("error =>", error);
+    } finally {
+      loading.value = false;
+    }
+  };
+
   /** 行样式 */
   function rowStyle() {
     return {};
@@ -282,6 +444,10 @@ export function useScheduledTask() {
     handleDeleteBatch,
     handleSizeChange,
     handleCurrentChange,
-    handleSelectionChange
+    handleSelectionChange,
+    start,
+    stop,
+    tryOnce,
+    restart
   };
 }

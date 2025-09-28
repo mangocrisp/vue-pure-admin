@@ -115,6 +115,7 @@
     "vue-types": "^6.0.0",
     "vue-virtual-scroller": "2.0.0-beta.8",
     "vue-waterfall-plugin-next": "^2.6.7",
+    "vue3-cron-plus-picker": "^1.0.2",
     "vue3-danmaku": "^1.6.6",
     "vue3-puzzle-vcode": "^1.1.7",
     "vuedraggable": "^4.1.0",

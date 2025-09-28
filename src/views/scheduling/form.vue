@@ -3,6 +3,9 @@ import { defineAsyncComponent, ref } from "vue";
 import { formRules } from "./utils/rule";
 import type { EditFormDTO } from "./utils/types";
 import { cloneDeep } from "@pureadmin/utils";
+import "vue3-cron-plus-picker/style.css";
+import { Vue3CronPlusPicker } from "vue3-cron-plus-picker";
+import { message } from "@/utils/message";
 
 const props = withDefaults(defineProps<EditFormDTO>(), {
   isAddForm: true,
@@ -45,7 +48,38 @@ function resetForm() {
   }
 }
 
+const showCron = ref(false);
+
+const cronFill = (expression: string) => {
+  if (expression && expression.length > 0) {
+    formRef.value.clearValidate("cron");
+  }
+  const cronArr = expression.split(" ");
+  /*
+  cron 表达式有几种格式：quartz 或者 spring
+   0 0 0/1 * * ?
+   秒 分 时 日 月 周
+   crontab（5位没有秒）
+   0 0/1 * * ?
+   分 时 日 月 周
+  */
+  if (cronArr.length < 6) {
+    message("请输入正确的六位cron表达式，如：0 0 0/1 * * ?");
+    return;
+  } else if (cronArr.length > 6) {
+    formData.value.cron = cronArr.splice(0, 6).join(" ");
+    return;
+  }
+  formData.value.cron = expression;
+};
+
+const cronHide = () => {
+  showCron.value = false;
+};
+
 //======================================== 代码编辑器 start ========================================================
+
+const codeEditorLoading = ref(false);
 
 /**可选字段导出面板 */
 const CodeEditor = defineAsyncComponent(
@@ -67,13 +101,13 @@ const editContentKey = ref<string>("");
  * @param l 语言
  */
 const showEditor = (key, l = "text") => {
+  codeEditorLoading.value = true;
   editContentKey.value = key;
   drawerDataView.value = !drawerDataView.value;
-  // const loadingInstance = ElLoading.service({})
   setTimeout(
     () => {
       (codeEditorRef.value as any).render(formData.value[key] ?? "", l);
-      // loadingInstance.close()
+      codeEditorLoading.value = false;
     },
     codeEditorRef.value ? 50 : 500
   );
@@ -126,13 +160,22 @@ defineExpose({ getFormRef, resetForm });
             </el-form-item>
           </el-tooltip>
         </el-col>
-        <el-col :span="12" :xs="24" :sm="12">
+        <el-col :span="24" :xs="24" :sm="24">
           <el-tooltip content="cron 表达式" :trigger-keys="[]">
             <el-form-item label="cron 表达式" prop="cron">
               <el-input
                 v-model="formData.cron"
                 clearable
                 placeholder="请输入cron 表达式"
+                @focus="showCron = true"
+              />
+              <!-- 这个不一定好用，将就着用吧 -->
+              <vue3-cron-plus-picker
+                v-show="showCron"
+                style="width: 100%"
+                :expression="formData.cron"
+                @fill="cronFill"
+                @hide="cronHide"
               />
             </el-form-item>
           </el-tooltip>
@@ -146,8 +189,8 @@ defineExpose({ getFormRef, resetForm });
                 clearable
                 class="w-[100%]!"
               >
-                <el-option label="是" value="1" />
-                <el-option label="否" value="0" />
+                <el-option label="是" :value="1" />
+                <el-option label="否" :value="0" />
               </el-select>
             </el-form-item>
           </el-tooltip>
@@ -192,7 +235,11 @@ defineExpose({ getFormRef, resetForm });
       :z-index="99999"
       :before-close="handleEditorClose"
     >
-      <CodeEditor ref="codeEditorRef" :options="{ readOnly: false }" />
+      <CodeEditor
+        ref="codeEditorRef"
+        v-loading="codeEditorLoading"
+        :options="{ readOnly: false }"
+      />
     </el-drawer>
   </div>
 </template>
