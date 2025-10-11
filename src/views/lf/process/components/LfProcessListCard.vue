@@ -133,6 +133,12 @@ const handleClickShowDesign = (data: LfProcessType.ProcessListVO) => {
   cursor: pointer;
   border-radius: 3px;
 
+  /* 初始阴影 */
+  box-shadow: 0 4px 6px rgb(0 0 0 / 10%);
+
+  /* 过渡动画：所有属性变化在0.3秒内完成，缓动效果 */
+  transition: all 0.3s ease;
+
   &_detail {
     flex: 1;
     min-height: 140px;
@@ -204,5 +210,19 @@ const handleClickShowDesign = (data: LfProcessType.ProcessListVO) => {
       color: #bababa;
     }
   }
+}
+
+/* 悬停效果：组合多种变化 */
+.list-card-item:hover {
+  /* 阴影加深，增强悬浮感 */
+  box-shadow: 0 10px 20px rgb(0 0 0 / 15%);
+
+  /* 向上移动5px */
+  transform: translateY(-5px);
+}
+
+.list-card-item:hover .list-card-item_detail--name,
+.list-card-item:hover .list-card-item_detail--desc {
+  color: var(--el-color-primary);
 }
 </style>
