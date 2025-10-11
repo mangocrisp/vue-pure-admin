@@ -109,10 +109,11 @@ function onClear() {
 watch(
   () => pageList.value,
   () =>
-    (totalPage.value =
+    (totalPage.value = (
       copyIconList[currentActiveType.value]?.filter(i =>
         i.includes(filterValue.value)
-      ) ?? []).length,
+      ) ?? []
+    ).length),
   { immediate: true }
 );
 watch(
