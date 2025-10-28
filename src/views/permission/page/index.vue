@@ -20,18 +20,22 @@ const username = ref(useUserStoreHook()?.username);
 
 const options = [
   {
-    value: "admin",
-    label: "管理员角色"
+    value: "root",
+    label: "超级管理员"
   },
   {
-    value: "common",
-    label: "普通角色"
+    value: "admin",
+    label: "管理员"
+  },
+  {
+    value: "user",
+    label: "普通用户"
   }
 ];
 
 function onChange() {
   useUserStoreHook()
-    .loginByUsername({ username: username.value, password: "admin123" })
+    .loginByUsername({ username: username.value, password: "123456" })
     .then(res => {
       if (res.success) {
         storageLocal().removeItem("async-routes");

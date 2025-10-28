@@ -122,6 +122,7 @@ export const permissionRouter = {
     {
       path: "/perm/page/index",
       name: "PermissionPage",
+      component: "permission/page/index",
       meta: {
         title: "menus.purePermissionPage",
         roles: ["admin", "common"]
@@ -140,11 +141,7 @@ export const permissionRouter = {
           name: "PermissionButtonRouter",
           meta: {
             title: "menus.purePermissionButtonRouter",
-            auths: [
-              "permission:btn:add",
-              "permission:btn:edit",
-              "permission:btn:delete"
-            ]
+            auths: ["permission:btn:add", "permission:btn:edit"]
           }
         },
         {
