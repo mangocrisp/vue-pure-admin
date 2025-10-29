@@ -1,4 +1,5 @@
 import type { PureHttpRequestConfig } from "./types.d";
+import { Md5 } from "ts-md5";
 
 /** 只能过滤简单的请求，如果请求参数为复杂对象，则要考虑过滤成本(key 会太长，序列化需要时间) */
 function getReqKey(config: PureHttpRequestConfig) {
@@ -12,7 +13,8 @@ function getReqKey(config: PureHttpRequestConfig) {
     typeof data === "string" ? data : JSON.stringify(data) // TODO: 请求拦截config的data为数组, 但在响应拦截config的data返回变成了字符串, 所以需要判断一下是否转换
   ].join("&");
 
-  return requestKey;
+  // return requestKey;
+  return Md5.hashStr(requestKey);
 }
 
 class CancelRepeatRequest {
@@ -22,6 +24,7 @@ class CancelRepeatRequest {
   set(config: PureHttpRequestConfig) {
     if (config.isCancelRepeat) return;
     const reqKey = getReqKey(config);
+    console.log(reqKey);
     if (reqKey.length > 2000) {
       // 如果 key 太长了，就直接返回了，太长了，过滤不了
       return;
@@ -36,13 +39,15 @@ class CancelRepeatRequest {
       this.pendingRequestMap.set(reqKey, controller);
     }
     setTimeout(() => {
+      // 如果 60 秒后还没响应，就删除，避免内存泄漏
       this.pendingRequestMap.delete(reqKey);
-    });
+    }, 60000);
   }
 
   del(config: PureHttpRequestConfig) {
     if (config.isCancelRepeat) return;
     const reqKey = getReqKey(config);
+    console.log(reqKey);
     this.pendingRequestMap.delete(reqKey);
   }
 }

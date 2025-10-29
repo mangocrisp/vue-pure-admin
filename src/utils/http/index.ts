@@ -14,6 +14,7 @@ import type {
 import { getToken, formatToken } from "@/utils/auth";
 import { useUserStoreHook } from "@/store/modules/user";
 import { ElMessage, ElNotification } from "element-plus";
+import cancelRepeatRequest from "./cancelRepeatRequest";
 
 // 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
 const defaultConfig: AxiosRequestConfig = {
@@ -97,6 +98,8 @@ class PureHttp {
   private httpInterceptorsRequest(): void {
     PureHttp.axiosInstance.interceptors.request.use(
       async (config: PureHttpRequestConfig): Promise<any> => {
+        // 防止重复请求
+        cancelRepeatRequest.set(config);
         // 优先判断post/get等方法是否传入回调，否则执行初始化设置等回调
         if (typeof config.beforeRequestCallback === "function") {
           config.beforeRequestCallback(config);
@@ -184,6 +187,8 @@ class PureHttp {
     instance.interceptors.response.use(
       (response: PureHttpResponse, option = { fileResHeaders }) => {
         const $config = response.config;
+        // 移除重复请求记录
+        cancelRepeatRequest.del($config);
         const { data, headers } = response || {};
         const { code = "", message = "", success = undefined } = data || {};
         // 优先判断post/get等方法是否传入回调，否则执行初始化设置等回调
@@ -217,6 +222,8 @@ class PureHttp {
       },
       async (error: PureHttpError<ResponseBody>) => {
         const $error = error;
+        // 移除重复请求记录
+        cancelRepeatRequest.del($error.config);
         if ($error.code === "ERR_CANCELED") {
           ElNotification({
             title: "重复查询",
