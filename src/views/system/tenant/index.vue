@@ -102,6 +102,7 @@ const {
       <PureTableBar :columns="columns" title="系统租户" @refresh="onSearch">
         <template #buttons>
           <el-button
+            v-auth="['system:tenant:add']"
             type="primary"
             :icon="useRenderIcon(AddFill)"
             @click="openDialog()"
@@ -115,7 +116,11 @@ const {
             @confirm="handleDeleteBatch"
           >
             <template #reference>
-              <el-button type="danger" :icon="useRenderIcon(Delete)">
+              <el-button
+                v-auth="['system:tenant:del:batch']"
+                type="danger"
+                :icon="useRenderIcon(Delete)"
+              >
                 删除
               </el-button>
             </template>
@@ -149,6 +154,7 @@ const {
           >
             <template #operation="{ row }">
               <el-button
+                v-auth="['system:tenant:edit']"
                 class="reset-margin"
                 link
                 type="primary"
@@ -165,6 +171,7 @@ const {
               >
                 <template #reference>
                   <el-button
+                    v-auth="['system:tenant:user:allot']"
                     class="reset-margin"
                     link
                     type="warning"
@@ -181,6 +188,7 @@ const {
               >
                 <template #reference>
                   <el-button
+                    v-auth="['system:tenant:del']"
                     class="reset-margin"
                     link
                     type="danger"

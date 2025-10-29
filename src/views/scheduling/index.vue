@@ -116,6 +116,7 @@ const requestUpload = () => Promise.resolve();
       >
         <template #buttons>
           <el-button
+            v-auth="['scheduling:task:start']"
             type="success"
             :icon="useRenderIcon(CodiconDebugStart)"
             @click="start()"
@@ -123,6 +124,7 @@ const requestUpload = () => Promise.resolve();
             启动
           </el-button>
           <el-button
+            v-auth="['scheduling:task:stop']"
             type="danger"
             :icon="useRenderIcon(SolarStopBold)"
             @click="stop()"
@@ -130,6 +132,7 @@ const requestUpload = () => Promise.resolve();
             停止
           </el-button>
           <el-button
+            v-auth="['scheduling:task:restart']"
             type="warning"
             :icon="useRenderIcon(CodiconDebugRestart)"
             @click="restart()"
@@ -137,6 +140,7 @@ const requestUpload = () => Promise.resolve();
             重启
           </el-button>
           <el-button
+            v-auth="['scheduling:task:add']"
             type="primary"
             :icon="useRenderIcon(AddFill)"
             @click="openDialog()"
@@ -149,7 +153,11 @@ const requestUpload = () => Promise.resolve();
             @confirm="handleDeleteBatch"
           >
             <template #reference>
-              <el-button type="danger" :icon="useRenderIcon(Delete)">
+              <el-button
+                v-auth="['scheduling:task:del:batch']"
+                type="danger"
+                :icon="useRenderIcon(Delete)"
+              >
                 删除
               </el-button>
             </template>
@@ -183,6 +191,7 @@ const requestUpload = () => Promise.resolve();
           >
             <template #operation="{ row }">
               <el-button
+                v-auth="['scheduling:task:edit']"
                 class="reset-margin"
                 link
                 type="primary"
@@ -198,6 +207,7 @@ const requestUpload = () => Promise.resolve();
               >
                 <template #reference>
                   <el-button
+                    v-auth="['scheduling:task:del']"
                     class="reset-margin"
                     link
                     type="danger"
@@ -220,6 +230,7 @@ const requestUpload = () => Promise.resolve();
                   <el-dropdown-menu>
                     <el-dropdown-item>
                       <el-button
+                        v-auth="['scheduling:task:start']"
                         class="reset-margin"
                         link
                         type="primary"
@@ -232,6 +243,7 @@ const requestUpload = () => Promise.resolve();
                     </el-dropdown-item>
                     <el-dropdown-item>
                       <el-button
+                        v-auth="['scheduling:task:start']"
                         link
                         type="success"
                         :size="size"
@@ -243,6 +255,7 @@ const requestUpload = () => Promise.resolve();
                     </el-dropdown-item>
                     <el-dropdown-item>
                       <el-button
+                        v-auth="['scheduling:task:stop']"
                         type="danger"
                         link
                         :size="size"
@@ -254,6 +267,7 @@ const requestUpload = () => Promise.resolve();
                     </el-dropdown-item>
                     <el-dropdown-item>
                       <el-button
+                        v-auth="['scheduling:task:restart']"
                         type="warning"
                         link
                         :size="size"

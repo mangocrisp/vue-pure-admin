@@ -11,6 +11,7 @@ import { usePublicHooks } from "../../hooks";
 import { onBeforeRouteUpdate, useRoute } from "vue-router";
 import type { DictEditFormDTO } from "./types";
 import SystemDictApi from "@/api/system/dict";
+import { hasAuth } from "@/router/utils";
 
 export function usePermission() {
   const route = useRoute();
@@ -55,6 +56,7 @@ export function usePermission() {
       label: "状态",
       cellRenderer: scope => (
         <el-switch
+          disabled={!hasAuth(["system:dict:edit"])}
           size={scope.props.size === "small" ? "small" : "default"}
           loading={switchLoadMap.value[scope.index]?.loading}
           v-model={scope.row.status}

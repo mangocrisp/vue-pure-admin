@@ -18,6 +18,7 @@ import {
 } from "@/utils/roleMenuPerm";
 import SystemRoleMenuApi from "@/api/system/roleMenu";
 import SystemRolePermApi from "@/api/system/rolePerm";
+import { hasAuth } from "@/router/utils";
 
 export function useRole(treeRef: Ref) {
   /** 查询表单 */
@@ -79,6 +80,7 @@ export function useRole(treeRef: Ref) {
       label: "状态",
       cellRenderer: scope => (
         <el-switch
+          disabled={!hasAuth(["system:role:edit"])}
           size={scope.props.size === "small" ? "small" : "default"}
           loading={switchLoadMap.value[scope.index]?.loading}
           v-model={scope.row.status}

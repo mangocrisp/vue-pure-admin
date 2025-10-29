@@ -11,6 +11,7 @@ import SystemDictTypeApi from "@/api/system/dictType";
 import { usePublicHooks } from "../../hooks";
 import { RouterLink } from "vue-router";
 import type { DictTtypeEditFormDTO } from "./types";
+import { hasAuth } from "@/router/utils";
 
 export function usePermission() {
   /** 查询表单 */
@@ -57,6 +58,7 @@ export function usePermission() {
       label: "状态",
       cellRenderer: scope => (
         <el-switch
+          disabled={!hasAuth(["system:dict-type:edit"])}
           size={scope.props.size === "small" ? "small" : "default"}
           loading={switchLoadMap.value[scope.index]?.loading}
           v-model={scope.row.status}

@@ -11,6 +11,7 @@ import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import { usePublicHooks } from "../../hooks";
 import SystemTenantApi from "@/api/system/tenant";
 import router from "@/router";
+import { hasAuth } from "@/router/utils";
 
 export function usePermission() {
   /** 查询表单 */
@@ -73,6 +74,7 @@ export function usePermission() {
       minWidth: 90,
       cellRenderer: scope => (
         <el-switch
+          disabled={!hasAuth(["system:tenant:edit"])}
           size={scope.props.size === "small" ? "small" : "default"}
           loading={switchLoadMap.value[scope.index]?.loading}
           v-model={scope.row.status}

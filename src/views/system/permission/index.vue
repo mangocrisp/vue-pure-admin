@@ -73,6 +73,7 @@ const {
       <PureTableBar title="权限管理" :columns="columns" @refresh="onSearch">
         <template #buttons>
           <el-button
+            v-auth="['system:permission:add']"
             type="primary"
             :icon="useRenderIcon(AddFill)"
             @click="openDialog()"
@@ -86,7 +87,11 @@ const {
             @confirm="handleDeleteBatch"
           >
             <template #reference>
-              <el-button type="danger" :icon="useRenderIcon(Delete)">
+              <el-button
+                v-auth="['system:permission:del:batch']"
+                type="danger"
+                :icon="useRenderIcon(Delete)"
+              >
                 删除
               </el-button>
             </template>
@@ -120,6 +125,7 @@ const {
           >
             <template #operation="{ row }">
               <el-button
+                v-auth="['system:permission:edit']"
                 class="reset-margin"
                 link
                 type="primary"
@@ -135,6 +141,7 @@ const {
               >
                 <template #reference>
                   <el-button
+                    v-auth="['system:permission:del']"
                     class="reset-margin"
                     link
                     type="danger"

@@ -89,6 +89,7 @@ const {
             >
               <template #reference>
                 <el-button
+                  v-auth="['system:user:force-all']"
                   class="reset-margin"
                   link
                   type="primary"

@@ -42,6 +42,7 @@ import AdminFileApi from "@/api/admin/file";
 import { blobToDataURI } from "@/utils";
 import SystemRoleApi from "@/api/system/role";
 import SystemTenantApi from "@/api/system/tenant";
+import { hasAuth } from "@/router/utils";
 
 export function useUser(tableRef: Ref, treeRef: Ref) {
   const form = reactive({
@@ -137,6 +138,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
           size={scope.props.size === "small" ? "small" : "default"}
           loading={switchLoadMap.value[scope.index]?.loading}
           v-model={scope.row.status}
+          disabled={!hasAuth(["system:user:edit"])}
           active-value={1}
           inactive-value={0}
           active-text="已启用"

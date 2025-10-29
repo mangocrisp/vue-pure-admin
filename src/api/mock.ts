@@ -141,7 +141,11 @@ export const permissionRouter = {
           name: "PermissionButtonRouter",
           meta: {
             title: "menus.purePermissionButtonRouter",
-            auths: ["permission:btn:add", "permission:btn:edit"]
+            auths: [
+              "permission:btn:add",
+              "permission:btn:edit",
+              "permission:btn:delete"
+            ]
           }
         },
         {
