@@ -43,6 +43,12 @@ export const userKey = "user-info";
 /** 顶级角色 code */
 export const ROOTRoleCode = ["ROOT"];
 
+/** 判断是否为顶级角色 */
+export function isROOTRole(roles: Array<string>): boolean {
+  if (!roles || roles.length === 0) return false;
+  return roles.some(role => ROOTRoleCode.includes(role));
+}
+
 export const AuthorizedKeyPrefix = "authorized_";
 
 /**

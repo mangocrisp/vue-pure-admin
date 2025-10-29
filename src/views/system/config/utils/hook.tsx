@@ -11,6 +11,7 @@ import { usePublicHooks } from "../../hooks";
 import type { EditFormDTO } from "./types";
 import SystemParamsApi from "@/api/system/params";
 import { ParamsType } from "./enums";
+import { hasAuth } from "@/router/utils";
 
 export function usePermission() {
   /** 查询表单 */
@@ -58,6 +59,7 @@ export function usePermission() {
       label: "状态",
       cellRenderer: scope => (
         <el-switch
+          disabled={!hasAuth(["system:params:edit"])}
           size={scope.props.size === "small" ? "small" : "default"}
           loading={switchLoadMap.value[scope.index]?.loading}
           v-model={scope.row.status}

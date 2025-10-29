@@ -89,6 +89,7 @@ const {
       <PureTableBar :columns="columns" title="系统参数" @refresh="onSearch">
         <template #buttons>
           <el-button
+            v-auth="['system:params:add']"
             type="primary"
             :icon="useRenderIcon(AddFill)"
             @click="openDialog()"
@@ -102,7 +103,11 @@ const {
             @confirm="handleDeleteBatch"
           >
             <template #reference>
-              <el-button type="danger" :icon="useRenderIcon(Delete)">
+              <el-button
+                v-auth="['system:params:del:batch']"
+                type="danger"
+                :icon="useRenderIcon(Delete)"
+              >
                 删除
               </el-button>
             </template>
@@ -136,6 +141,7 @@ const {
           >
             <template #operation="{ row }">
               <el-button
+                v-auth="['system:params:edit']"
                 class="reset-margin"
                 link
                 type="primary"
@@ -151,6 +157,7 @@ const {
               >
                 <template #reference>
                   <el-button
+                    v-auth="['system:params:del']"
                     class="reset-margin"
                     link
                     type="danger"

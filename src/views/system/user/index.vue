@@ -121,6 +121,7 @@ const {
       >
         <template #buttons>
           <el-button
+            v-auth="['system:user:add']"
             type="primary"
             :icon="useRenderIcon(AddFill)"
             @click="openDialog()"
@@ -147,7 +148,12 @@ const {
             </div>
             <el-popconfirm title="是否确认删除?" @confirm="onbatchDel">
               <template #reference>
-                <el-button type="danger" text class="mr-1!">
+                <el-button
+                  v-auth="['system:user:del:batch']"
+                  type="danger"
+                  text
+                  class="mr-1!"
+                >
                   批量删除
                 </el-button>
               </template>
@@ -175,6 +181,7 @@ const {
           >
             <template #operation="{ row }">
               <el-button
+                v-auth="['system:user:edit']"
                 class="reset-margin"
                 link
                 type="primary"
@@ -190,6 +197,7 @@ const {
               >
                 <template #reference>
                   <el-button
+                    v-auth="['system:user:del']"
                     class="reset-margin"
                     link
                     type="primary"
@@ -224,6 +232,7 @@ const {
                     </el-dropdown-item>
                     <el-dropdown-item>
                       <el-button
+                        v-auth="['system:user:passwd']"
                         :class="buttonClass"
                         link
                         type="primary"
@@ -236,6 +245,7 @@ const {
                     </el-dropdown-item>
                     <el-dropdown-item>
                       <el-button
+                        v-auth="['system:user:edit']"
                         :class="buttonClass"
                         link
                         type="primary"
@@ -248,6 +258,7 @@ const {
                     </el-dropdown-item>
                     <el-dropdown-item>
                       <el-button
+                        v-auth="['system:user:edit']"
                         :class="buttonClass"
                         link
                         type="primary"

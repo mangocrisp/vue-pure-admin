@@ -118,6 +118,7 @@ const {
         </template>
         <template #buttons>
           <el-button
+            v-auth="['system:dict:add']"
             type="primary"
             :icon="useRenderIcon(AddFill)"
             @click="openDialog()"
@@ -131,7 +132,11 @@ const {
             @confirm="handleDeleteBatch"
           >
             <template #reference>
-              <el-button type="danger" :icon="useRenderIcon(Delete)">
+              <el-button
+                v-auth="['system:tenant:del:batch']"
+                type="danger"
+                :icon="useRenderIcon(Delete)"
+              >
                 删除
               </el-button>
             </template>
@@ -165,6 +170,7 @@ const {
           >
             <template #operation="{ row }">
               <el-button
+                v-auth="['system:dict:edit']"
                 class="reset-margin"
                 link
                 type="primary"
@@ -180,6 +186,7 @@ const {
               >
                 <template #reference>
                   <el-button
+                    v-auth="['system:dict:del']"
                     class="reset-margin"
                     link
                     type="danger"

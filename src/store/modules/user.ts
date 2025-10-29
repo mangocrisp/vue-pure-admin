@@ -13,7 +13,8 @@ import {
   setToken,
   removeToken,
   userKey,
-  updateTokenInfo
+  updateTokenInfo,
+  isROOTRole
 } from "@/utils/auth";
 import { useEncrypt } from "@/hooks";
 import Auth from "@/api/auth";
@@ -122,7 +123,7 @@ export const useUserStore = defineStore("pure-user", {
               username: myInfo.username,
               nickname: myInfo.nickname,
               roles: myInfo.roles,
-              permissions: undefined,
+              permissions: isROOTRole(myInfo.roles) ? ["*:*:*"] : undefined,
               accessToken: loginResult.access_token,
               refreshToken: loginResult.refresh_token,
               expires,
@@ -150,7 +151,7 @@ export const useUserStore = defineStore("pure-user", {
         username: myInfo.username,
         nickname: myInfo.nickname,
         roles: myInfo.roles,
-        permissions: undefined,
+        permissions: isROOTRole(myInfo.roles) ? ["*:*:*"] : undefined,
         deptIds: myInfo.deptIds
       };
       updateTokenInfo(token);

@@ -154,6 +154,7 @@ onMounted(() => {
       >
         <template #buttons>
           <el-button
+            v-auth="['system:role:add']"
             type="primary"
             :icon="useRenderIcon(AddFill)"
             @click="openDialog()"
@@ -167,7 +168,11 @@ onMounted(() => {
             @confirm="handleDeleteBatch"
           >
             <template #reference>
-              <el-button type="danger" :icon="useRenderIcon(Delete)">
+              <el-button
+                v-auth="['system:role:del:batch']"
+                type="danger"
+                :icon="useRenderIcon(Delete)"
+              >
                 删除
               </el-button>
             </template>
@@ -199,6 +204,7 @@ onMounted(() => {
           >
             <template #operation="{ row }">
               <el-button
+                v-auth="['system:role:edit']"
                 class="reset-margin"
                 link
                 type="primary"
@@ -214,6 +220,7 @@ onMounted(() => {
               >
                 <template #reference>
                   <el-button
+                    v-auth="['system:role:del']"
                     class="reset-margin"
                     link
                     type="danger"
@@ -225,6 +232,7 @@ onMounted(() => {
                 </template>
               </el-popconfirm>
               <el-button
+                v-auth="['system:role:edit']"
                 class="reset-margin"
                 link
                 type="success"
