@@ -258,7 +258,7 @@ const {
                     </el-dropdown-item>
                     <el-dropdown-item>
                       <el-button
-                        v-auth="['system:user:edit']"
+                        v-auth="['system:tenant:user:allot']"
                         :class="buttonClass"
                         link
                         type="primary"
