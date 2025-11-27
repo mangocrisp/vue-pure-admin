@@ -219,7 +219,9 @@ function openWebSocket() {
                 ElNotification({
                   title: title,
                   dangerouslyUseHTMLString: true,
-                  message: `<img style="width: 30px;height: 30px;vertical-align: bottom;border-radius: 50%;position: absolute;left: 10px" src="${base64Data}"/> <span>${data.message}</span>`,
+                  message: base64Data
+                    ? `<img style="width: 30px;height: 30px;vertical-align: bottom;border-radius: 50%;position: absolute;left: 10px" src="${base64Data}"/> <span>${data.message}</span>`
+                    : `<span>${data.message}</span>`,
                   icon: useRenderIcon(BellIcon, { color: "#409EFF" }),
                   position: "bottom-right",
                   onClick: () => {
