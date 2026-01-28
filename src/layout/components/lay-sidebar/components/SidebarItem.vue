@@ -21,6 +21,7 @@ import ArrowUp from "~icons/ep/arrow-up-bold";
 import EpArrowDown from "~icons/ep/arrow-down-bold";
 import ArrowLeft from "~icons/ep/arrow-left-bold";
 import ArrowRight from "~icons/ep/arrow-right-bold";
+import { useRouteNoticeStoreHook } from "@/store/modules/route-notice";
 
 const attrs = useAttrs();
 const { layout, isCollapse, tooltipEffect, getDivStyle } = useNav();
@@ -127,6 +128,23 @@ function resolvePath(routePath) {
     return posix.resolve(props.basePath, routePath);
   }
 }
+
+// ==================== 菜单内的通知数量 start
+
+const useRouteNoticeStore = useRouteNoticeStoreHook();
+
+/**
+ * 当前菜单项是否有子菜单有通知
+ */
+const hasChildrenNotice = computed(() => {
+  const item = props.item;
+  if (!item.children || item.children.length === 0) return false;
+  return item.children.some(
+    child => useRouteNoticeStore.notice(child.name).value > 0
+  );
+});
+
+// ==================== 菜单内的通知数量 end
 </script>
 
 <template>
@@ -185,6 +203,12 @@ function resolvePath(routePath) {
           >
             {{ transformI18n(onlyOneChild.meta.title) }}
           </ReText>
+          <el-badge
+            v-if="useRouteNoticeStore.notice(onlyOneChild.name).value > 0"
+            :value="useRouteNoticeStore.notice(onlyOneChild.name).value"
+            :max="99"
+            class="mt-[-25px]"
+          />
           <SidebarExtraIcon :extraIcon="onlyOneChild.meta.extraIcon" />
         </div>
       </template>
@@ -224,6 +248,7 @@ function resolvePath(routePath) {
       >
         {{ transformI18n(item.meta.title) }}
       </ReText>
+      <el-badge v-if="hasChildrenNotice" is-dot class="mt-[-35px]" />
       <SidebarExtraIcon v-if="!isCollapse" :extraIcon="item.meta.extraIcon" />
     </template>
 

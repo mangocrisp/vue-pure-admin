@@ -25,5 +25,6 @@ export type {
   multiType,
   cacheType,
   positionType,
-  SystemDictConfigType
+  SystemDictConfigType,
+  RouteNoticeType
 } from "./types";

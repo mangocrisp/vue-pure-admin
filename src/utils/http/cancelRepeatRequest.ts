@@ -24,7 +24,7 @@ class CancelRepeatRequest {
   set(config: PureHttpRequestConfig) {
     if (config.isCancelRepeat) return;
     const reqKey = getReqKey(config);
-    console.log(reqKey);
+    // console.log(reqKey);
     if (reqKey.length > 2000) {
       // 如果 key 太长了，就直接返回了，太长了，过滤不了
       return;
@@ -47,7 +47,7 @@ class CancelRepeatRequest {
   del(config: PureHttpRequestConfig) {
     if (config.isCancelRepeat) return;
     const reqKey = getReqKey(config);
-    console.log(reqKey);
+    // console.log(reqKey);
     this.pendingRequestMap.delete(reqKey);
   }
 }

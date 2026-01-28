@@ -11,6 +11,7 @@ import IcBaselineMessage from "~icons/ic/baseline-message";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import SystemNoticeApi from "@/api/system/notice";
 import { $t } from "@/plugins/i18n";
+import { useRouteNoticeStoreHook } from "@/store/modules/route-notice";
 
 const { t } = useI18n();
 const noticesNum = ref("0");
@@ -147,6 +148,11 @@ const noticeDropdownRef = ref(null);
 const useWebSocketStore = useWebSocketStoreHook();
 
 const scrollbarRefs = ref({});
+
+// ==================== 路由通知 start
+
+const routeNoticeStore = useRouteNoticeStoreHook();
+// =================== 路由通知 end
 function openWebSocket() {
   useWebSocketStore.connect().then(webSocket => {
     webSocket.onmessage = event => {
@@ -162,6 +168,7 @@ function openWebSocket() {
           });
         } else {
           if (data.topic == "simple") {
+            // 简单通知消息，只在右下角弹出
             if (data.fromUser) {
               if (data.name) {
                 title = "来自用户[" + data.name + "]的消息";
@@ -203,6 +210,7 @@ function openWebSocket() {
               });
             }
           } else if (NoticeType.indexOf(data.topic) !== -1) {
+            // 系统通知、消息、待办 等需要计数的通知,在右上角的通知菜单中展示
             noticesTopicNum.value[data.topic] += 1;
             noticesNumCount(1);
             const noticeItem = notices.value.find(n => n.key === data.topic);
@@ -262,6 +270,15 @@ function openWebSocket() {
                 });
               }
             );
+          } else if (data.topic == "route-notice") {
+            // 路由通知，需要更新路由通知状态
+            // routeNoticeStore.SET_NOTICE("", 1);
+            // console.log(data.data);
+            if (data.data) {
+              for (const [key, value] of Object.entries(data.data)) {
+                routeNoticeStore.SET_NOTICE(key, value as number);
+              }
+            }
           } else {
             ElNotification({
               title: title,

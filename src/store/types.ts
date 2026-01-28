@@ -65,3 +65,7 @@ export type SystemDictConfigType = {
   dict: SystemDictType.DictsType;
   params: SystemParamsType.ParamsType;
 };
+
+export type RouteNoticeType = {
+  [x: string]: number;
+};
