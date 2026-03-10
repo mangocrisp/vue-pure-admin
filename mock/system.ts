@@ -52,6 +52,8 @@ export default defineFakeRoute([
       return {
         mock: true,
         success: true,
+        code: 0,
+        message: "操作成功",
         data: {
           list,
           total: list.length, // 总条目数
@@ -69,6 +71,8 @@ export default defineFakeRoute([
       return {
         mock: true,
         success: true,
+        code: 0,
+        message: "操作成功",
         data: [
           { id: 1, name: "超级管理员" },
           { id: 2, name: "普通角色" }
@@ -86,12 +90,16 @@ export default defineFakeRoute([
           return {
             mock: true,
             success: true,
+            code: 0,
+            message: "操作成功",
             data: [1]
           };
         } else if (body.userId == 2) {
           return {
             mock: true,
             success: true,
+            code: 0,
+            message: "操作成功",
             data: [2]
           };
         }
@@ -99,6 +107,8 @@ export default defineFakeRoute([
         return {
           mock: true,
           success: false,
+          code: 10001,
+          message: "请求参数缺失或格式不正确",
           data: []
         };
       }
@@ -137,6 +147,8 @@ export default defineFakeRoute([
       return {
         mock: true,
         success: true,
+        code: 0,
+        message: "操作成功",
         data: {
           list,
           total: list.length, // 总条目数
@@ -154,6 +166,8 @@ export default defineFakeRoute([
       return {
         mock: true,
         success: true,
+        code: 0,
+        message: "操作成功",
         data: [
           // 外部页面
           {
@@ -359,6 +373,8 @@ export default defineFakeRoute([
         return {
           mock: true,
           success: true,
+          code: 0,
+          message: "操作成功",
           data: [
             100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 200, 201,
             202, 203, 204, 205, 300, 301, 302, 303, 304, 400, 401, 402, 403,
@@ -369,6 +385,8 @@ export default defineFakeRoute([
         return {
           mock: true,
           success: true,
+          code: 0,
+          message: "操作成功",
           data: [
             100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 404, 500,
             501, 502, 503
@@ -385,6 +403,8 @@ export default defineFakeRoute([
       return {
         mock: true,
         success: true,
+        code: 0,
+        message: "操作成功",
         data: [
           // 外部页面
           {
@@ -1267,6 +1287,8 @@ export default defineFakeRoute([
       return {
         mock: true,
         success: true,
+        code: 0,
+        message: "操作成功",
         data: [
           {
             name: "杭州总公司",
@@ -1431,6 +1453,8 @@ export default defineFakeRoute([
       return {
         mock: true,
         success: true,
+        code: 0,
+        message: "操作成功",
         data: {
           list,
           total: list.length, // 总条目数
@@ -1476,6 +1500,8 @@ export default defineFakeRoute([
       return {
         mock: true,
         success: true,
+        code: 0,
+        message: "操作成功",
         data: {
           list,
           total: list.length, // 总条目数
@@ -1523,6 +1549,8 @@ export default defineFakeRoute([
       return {
         mock: true,
         success: true,
+        code: 0,
+        message: "操作成功",
         data: {
           list,
           total: list.length, // 总条目数
@@ -1582,6 +1610,8 @@ export default defineFakeRoute([
       return {
         mock: true,
         success: true,
+        code: 0,
+        message: "操作成功",
         data: {
           list,
           total: list.length, // 总条目数
@@ -1616,7 +1646,8 @@ export default defineFakeRoute([
             "Content-Length": 17019
           },
           responseBody: {
-            success: true,
+            code: 0,
+            message: "操作成功",
             data: [
               {
                 parentId: 0,

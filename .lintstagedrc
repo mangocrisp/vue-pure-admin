@@ -4,11 +4,9 @@
     "eslint --cache --fix"
   ],
   "{!(package)*.json,*.code-snippets,.!({browserslist,npm,nvm})*rc}": [
-    "prettier --cache --write--parser json"
+    "prettier --cache --write --parser json"
   ],
-  "package.json": [
-    "prettier --cache --write"
-  ],
+  "package.json": ["prettier --cache --write"],
   "*.vue": [
     "prettier --write",
     "eslint --cache --fix",
@@ -18,7 +16,5 @@
     "prettier --cache --ignore-unknown --write",
     "stylelint --fix --allow-empty-input"
   ],
-  "*.md": [
-    "prettier --cache --ignore-unknown --write"
-  ]
+  "*.md": ["prettier --cache --ignore-unknown --write"]
 }

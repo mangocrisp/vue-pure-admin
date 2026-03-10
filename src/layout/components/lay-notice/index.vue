@@ -6,12 +6,14 @@ import NoticeList from "./components/NoticeList.vue";
 import { useWebSocketStoreHook } from "@/store/modules/websocket";
 import { ElNotification } from "element-plus";
 
-import BellIcon from "~icons/ep/bell";
 import IcBaselineMessage from "~icons/ic/baseline-message";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import SystemNoticeApi from "@/api/system/notice";
 import { $t } from "@/plugins/i18n";
 import { useRouteNoticeStoreHook } from "@/store/modules/route-notice";
+
+import BellIcon from "~icons/lucide/bell";
+import ArrowRightIcon from "~icons/ri/arrow-right-s-line";
 
 const { t } = useI18n();
 const noticesNum = ref("0");
@@ -143,7 +145,7 @@ const loadMore = async description => {
   data.records.forEach(item => noticeItem.list.push(convertNoticeItem(item)));
 };
 
-const noticeDropdownRef = ref(null);
+const dropdownRef = ref(null);
 
 const useWebSocketStore = useWebSocketStoreHook();
 
@@ -235,8 +237,8 @@ function openWebSocket() {
                   onClick: () => {
                     activeKey.value = data.topic;
                     // 打开下拉菜单
-                    if (noticeDropdownRef.value) {
-                      (noticeDropdownRef.value as any).handleOpen();
+                    if (dropdownRef.value) {
+                      (dropdownRef.value as any).handleOpen();
                       setTimeout(() => {
                         scrollbarRefs.value[data.topic]?.scrollTo({
                           top: 0,
@@ -257,8 +259,8 @@ function openWebSocket() {
                   onClick: () => {
                     activeKey.value = data.topic;
                     // 打开下拉菜单
-                    if (noticeDropdownRef.value) {
-                      (noticeDropdownRef.value as any).handleOpen();
+                    if (dropdownRef.value) {
+                      (dropdownRef.value as any).handleOpen();
                       setTimeout(() => {
                         scrollbarRefs.value[data.topic]?.scrollTo({
                           top: 0,
@@ -293,6 +295,32 @@ function openWebSocket() {
   });
 }
 
+const currentNoticeHasData = computed(() => {
+  const currentNotice = notices.value.find(
+    item => item.key === activeKey.value
+  );
+  return currentNotice && currentNotice.list.length > 0;
+});
+
+const hasAnyNoticeData = computed(() => {
+  return notices.value.some(
+    item => Array.isArray(item.list) && item.list.length > 0
+  );
+});
+
+const onWatchMore = () => {
+  dropdownRef.value.handleClose();
+};
+
+const onMarkAsRead = () => {
+  const currentNotice = notices.value.find(
+    item => item.key === activeKey.value
+  );
+  if (currentNotice) {
+    currentNotice.list = [];
+  }
+};
+
 onMounted(() => {
   loadNoticeData();
   useWebSocketStore.disconnect();
@@ -304,16 +332,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <el-dropdown ref="noticeDropdownRef" trigger="click" placement="bottom-end">
+  <el-dropdown ref="dropdownRef" trigger="click" placement="bottom-end">
     <span
-      :class="[
-        'dropdown-badge',
-        'navbar-bg-hover',
-        'select-none',
-        Number(noticesNum) !== 0 && 'mr-[10px]'
-      ]"
+      :class="['dropdown-badge', 'navbar-bg-hover', 'select-none', 'mr-1.75']"
     >
-      <el-badge :value="Number(noticesNum) === 0 ? '' : noticesNum" :max="99">
+      <el-badge is-dot :hidden="!hasAnyNoticeData">
         <span class="header-notice-icon">
           <IconifyIconOffline :icon="BellIcon" />
         </span>
@@ -337,7 +360,7 @@ onMounted(() => {
               <el-tab-pane :label="getLabel(item)" :name="`${item.key}`">
                 <el-scrollbar
                   :ref="el => (scrollbarRefs[item.key] = el)"
-                  max-height="330px"
+                  max-height="345px"
                   @end-reached="loadMore"
                 >
                   <div class="noticeList-container">
@@ -348,12 +371,54 @@ onMounted(() => {
             </template>
           </span>
         </el-tabs>
+        <div
+          v-if="currentNoticeHasData"
+          class="border-t border-t-(--el-border-color-light) text-sm"
+        >
+          <div class="flex-bc m-1">
+            <el-button type="primary" size="small" text @click="onWatchMore">
+              {{ t("buttons.pureWatchMore") }}
+              <IconifyIconOffline :icon="ArrowRightIcon" />
+            </el-button>
+            <el-button type="primary" size="small" text @click="onMarkAsRead">
+              {{ t("buttons.pureMarkAsRead") }}
+            </el-button>
+          </div>
+        </div>
       </el-dropdown-menu>
     </template>
   </el-dropdown>
 </template>
 
 <style lang="scss" scoped>
+/* ”铃铛“摇晃衰减动画 */
+@keyframes pure-bell-ring {
+  0%,
+  100% {
+    transform-origin: top;
+  }
+
+  15% {
+    transform: rotateZ(10deg);
+  }
+
+  30% {
+    transform: rotateZ(-10deg);
+  }
+
+  45% {
+    transform: rotateZ(5deg);
+  }
+
+  60% {
+    transform: rotateZ(-5deg);
+  }
+
+  75% {
+    transform: rotateZ(2deg);
+  }
+}
+
 .dropdown-badge {
   display: flex;
   align-items: center;
@@ -363,7 +428,13 @@ onMounted(() => {
   cursor: pointer;
 
   .header-notice-icon {
-    font-size: 18px;
+    font-size: 16px;
+  }
+
+  &:hover {
+    .header-notice-icon svg {
+      animation: pure-bell-ring 1s both;
+    }
   }
 }
 

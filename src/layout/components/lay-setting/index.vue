@@ -37,7 +37,7 @@ const horizontalRef = ref();
 
 const {
   dataTheme,
-  overallStyle,
+  themeMode,
   layoutTheme,
   themeColors,
   toggleClass,
@@ -50,20 +50,25 @@ if (unref(layoutTheme)) {
   const layout = unref(layoutTheme).layout;
   const theme = unref(layoutTheme).theme;
   document.documentElement.setAttribute("data-theme", theme);
-  setLayoutModel(layout);
+  setMenuLayout(layout);
 }
 
-/** 默认灵动模式 */
-const markValue = ref($storage.configure?.showModel ?? "smart");
+/** 页签风格默认为谷歌风格 */
+const tagsStyleValue = ref($storage.configure?.tagsStyle ?? "chrome");
 
 const logoVal = ref($storage.configure?.showLogo ?? true);
+
+const watermarkConfigs = reactive({
+  enable: $storage.configure.watermark,
+  text: $storage.configure.watermarkText
+});
 
 const settings = reactive({
   greyVal: $storage.configure.grey,
   weakVal: $storage.configure.weak,
   tabsVal: $storage.configure.hideTabs,
   showLogo: $storage.configure.showLogo,
-  showModel: $storage.configure.showModel,
+  tagsStyle: $storage.configure.tagsStyle,
   hideFooter: $storage.configure.hideFooter,
   multiTagsCache: $storage.configure.multiTagsCache,
   stretch: $storage.configure.stretch
@@ -124,9 +129,17 @@ const multiTagsCacheChange = () => {
 
 function onChange({ option }) {
   const { value } = option;
-  markValue.value = value;
-  storageConfigureChange("showModel", value);
-  emitter.emit("tagViewsShowModel", value);
+  tagsStyleValue.value = value;
+  storageConfigureChange("tagsStyle", value);
+  emitter.emit("tagViewsTagsStyle", value);
+}
+
+function onWatermarkSwitchChange(value) {
+  storageConfigureChange("watermark", value);
+}
+
+function onWatermarkInputChange(text) {
+  storageConfigureChange("watermarkText", text);
 }
 
 /** 侧边栏Logo */
@@ -189,30 +202,30 @@ const getThemeColor = computed(() => {
 });
 
 const pClass = computed(() => {
-  return ["mb-[12px]!", "font-medium", "text-sm", "dark:text-white"];
+  return ["mb-3!", "font-medium", "text-sm", "dark:text-white"];
 });
 
 const themeOptions = computed<Array<OptionsType>>(() => {
   return [
     {
-      label: t("panel.pureOverallStyleLight"),
+      label: t("panel.pureThemeModeLight"),
       icon: DayIcon,
       theme: "light",
-      tip: t("panel.pureOverallStyleLightTip"),
+      tip: t("panel.pureThemeModeLightTip"),
       iconAttrs: { fill: isDark.value ? "#fff" : "#000" }
     },
     {
-      label: t("panel.pureOverallStyleDark"),
+      label: t("panel.pureThemeModeDark"),
       icon: DarkIcon,
       theme: "dark",
-      tip: t("panel.pureOverallStyleDarkTip"),
+      tip: t("panel.pureThemeModeDarkTip"),
       iconAttrs: { fill: isDark.value ? "#fff" : "#000" }
     },
     {
-      label: t("panel.pureOverallStyleSystem"),
+      label: t("panel.pureThemeModeSystem"),
       icon: SystemIcon,
       theme: "system",
-      tip: t("panel.pureOverallStyleSystemTip"),
+      tip: t("panel.pureThemeModeSystemTip"),
       iconAttrs: { fill: isDark.value ? "#fff" : "#000" }
     }
   ];
@@ -238,8 +251,8 @@ const markOptions = computed<Array<OptionsType>>(() => {
   ];
 });
 
-/** 设置导航模式 */
-function setLayoutModel(layout: string) {
+/** 设置菜单布局 */
+function setMenuLayout(layout: string) {
   layoutTheme.value.layout = layout;
   window.document.body.setAttribute("layout", layout);
   $storage.layout = {
@@ -249,7 +262,7 @@ function setLayoutModel(layout: string) {
     sidebarStatus: $storage.layout?.sidebarStatus,
     epThemeColor: $storage.layout?.epThemeColor,
     themeColor: $storage.layout?.themeColor,
-    overallStyle: $storage.layout?.overallStyle
+    themeMode: $storage.layout?.themeMode
   };
   useAppStoreHook().setLayout(layout);
 }
@@ -276,15 +289,15 @@ watch($storage, ({ layout }) => {
 
 const mediaQueryList = window.matchMedia("(prefers-color-scheme: dark)");
 
-/** 根据操作系统主题设置平台整体风格 */
+/** 根据操作系统主题设置平台主题模式 */
 function updateTheme() {
-  if (overallStyle.value !== "system") return;
+  if (themeMode.value !== "system") return;
   if (mediaQueryList.matches) {
     dataTheme.value = true;
   } else {
     dataTheme.value = false;
   }
-  dataThemeChange(overallStyle.value);
+  dataThemeChange(themeMode.value);
 }
 
 function removeMatchMedia() {
@@ -317,18 +330,18 @@ onUnmounted(() => removeMatchMedia);
 <template>
   <LayPanel>
     <div class="p-5">
-      <p :class="pClass">{{ t("panel.pureOverallStyle") }}</p>
+      <p :class="pClass">{{ t("panel.pureThemeMode") }}</p>
       <Segmented
         resize
         class="select-none"
-        :modelValue="overallStyle === 'system' ? 2 : dataTheme ? 1 : 0"
+        :modelValue="themeMode === 'system' ? 2 : dataTheme ? 1 : 0"
         :options="themeOptions"
         @change="
           theme => {
             theme.index === 1 && theme.index !== 2
               ? (dataTheme = true)
               : (dataTheme = false);
-            overallStyle = theme.option.theme;
+            themeMode = theme.option.theme;
             dataThemeChange(theme.option.theme);
             theme.index === 2 && watchSystemThemeChange();
           }
@@ -345,8 +358,8 @@ onUnmounted(() => removeMatchMedia);
           @click="setLayoutThemeColor(item.themeColor)"
         >
           <el-icon
-            style="margin: 0.1em 0.1em 0 0"
-            :size="17"
+            class="mt-px"
+            :size="20"
             :color="getThemeColor(item.themeColor)"
           >
             <IconifyIconOffline :icon="Check" />
@@ -354,7 +367,7 @@ onUnmounted(() => removeMatchMedia);
         </li>
       </ul>
 
-      <p :class="['mt-5!', pClass]">{{ t("panel.pureLayoutModel") }}</p>
+      <p :class="['mt-5!', pClass]">{{ t("panel.pureMenuLayout") }}</p>
       <ul class="pure-theme">
         <li
           ref="verticalRef"
@@ -363,7 +376,7 @@ onUnmounted(() => removeMatchMedia);
             zIndex: 41000
           }"
           :class="layoutTheme.layout === 'vertical' ? 'is-select' : ''"
-          @click="setLayoutModel('vertical')"
+          @click="setMenuLayout('vertical')"
         >
           <div />
           <div />
@@ -376,7 +389,7 @@ onUnmounted(() => removeMatchMedia);
             zIndex: 41000
           }"
           :class="layoutTheme.layout === 'horizontal' ? 'is-select' : ''"
-          @click="setLayoutModel('horizontal')"
+          @click="setMenuLayout('horizontal')"
         >
           <div />
           <div />
@@ -389,7 +402,7 @@ onUnmounted(() => removeMatchMedia);
             zIndex: 41000
           }"
           :class="layoutTheme.layout === 'mix' ? 'is-select' : ''"
-          @click="setLayoutModel('mix')"
+          @click="setMenuLayout('mix')"
         >
           <div />
           <div />
@@ -416,7 +429,7 @@ onUnmounted(() => removeMatchMedia);
         <button
           v-else
           v-ripple="{ class: 'text-gray-300' }"
-          class="bg-transparent flex-c w-full h-20 rounded-md border border-[var(--pure-border-color)]"
+          class="bg-transparent flex-c w-full h-20 rounded-md border border-(--pure-border-color)"
           @click="setStretch(!settings.stretch)"
         >
           <div
@@ -438,39 +451,51 @@ onUnmounted(() => removeMatchMedia);
         </button>
       </span>
 
-      <p :class="['mt-4!', pClass]">{{ t("panel.pureTagsStyle") }}</p>
+      <p :class="['mt-5!', pClass]">{{ t("panel.pureTagsStyle") }}</p>
       <Segmented
         resize
         class="select-none"
-        :modelValue="markValue === 'smart' ? 0 : markValue === 'card' ? 1 : 2"
+        :modelValue="
+          tagsStyleValue === 'smart' ? 0 : tagsStyleValue === 'card' ? 1 : 2
+        "
         :options="markOptions"
         @change="onChange"
       />
 
       <p class="mt-5! font-medium text-sm dark:text-white">
-        {{ t("panel.pureInterfaceDisplay") }}
+        {{ t("panel.pureFullScreenWatermark") }}
       </p>
       <ul class="setting">
         <li>
-          <span class="dark:text-white">{{ t("panel.pureGreyModel") }}</span>
+          <span class="dark:text-white">
+            {{ t("panel.pureEnableWatermark") }}
+          </span>
           <el-switch
-            v-model="settings.greyVal"
+            v-model="watermarkConfigs.enable"
             inline-prompt
             :active-text="t('buttons.pureOpenText')"
             :inactive-text="t('buttons.pureCloseText')"
-            @change="greyChange"
+            @change="onWatermarkSwitchChange"
           />
         </li>
-        <li>
-          <span class="dark:text-white">{{ t("panel.pureWeakModel") }}</span>
-          <el-switch
-            v-model="settings.weakVal"
-            inline-prompt
-            :active-text="t('buttons.pureOpenText')"
-            :inactive-text="t('buttons.pureCloseText')"
-            @change="weekChange"
+        <li v-if="watermarkConfigs.enable" v-motion-fade>
+          <span class="dark:text-white">
+            {{ t("panel.pureWatermarkText") }}
+          </span>
+          <el-input
+            v-model="watermarkConfigs.text"
+            class="w-32!"
+            clearable
+            :placeholder="t('panel.pureWatermarkTextPlaceholder')"
+            @input="onWatermarkInputChange"
           />
         </li>
+      </ul>
+
+      <p class="mt-3! font-medium text-sm dark:text-white">
+        {{ t("panel.pureInterfaceDisplay") }}
+      </p>
+      <ul class="setting">
         <li>
           <span class="dark:text-white">{{ t("panel.pureHiddenTags") }}</span>
           <el-switch
@@ -492,6 +517,18 @@ onUnmounted(() => removeMatchMedia);
           />
         </li>
         <li>
+          <span class="dark:text-white">
+            {{ t("panel.pureMultiTagsCache") }}
+          </span>
+          <el-switch
+            v-model="settings.multiTagsCache"
+            inline-prompt
+            :active-text="t('buttons.pureOpenText')"
+            :inactive-text="t('buttons.pureCloseText')"
+            @change="multiTagsCacheChange"
+          />
+        </li>
+        <li>
           <span class="dark:text-white">Logo</span>
           <el-switch
             v-model="logoVal"
@@ -504,15 +541,23 @@ onUnmounted(() => removeMatchMedia);
           />
         </li>
         <li>
-          <span class="dark:text-white">
-            {{ t("panel.pureMultiTagsCache") }}
-          </span>
+          <span class="dark:text-white">{{ t("panel.pureGreyModel") }}</span>
           <el-switch
-            v-model="settings.multiTagsCache"
+            v-model="settings.greyVal"
             inline-prompt
             :active-text="t('buttons.pureOpenText')"
             :inactive-text="t('buttons.pureCloseText')"
-            @change="multiTagsCacheChange"
+            @change="greyChange"
+          />
+        </li>
+        <li>
+          <span class="dark:text-white">{{ t("panel.pureWeakModel") }}</span>
+          <el-switch
+            v-model="settings.weakVal"
+            inline-prompt
+            :active-text="t('buttons.pureOpenText')"
+            :inactive-text="t('buttons.pureCloseText')"
+            @change="weekChange"
           />
         </li>
       </ul>
@@ -538,17 +583,24 @@ onUnmounted(() => removeMatchMedia);
 }
 
 .theme-color {
-  height: 20px;
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
 
   li {
-    float: left;
-    height: 20px;
-    margin-right: 8px;
+    position: relative;
+    width: 21px;
+    height: 21px;
     cursor: pointer;
     border-radius: 4px;
+    box-shadow: rgb(0 0 0 / 15%) 0 0 0 1px inset;
+    transition: all 0.2s ease;
 
-    &:nth-child(1) {
-      border: 1px solid #ddd;
+    &:hover {
+      box-shadow:
+        rgb(0 0 0 / 25%) 0 0 0 1px inset,
+        0 2px 4px rgb(0 0 0 / 15%);
+      transform: scale(1.1);
     }
   }
 }

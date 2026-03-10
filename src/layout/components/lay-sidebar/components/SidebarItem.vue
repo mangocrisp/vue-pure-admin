@@ -72,7 +72,7 @@ const textClass = computed(() => {
     ((layout.value === "vertical" && item.parentId === null) ||
       (layout.value === "mix" && item.pathList.length === 2))
   ) {
-    return `${baseClass} min-w-[54px]! text-center! px-3!`;
+    return `${baseClass} min-w-13.5! text-center! px-3!`;
   }
   return baseClass;
 });
@@ -187,7 +187,7 @@ const hasChildrenNotice = computed(() => {
             item?.pathList?.length === 2)
         "
         truncated
-        class="w-full! px-3! min-w-[54px]! text-center! text-inherit!"
+        class="w-full! px-3! min-w-13.5! text-center! text-inherit!"
       >
         {{ transformI18n(onlyOneChild.meta.title) }}
       </el-text>
@@ -207,7 +207,7 @@ const hasChildrenNotice = computed(() => {
             v-if="useRouteNoticeStore.notice(onlyOneChild.name).value > 0"
             :value="useRouteNoticeStore.notice(onlyOneChild.name).value"
             :max="99"
-            class="mt-[-25px]"
+            class="-mt-6.25"
           />
           <SidebarExtraIcon :extraIcon="onlyOneChild.meta.extraIcon" />
         </div>
@@ -248,7 +248,7 @@ const hasChildrenNotice = computed(() => {
       >
         {{ transformI18n(item.meta.title) }}
       </ReText>
-      <el-badge v-if="hasChildrenNotice" is-dot class="mt-[-35px]" />
+      <el-badge v-if="hasChildrenNotice" is-dot class="-mt-8.75" />
       <SidebarExtraIcon v-if="!isCollapse" :extraIcon="item.meta.extraIcon" />
     </template>
 

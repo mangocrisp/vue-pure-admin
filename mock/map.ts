@@ -35,6 +35,8 @@ export default defineFakeRoute([
       return {
         mock: true,
         success: true,
+        code: 0,
+        message: "操作成功",
         data: mapList()
       };
     }

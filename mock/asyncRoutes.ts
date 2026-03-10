@@ -327,6 +327,8 @@ export default defineFakeRoute([
     method: "get",
     response: () => {
       return {
+        code: 0,
+        message: "操作成功",
         mock: true,
         success: true,
         data: [

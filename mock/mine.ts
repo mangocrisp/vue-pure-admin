@@ -10,6 +10,8 @@ export default defineFakeRoute([
       return {
         mock: true,
         success: true,
+        code: 0,
+        message: "操作成功",
         data: {
           avatar: "https://avatars.githubusercontent.com/u/44761321",
           username: "admin",
@@ -49,6 +51,8 @@ export default defineFakeRoute([
       return {
         mock: true,
         success: true,
+        code: 0,
+        message: "操作成功",
         data: {
           list,
           total: list.length, // 总条目数

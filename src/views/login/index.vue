@@ -63,8 +63,8 @@ const currentPage = computed(() => {
 const { t } = useI18n();
 const { initStorage } = useLayout();
 initStorage();
-const { dataTheme, overallStyle, dataThemeChange } = useDataThemeChange();
-dataThemeChange(overallStyle.value);
+const { dataTheme, themeMode, dataThemeChange } = useDataThemeChange();
+dataThemeChange(themeMode.value);
 const { title, getDropdownItemStyle, getDropdownItemClass } = useNav();
 const { locale, translationCh, translationEn } = useTranslationLang();
 
@@ -124,41 +124,33 @@ const onLogin = async (formEl: FormInstance | undefined) => {
           captcha_code: ruleForm.captcha_code,
           captcha_uuid: ruleForm.captcha_uuid
         })
-        .then(res => {
-          if (res.success) {
-            // 获取后端路由
-            return initRouter().then(async () => {
-              try {
-                disabled.value = true;
-                const redirect =
-                  (route?.query?.redirect as string) ?? getTopMenu(true).path;
-                if (redirect.startsWith("http")) {
-                  window.location.href = redirect;
-                } else if (redirect.startsWith("base64:")) {
-                  window.location.href = window.atob(redirect.substring(7));
-                } else if (redirect.startsWith("URIComponent:")) {
-                  window.location.href = decodeURIComponent(
-                    redirect.substring(13)
-                  );
-                } else {
-                  await router.push({ path: "/" });
-                  nextTick(() => {
-                    router.replace({ path: redirect });
-                  });
-                  // 没有历史记录，跳转到默认页面
-                  message(t("login.pureLoginSuccess"), { type: "success" });
-                }
-              } finally {
-                disabled.value = false;
+        .then(() => {
+          // 获取后端路由
+          return initRouter().then(async () => {
+            try {
+              disabled.value = true;
+              const redirect =
+                (route?.query?.redirect as string) ?? getTopMenu(true).path;
+              if (redirect.startsWith("http")) {
+                window.location.href = redirect;
+              } else if (redirect.startsWith("base64:")) {
+                window.location.href = window.atob(redirect.substring(7));
+              } else if (redirect.startsWith("URIComponent:")) {
+                window.location.href = decodeURIComponent(
+                  redirect.substring(13)
+                );
+              } else {
+                await router.push({ path: "/" });
+                nextTick(() => {
+                  router.replace({ path: redirect });
+                });
+                // 没有历史记录，跳转到默认页面
+                message(t("login.pureLoginSuccess"), { type: "success" });
               }
-            });
-          } else {
-            message(t("login.pureLoginFail"), { type: "error" });
-            // 需要输入验证码时
-            if (hasCaptcha.value) {
-              refreshCode();
+            } finally {
+              disabled.value = false;
             }
-          }
+          });
         })
         .catch(error => {
           message(t("login.pureLoginFail"), { type: "error" });
@@ -167,7 +159,10 @@ const onLogin = async (formEl: FormInstance | undefined) => {
             refreshCode();
           }
         })
-        .finally(() => (loading.value = false));
+        .finally(() => {
+          disabled.value = false;
+          loading.value = false;
+        });
     }
   });
 };
@@ -213,7 +208,7 @@ watch(loginDay, value => {
       <!-- 国际化 -->
       <el-dropdown trigger="click">
         <globalization
-          class="hover:text-primary hover:bg-[transparent]! w-[20px] h-[20px] ml-1.5 cursor-pointer outline-hidden duration-300"
+          class="hover:text-primary hover:bg-transparent! size-5 ml-1.5 cursor-pointer outline-hidden duration-300"
         />
         <template #dropdown>
           <el-dropdown-menu class="translation">
@@ -333,7 +328,7 @@ watch(loginDay, value => {
 
             <Motion :delay="250">
               <el-form-item>
-                <div class="w-full h-[20px] flex justify-between items-center">
+                <div class="w-full h-5 flex-bc">
                   <el-checkbox v-model="checked">
                     <span class="flex">
                       <select
@@ -384,7 +379,7 @@ watch(loginDay, value => {
 
             <Motion :delay="300">
               <el-form-item>
-                <div class="w-full h-[20px] flex justify-between items-center">
+                <div class="w-full h-5 flex-bc">
                   <el-button
                     v-for="(item, index) in operates"
                     :key="index"
@@ -457,7 +452,7 @@ watch(loginDay, value => {
 }
 
 .translation {
-  ::v-deep(.el-dropdown-menu__item) {
+  :deep(.el-dropdown-menu__item) {
     padding: 5px 40px;
   }
 
