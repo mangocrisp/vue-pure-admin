@@ -13,6 +13,8 @@ const websocketHost = import.meta.env.DEV
     location.host +
     "/api";
 
+const websocketURL = websocketHost + "/websocket/{userId}?jti={jti}";
+
 export const useWebSocketStore = defineStore("system-websocket", {
   state: () => {
     return {
@@ -20,7 +22,7 @@ export const useWebSocketStore = defineStore("system-websocket", {
       isConnected: false,
       isConnecting: false,
       error: undefined,
-      wsUrl: websocketHost + "/websocket/{userId}?jti={jti}" // TODO 这个地址可能由于单体架构和微服务架构不同，需要根据实际情况修改
+      wsUrl: websocketURL // TODO 这个地址可能由于单体架构和微服务架构不同，需要根据实际情况修改
     };
   },
   getters: {
@@ -38,7 +40,7 @@ export const useWebSocketStore = defineStore("system-websocket", {
      */
     createNewWebSocket(toUserId?: string[]): Promise<WebSocket> {
       const tokenCache = getToken();
-      this.wsUrl = this.wsUrl
+      this.wsUrl = websocketURL
         .replace("{userId}", useUserStore.id)
         .replace("{jti}", tokenCache.jti);
       // 如果有指定的用户ID，则添加到URL中，用于点对点通信
