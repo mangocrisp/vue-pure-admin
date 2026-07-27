@@ -15,7 +15,7 @@ const websocketHost = import.meta.env.DEV
 
 const websocketURL = websocketHost + "/websocket/{userId}?jti={jti}";
 
-export const useWebSocketStore = defineStore("system-websocket", {
+export const useWebSocketStore = defineStore("admin-websocket", {
   state: () => {
     return {
       webSocket: undefined as WebSocket | undefined,

@@ -94,7 +94,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
           preview-teleported={true}
           src={row.avatar || userAvatar}
           preview-src-list={Array.of(row.avatar || userAvatar)}
-          class="w-[24px] h-[24px] rounded-full align-middle"
+          class="size-6  rounded-full align-middle"
         />
       ),
       width: 90
@@ -233,8 +233,14 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     console.log(row);
   }
 
-  function handleDelete(row) {
-    message(`您删除了用户编号为${row.id}的这条数据`, { type: "success" });
+  async function handleDelete(row) {
+    const result = await SystemUserApi.remove(row.id);
+    console.log(result);
+    if (result.ok === true) {
+      message(`您删除了用户编号为${row.id}的这条数据`, { type: "success" });
+    } else {
+      message(`删除用户编号为${row.id}的这条数据失败`, { type: "error" });
+    }
     onSearch();
   }
 
@@ -261,13 +267,21 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   }
 
   /** 批量删除 */
-  function onbatchDel() {
+  async function onbatchDel() {
     // 返回当前选中的行
     const curSelected = tableRef.value.getTableRef().getSelectionRows();
-    // 接下来根据实际业务，通过选中行的某项数据，比如下面的id，调用接口进行批量删除
-    message(`已删除用户编号为 ${getKeyList(curSelected, "id")} 的数据`, {
-      type: "success"
-    });
+    const result = await SystemUserApi.batchRemove(
+      getKeyList(curSelected, "id")
+    );
+    if (result.ok === true) {
+      message(`已删除用户编号为 ${getKeyList(curSelected, "id")} 的数据`, {
+        type: "success"
+      });
+    } else {
+      message(`删除用户编号为 ${getKeyList(curSelected, "id")} 的数据失败`, {
+        type: "error"
+      });
+    }
     tableRef.value.getTableRef().clearSelection();
     onSearch();
   }
